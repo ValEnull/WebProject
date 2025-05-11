@@ -1,0 +1,1 @@
+mancano ancora le funzionalità legate ai pulsanti e la popup window dello user. Prossimamente aggiusto e aggiungo anche quelle.
