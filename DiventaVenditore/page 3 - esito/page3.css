@@ -1,0 +1,102 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: grid;
+    background-color: beige;
+}
+
+/* === header === */
+.myHeader {
+    /*background-color: rgb(15, 103, 22);
+    border: solid 1px rgb(15, 103, 22);*/
+    background-color: whitesmoke;
+    border: none;
+    border-bottom: solid 1px goldenrod;
+    text-decoration: underline;
+    color: rgb(235, 121, 80);
+    font-size: 1.2em;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 0.5em 1em;
+    gap: 1em;
+    align-items: center;
+    justify-content: center;
+}
+
+#logo {
+    border-radius: 50%;
+    height: 4em;
+    width: 4em;
+    max-width: 5em;
+    max-height: 5em;
+    flex-shrink: 0;
+}
+
+/* === main ===*/
+.container {
+    padding-top: 10%;
+    padding-bottom: 5%;
+}
+
+main {
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}
+
+main h1 {
+    color: rgb(235, 121, 80);
+    text-decoration: underline;
+    font-size: 3em;
+}
+
+main p {
+    color: rgb(85, 83, 83);
+    font-size: 2em;
+}
+
+/* === continue btn === */
+.divCenter {
+    justify-content: center;
+    display: flex;
+}
+
+.continueBTN {
+    width: auto;
+    height: 10em;
+    border: none;
+    border-radius: 5em;
+    background-color: rgb(235, 121, 80);
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    cursor: pointer;
+}
+
+.continueBTN:hover {
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.continueBTN a {
+    font-size: 2em;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    text-decoration: none;
+}
+
+.continueBTN a:hover {
+    text-decoration: underline;
+}
+
+/* === help buttons === */
+.linkContainer {
+    padding-top: 5%;
+    text-align: center;
+    padding-bottom: 2em;
+}
+
+.linkContainer a {
+    text-decoration: none;
+    color: rgb(14, 81, 189);
+    font-size: 1em;
+}
