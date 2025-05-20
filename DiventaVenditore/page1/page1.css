@@ -1,0 +1,313 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    /*background: linear-gradient(to right, beige, orange, orangered);*/ /*Per aggiungere uno sfondo più sfumato*/
+    width: fit-content;
+}
+
+/* === header === */
+.myHeader {
+    /*background-color: rgb(15, 103, 22);
+    border: solid 1px rgb(15, 103, 22);*/
+    background-color: whitesmoke;
+    border: none;
+    border-bottom: solid 1px goldenrod;
+    color: black;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 0.5em 1em;
+    gap: 1em;
+    align-items: center;
+    justify-content: center;
+}
+
+#logo {
+    border-radius: 50%;
+    height: 4em;
+    width: 4em;
+    max-width: 5em;
+    max-height: 5em;
+    flex-shrink: 0;
+}
+
+/* === main content === */
+#textContainer {
+    padding-bottom: 2em;
+    width: auto;
+    height: 25em;
+    /* text */
+    color: white;
+    text-align: center;
+    padding-top: 1em;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8); /* shadow for constrast */
+}
+
+/* === photo banner === */
+.slider {
+    margin-top: -20px;
+    margin-bottom: -20px;
+    padding-top: 10px;
+    padding-bottom: 2.6em;
+    height: 100%;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 1.5s ease-in-out;
+    opacity: 0;
+    animation: fadeIn 2s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* === text in the banner === */
+.title {
+    font-size: 5em;
+    font-weight: bold;
+    margin-bottom: -35px;
+}
+
+.text {
+    font-size: 1.5em;
+    font-style: italic;
+    margin-bottom: -0.8em;
+}
+
+/* === small text == */
+.whyUs {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    font-size: 1.5em;
+    padding-top: 1.5em;
+    padding-left: 25%;
+    padding-right: 25%;
+}
+
+/* === incons === */
+.iconsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.articolo{
+    flex: 1 1 300px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+#shield {
+    text-align: center;
+}
+
+.articolo i {
+    font-size: 2em;
+    display: flex;
+    justify-content: center;
+}
+
+.articolo h3 {
+    text-align: center;
+}
+
+.articolo p {
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .articolo {
+    flex: 100%; /* Su mobile, articoli in colonna */
+  }
+}
+
+#shield {
+    color: rgb(73, 65, 221);
+}
+
+#handshake {
+    color: rgb(164, 210, 225);
+}
+
+#heart {
+    color: red;
+}
+
+.iconsContainer p {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-weight: bold;
+    /*color: rgb(15, 103, 22);*/
+}
+
+/* === start button === */
+
+#buttonContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1em;
+}
+
+#startBTN {
+    /* button style */
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    height: fit-content;
+    width: auto;
+    background-color: rgb(15, 103, 22);
+    padding: 15px;
+
+    /* text style */
+    color: white;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+/* === help buttons === */
+.linkContainer {
+    text-align: center;
+}
+
+.linkContainer a {
+    text-decoration: none;
+    color: rgb(14, 81, 189);
+    font-size: 1em;
+}
+
+/* === line === */
+.barrier {
+    border: solid rgb(15, 103, 22) 1px;
+}
+
+/*=== discover us ===*/
+
+.discover {
+    background-color: beige;
+    display: grid;
+    text-align: center;
+    padding-top: 4em;
+    padding-bottom: 4em;
+}
+
+.discover h3 {
+    padding-bottom: 0.5em;
+    font-size: 2em;
+    line-height: 1em;
+}
+
+.why {
+    font-size: 1.5em;
+}
+
+.discover h4 {
+    font-size: 1.5em;
+}
+
+.piller {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.piller p {
+    flex: 1 1 300px;
+    font-size: 1.5em;
+    padding: 0.8em;
+    border-bottom: solid black 1px;
+    border-top: solid black 1px;
+    box-sizing: border-box;
+}
+
+/* footer customizations */
+
+footer {
+    
+
+    background-color: black;
+    /*background-color: rgb(15, 103, 22); /*Buon colore*/
+    /*background-color: rgb(0, 0, 0);*/
+    text-align: center;
+    padding: fit-content;
+    padding-top: 2.5em;
+    margin: 0;
+    overflow: hidden;
+}
+
+/* icons customizations */
+
+footer i {
+    width: fit-content;
+    max-width: 50px;
+    height: fit-content;
+    max-height: 50px;
+
+    cursor: pointer;
+    
+    font-size: 2em;
+    margin: 0 10px;
+    border: solid 1px #dedec3;
+    border-radius: 50%;
+    padding: 10px;
+    background-color: #dedec3;
+}
+
+/*
+#facebook {
+    color: #3b5998;
+}
+
+#ig {
+    color: #D300C5;
+}
+
+#X {
+    color: rgb(0, 0, 0);
+}
+
+#linkedin {
+    color: #0077b5;
+}
+
+#yt {
+    color: #ff0000;
+}
+*/
+
+/* link customizations */
+
+.linkContainerFooter {
+    margin-top: 1em;
+    padding-bottom: 1em;
+}
+
+footer a {
+    text-decoration: none;
+    color: white;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 1.5em;
+    padding: 1em;
+}
+
+.line {
+    border: solid 3px rgb(15, 103, 22);
+    width: 100%;
+}
+
+/* text customizations */
+#copyfake {
+    font-size: 0.6em;
+    color: white;
+    padding: 0.5em;
+    font-family: 'Times New Roman', Times, serif;
+    font-style: italic;
+}
