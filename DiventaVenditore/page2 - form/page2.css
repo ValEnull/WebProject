@@ -1,0 +1,124 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: grid;
+    background-color: beige;
+}
+
+/* === header === */
+.myHeader {
+    /*background-color: rgb(15, 103, 22);
+    border: solid 1px rgb(15, 103, 22);*/
+    background-color: whitesmoke;
+    border: none;
+    border-bottom: solid 1px goldenrod;
+    text-decoration: underline;
+    color: rgb(235, 121, 80);
+    font-size: 1.2em;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 0.5em 1em;
+    gap: 1em;
+    align-items: center;
+    justify-content: center;
+}
+
+#logo {
+    border-radius: 50%;
+    height: 4em;
+    width: 4em;
+    max-width: 5em;
+    max-height: 5em;
+    flex-shrink: 0;
+}
+
+/* === form title === */
+#title {
+    text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+    text-decoration: underline;
+    color: rgb(235, 121, 80);
+}
+
+/* === div center === */
+.divCenter {
+    display: flex;
+    justify-content: center;
+}
+
+/* === div form === */
+.registrationForm {
+    width: 40%;
+    height: fit-content;
+    padding: 2em;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+    border: none;
+    border-radius: 0.5em;
+    color: beige;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    background-color: rgb(235, 121, 80);
+    display: block;
+    line-height: 1.1;
+}
+
+.registrationForm input {
+    background-color: whitesmoke;
+    border: none;
+    border-radius: 0.5em;
+    width: 100%;
+    height: 2em;
+}
+
+/* Stile normale dell'input */
+input[type="text"], input[type="email"], input[type="password"] {
+  border: 2px solid #ccc;
+  padding: 8px;
+  border-radius: 4px;
+  outline: none; /* Rimuove l'outline predefinito del browser */
+  transition: border-color 0.3s ease; /* Aggiunge un'animazione fluida */
+}
+
+/* Stile quando l'input è selezionato (focus) */
+input[type="text"]:focus,  input[type="email"]:focus, input[type="password"]:focus {
+  border-color: rgb(153, 71, 71); /* Cambia questo colore a tuo piacimento */
+  /* Altri stili opzionali quando è selezionato */
+  box-shadow: 0 0 5px rgba(56, 57, 56, 0.5);
+}
+
+/* === registration btn === */
+#myBTN {
+    cursor: pointer;
+    border: solid 2px #ccc;
+    background-color: beige;
+    font-size: 0.7em;
+    width: auto;
+    height: 3em;
+    display: flex;
+    color: rgb(235, 121, 80);
+}
+
+#myBTN:hover {
+    box-shadow: 0 0 10px 2px hsla(23, 86%, 35%, 0.7);
+}
+
+#myBTN:active {
+    border: solid 2px hsl(16, 100%, 50%);
+    color: hsl(16, 100%, 50%);
+    text-decoration: underline;
+}
+
+/* === help buttons === */
+.linkContainer {
+    text-align: center;
+    padding-bottom: 2em;
+}
+
+.linkContainer a {
+    text-decoration: none;
+    color: rgb(14, 81, 189);
+    font-size: 1em;
+}
