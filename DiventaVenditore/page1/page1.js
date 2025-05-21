@@ -1,16 +1,16 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Array di immagini (sostituire con i propri percorsi)
     const images = [
-        '/final/img/fotoArtig/artigianato-handmade.jpg',
-        '/final/img//fotoArtig/lavoro.jpg', 
-        '/final/img//fotoArtig/gioielli.jpg',
-        '/final/img//fotoArtig/piattiColorati.jpg', 
-        '/final/img//fotoArtig/mani.jpeg',
-        '/final/img//fotoArtig/perline.jpg',
-        '/final/img//fotoArtig/tazze.jpg',
-        '/final/img//fotoArtig/vecchino.jpg', 
-        '/final/img//fotoArtig/vasoArgilla.jpeg',
-        '/final/img//fotoArtig/vetrata.jpg'
+        '/img/fotoArtig/artigianato-handmade.jpg',
+        '/img//fotoArtig/lavoro.jpg', 
+        '/img//fotoArtig/gioielli.jpg',
+        '/img//fotoArtig/piattiColorati.jpg', 
+        '/img//fotoArtig/mani.jpeg',
+        '/img//fotoArtig/perline.jpg',
+        '/img//fotoArtig/tazze.jpg',
+        '/img//fotoArtig/vecchino.jpg', 
+        '/img//fotoArtig/vasoArgilla.jpeg',
+        '/img//fotoArtig/vetrata.jpg'
     ];
     
     const slider = document.getElementById('slider');
