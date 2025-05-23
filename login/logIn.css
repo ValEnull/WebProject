@@ -1,0 +1,128 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: beige;
+    display: grid;
+}
+
+/* === header === */
+.myHeader {
+    /*background-color: rgb(15, 103, 22);
+    border: solid 1px rgb(15, 103, 22);*/
+    background-color: whitesmoke;
+    border: none;
+    border-bottom: solid 1px goldenrod;
+    text-decoration: underline;
+    color: rgb(235, 121, 80);
+    font-size: 1.2em;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 0.5em 1em;
+    gap: 1em;
+    align-items: center;
+    justify-content: center;
+}
+
+#logo {
+    border-radius: 50%;
+    height: 4em;
+    width: 4em;
+    max-width: 5em;
+    max-height: 5em;
+    flex-shrink: 0;
+}
+
+
+/* === form title === */
+h1 { 
+    font-size: 2.5em;
+    text-align: center;
+    font-weight: bold;
+    text-decoration: underline;
+    color: rgb(235, 121, 80);
+}
+
+/* === logIn form ===*/
+
+.divCenter {
+    display: flex;
+    justify-content: center;
+}
+
+.divLogIn {
+    width: 40%;
+    height: fit-content;
+    font-size: 1.5em;
+    padding: 2em;
+    border: none;
+    border-radius: 0.5em;
+    color: beige;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    background-color: rgb(235, 121, 80);
+    display: block;
+    line-height: 1.1;
+}
+
+.divLogIn label {
+    padding-left: 0.2em;
+}
+
+.divLogIn input[type="text"] {
+    background-color: whitesmoke;
+    width: 100%;
+    height: 2em;
+    font-size: 0.7em;
+    padding-left: 0.5em;
+}
+
+/* Stile normale dell'input */
+input[type="text"] {
+  border: 2px solid #ccc;
+  padding: 8px;
+  border-radius: 0.5em;
+  outline: none; /* Rimuove l'outline predefinito del browser */
+  transition: border-color 0.3s ease; /* Aggiunge un'animazione fluida */
+}
+
+/* Stile quando l'input è selezionato (focus) */
+input[type="text"]:focus {
+  border-color: rgb(153, 71, 71); /* Cambia questo colore a tuo piacimento */
+  /* Altri stili opzionali quando è selezionato */
+  box-shadow: 0 0 5px rgba(56, 57, 56, 0.5);
+}
+
+/* === access BTN === */
+.accessBTN {
+    width: 90%;
+    height: 2.5em;
+    border-radius: 0.5em;
+    border: 2px solid #ccc;
+    cursor: pointer;
+    background-color: beige;
+    color: rgb(235, 121, 80);
+    font-size: 0.6em;
+}
+
+.accessBTN:active {
+    border-color: rgb(153, 71, 71);
+    box-shadow: 0 0 10px 2px hsla(23, 86%, 35%, 0.7);
+    color: orangered;
+    text-decoration: underline;
+}
+
+.accessBTN:hover {
+    box-shadow: 0 0 10px 2px hsla(23, 86%, 35%, 0.7);
+}
+
+/* === help buttons === */
+.linkContainer {
+    text-align: center;
+    padding-bottom: 2em;
+}
+
+.linkContainer a {
+    text-decoration: none;
+    color: rgb(14, 81, 189);
+    font-size: 1em;
+}

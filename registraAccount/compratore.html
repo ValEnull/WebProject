@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Registrati</title>
+        <!-- link CSS -->
+        <link rel="stylesheet" href="compratore.css">
+        <!-- favicon -->
+        <link rel="icon" href="/img/logoDef.png" type="image/png">
+    </head>
+    <body>
+
+        <!-- header -->
+         <header class="myHeader">
+            <img src="/Img/logoDef.png" alt="Logo" id="logo">
+            <h3>SaleCraft</h3>
+        </header>
+
+        <br>
+
+        <!-- registration form -->
+        <h1>Registrati</h1>
+        <div class="divCenter">
+            <div class="userForm">
+                <form action="" method="post" class="myForm">
+                    <label for="name">Nome</label>
+                    <br>
+                    <input type="text" id="name" placeholder="Il tuo nome..." maxlength="42" required>
+                    <br> <br>
+                    <label for="surname">Cognome</label>
+                    <br>
+                    <input type="text" id="surname" placeholder="Il tuo cognome..." maxlength="42" required>
+                    <br> <br>
+                    <label for="email">Email</label>
+                    <br>
+                    <input type="email" id="email" placeholder="Email..." maxlength="42" required>
+                    <br> <br>
+                    <label for="psw">Password</label>
+                    <br>
+                    <input type="password" id="psw" placeholder="Password..." maxlength="42" minlength="7" required>
+                    <br> <br>
+                    <label for="pswConf">Conferma password</label>
+                    <br>
+                    <input type="password" id="pswConf" placeholder="Password..." maxlength="42" minlength="7" required>
+                    <br> <br>
+                    <div class="divCenter">
+                        <input type="submit" value="Registrati" id="registerBTN">
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <br> <br> <br>
+
+        <!-- help buttons -->
+        <div class="linkContainer">
+            <a href="#">Torna alla Home</a>
+            <br> <br>
+            <a href="#">Non hai un account? Registrati subito!</a>
+        </div>
+        
+    </body>
+</html>
