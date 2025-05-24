@@ -185,6 +185,12 @@ header {
 }
 
 /* === featured product === */
+#featuredTitle {
+    text-align: center;
+    font-size: 1.25em;
+    color: rgb(235, 121, 80);
+}
+
 .featuredProduct {
     padding: 1em;
     display: flex;
@@ -207,7 +213,7 @@ header {
 .productsContainer {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10%;
+    gap: 6.5em;
     align-items: center;
     justify-content: center;
 }
@@ -223,8 +229,78 @@ header {
 .itemImg {
     height: 100%;
     width: 100%;
-    /* NOTA: l'immagine non sta occupando TUTTO lo spazio perché c'è il padding di 10px su product ma sta comunque occupando tutto lo spazio disponibile */
 }
+
+/* === footer customizations === */
+.space {
+    padding-top: 5em;
+}
+
+footer {
+    background-color: black;
+    text-align: center;
+    padding: fit-content;
+    padding-top: 2.5em;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* === icons customizations === */
+
+footer i {
+    color: black;
+    background-color: #dedec3;
+    font-size: 2em;
+    margin: 0.75em;
+    padding-top: 0.25em;
+    border-radius: 50%;
+    height: 1.5em;
+    width: 1.5em;
+
+
+    /*text-align: center;
+    width: fit-content;
+    max-width: 50px;
+    height: fit-content;
+    max-height: 50px;
+    cursor: pointer;
+    font-size: 2em;
+    margin: 0 10px;
+    border: solid 1px #dedec3;
+    border-radius: 50%;
+    padding: 10px;
+    background-color: #dedec3;*/
+}
+
+/* === info link customizations === */
+
+.linkContainerFooter {
+    margin-top: 1em;
+    padding-bottom: 1em;
+}
+
+footer a {
+    text-decoration: none;
+    color: white;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 1.5em;
+    padding: 1em;
+}
+
+.line {
+    border: solid 3px rgb(15, 103, 22);
+    width: 100%;
+}
+
+/* text customizations */
+#copyfake {
+    font-size: 0.6em;
+    color: white;
+    padding: 0.5em;
+    font-family: 'Times New Roman', Times, serif;
+    font-style: italic;
+}
+
 
 /* === RESPONSIVE === */
 
@@ -295,7 +371,6 @@ header {
     .itemImg {
         height: 100%;
         width: 100%;
-        /* NOTA: l'immagine non sta occupando TUTTO lo spazio perché c'è il padding di 10px su product ma sta comunque occupando tutto lo spazio disponibile */
     }
 }
 
@@ -372,6 +447,5 @@ header {
     .itemImg {
         height: 100%;
         width: 100%;
-        /* NOTA: l'immagine non sta occupando TUTTO lo spazio perché c'è il padding di 10px su product ma sta comunque occupando tutto lo spazio disponibile */
     }
 }
