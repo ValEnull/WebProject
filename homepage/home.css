@@ -171,6 +171,61 @@ header {
     background-color: rgba(0, 0, 0, 0.2);
 }
 
+/* === banner === */
+.divCenter {
+    display: flex;
+    justify-content: center;
+}
+
+.banner {
+    height: 13em;
+    width: 87%;
+    border: solid black 1px;
+    text-align: center;
+}
+
+/* === featured product === */
+.featuredProduct {
+    padding: 1em;
+    display: flex;
+    align-items: flex-start;
+    border: solid black 1px;
+    width: 80%;
+    gap: 10%;
+}
+
+.divFeatured img {
+    width: 5em;
+    height: auto;
+}
+
+.featuredText {
+    flex: 1;
+}
+
+/* === products === */
+.productsContainer {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10%;
+    align-items: center;
+    justify-content: center;
+}
+
+.product {
+    height: 15em;
+    width: 15em;
+    padding: 0.35em;
+    border: solid 1px black;
+    border-radius: 1em;
+}
+
+.itemImg {
+    height: 100%;
+    width: 100%;
+    /* NOTA: l'immagine non sta occupando TUTTO lo spazio perché c'è il padding di 10px su product ma sta comunque occupando tutto lo spazio disponibile */
+}
+
 /* === RESPONSIVE === */
 
 /* Tablet */
@@ -216,6 +271,31 @@ header {
     .navBar a {
         padding: 10px 5px;
         font-size: 0.85em;
+    }
+
+    /* === products === */
+    .productsContainer {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10%;
+    }
+
+    #lastItem {
+        display: none;
+    }
+
+    .product {
+        height: 10em;
+        width: 10em;
+        padding: 0.35em;
+        border: solid 1px black;
+        border-radius: 1em;
+    }
+
+    .itemImg {
+        height: 100%;
+        width: 100%;
+        /* NOTA: l'immagine non sta occupando TUTTO lo spazio perché c'è il padding di 10px su product ma sta comunque occupando tutto lo spazio disponibile */
     }
 }
 
@@ -272,5 +352,26 @@ header {
     .navBar a {
         padding: 8px;
         border-radius: 0;
+    }
+
+    /* === products === */
+    .productsContainer {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10%;
+    }
+
+    .product {
+        height: 8em;
+        width: 8em;
+        padding: 0.35em;
+        border: solid 1px black;
+        border-radius: 1em;
+    }
+
+    .itemImg {
+        height: 100%;
+        width: 100%;
+        /* NOTA: l'immagine non sta occupando TUTTO lo spazio perché c'è il padding di 10px su product ma sta comunque occupando tutto lo spazio disponibile */
     }
 }
