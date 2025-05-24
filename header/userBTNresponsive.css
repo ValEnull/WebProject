@@ -1,0 +1,265 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+/* === HEADER === */
+header {
+    background-color: rgb(65, 65, 227);
+    border: solid 1px rgb(65, 65, 227);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5em 1em;
+    gap: 1em;
+}
+
+/* === LOGO === */
+.logoPlaceholder {
+    background-color: rgb(227, 89, 65);
+    border: black solid 1px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 4em;
+    width: 4em;
+    flex-shrink: 0;
+}
+
+.logo {
+    height: 3em;
+    width: auto;
+    max-width: 100%;
+}
+
+/* === SEARCH BOX === */
+.box {
+    flex: 1 1 50%;
+    background-color: #eee;
+    height: 3em;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1em;
+    min-width: 200px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: none;
+    font-size: 1em;
+}
+
+/* === ICONS === */
+.icons {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.btnImg {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5em;
+}
+
+.btnImg img {
+    width: 2.5em;
+    height: auto;
+    object-fit: contain;
+}
+
+/* === DROPDOWN === */
+.dropdown {
+    position: relative;
+}
+
+.dropdown .content {
+    display: none;
+    position: absolute;
+    background-color: rgba(172, 170, 170, 0.911);
+    min-width: 200px;
+    right: 0;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.442);
+    z-index: 10;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.dropdown:hover .content {
+    display: block;
+}
+
+.dropdown a {
+    display: block;
+    width: 100%;
+    padding: 10px 20px;
+    color: black;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    white-space: nowrap;
+}
+
+.dropdown a:hover {
+    background-color: red;
+    color: white;
+}
+
+.dropdown:hover .btnImg {
+    background-color: rgba(214, 210, 210, 0.651);
+    border-radius: 50%;
+}
+
+/* === NAVBAR === */
+.navBar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background-color: rgb(227, 89, 65);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5em;
+    padding: 0.5em;
+}
+
+.navBar li {
+    flex: 1 1 auto;
+    text-align: center;
+    min-width: 120px;
+}
+
+.navBar a {
+    color: white;
+    text-decoration: none;
+    padding: 12px 8px;
+    display: block;
+    border-radius: 50px;
+    transition: background-color 0.3s ease;
+    font-size: 0.9em;
+}
+
+.navBar a:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* === RESPONSIVE === */
+
+/* Tablet */
+@media (max-width: 768px) {
+    header {
+        flex-direction: row;
+        align-items: center;
+        text-align: center;
+        padding: 0.5em;
+    }
+
+    .logoPlaceholder {
+        order: 1;
+        height: 3.5em;
+        width: 3.5em;
+    }
+
+    .box {
+        order: 3;
+        width: 100%;
+        flex: 1 1 100%;
+        margin: 0.5em 0;
+    }
+
+    .icons {
+        order: 2;
+        justify-content: flex-end;
+        flex: 1;
+    }
+
+    .btnImg img {
+        width: 2em;
+    }
+
+    .navBar ul {
+        gap: 0.3em;
+    }
+
+    .navBar li {
+        min-width: 100px;
+    }
+
+    .navBar a {
+        padding: 10px 5px;
+        font-size: 0.85em;
+    }
+}
+
+/* Smartphone */
+@media (max-width: 480px) {
+    .logoPlaceholder {
+        height: 3em;
+        width: 3em;
+    }
+
+    .logo {
+        height: 2.5em;
+    }
+
+    input {
+        font-size: 0.9em;
+    }
+
+    .box {
+        height: 2.5em;
+        padding: 0 0.75em;
+    }
+
+    .btnImg {
+        padding: 0.3em;
+    }
+
+    .btnImg img {
+        width: 1.8em;
+    }
+
+    .dropdown .content {
+        position: fixed;
+        width: 100%;
+        left: 0;
+        right: auto;
+        box-shadow: none;
+        background-color: #ccc;
+        margin-top: 0;
+        border-radius: 0;
+    }
+
+    .navBar ul {
+        flex-direction: column;
+        gap: 0.2em;
+        padding: 0.2em;
+    }
+
+    .navBar li {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .navBar a {
+        padding: 8px;
+        border-radius: 0;
+    }
+}
