@@ -50,7 +50,17 @@ body {
 }
 
 /* Why Us Section */
+.bg-custom-light {
+    background-color: #f5f6f7;
+}
+
 .barrier {
+    border: solid rgb(15, 103, 22) 1px;
+    width: 150px;
+    margin: 0 auto;
+}
+
+.barrier2 {
     border: solid rgb(15, 103, 22) 1px;
     width: 100px;
     margin: 0 auto;
@@ -87,14 +97,9 @@ body {
     border-top: solid black 1px;
 }
 
-/* Footer */
-.myFooter {
-    background-color: black;
-}
-
-.line {
-    border: solid 3px rgb(15, 103, 22);
-    width: 100%;
+.text-center h3.display-5 {
+  font-size: 2.5rem;
+  white-space: nowrap;
 }
 
 /* Responsive adjustments */
@@ -111,4 +116,27 @@ body {
     .text {
         font-size: 1.2rem;
     }
+
+    /*.text-center h3.display-5 {
+        display: inline-block; 
+        white-space: nowrap;
+    }*/
+
+    .text-center h3.display-5 {
+        font-size: 2rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .text-center h3.display-5 {
+    font-size: 1.75rem;
+    white-space: normal; 
+    display: inline-block; 
+  }
+  
+  /* Opzionale: regola i paragrafi per mobile */
+  .text-center p.why {
+    font-size: 0.7rem;
+  }
 }
