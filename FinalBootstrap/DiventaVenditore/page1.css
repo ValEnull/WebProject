@@ -1,0 +1,142 @@
+/* Custom styles that complement Bootstrap */
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* Header */
+.myHeader {
+    background-color: whitesmoke;
+    border-bottom: solid 1px goldenrod;
+}
+
+#logo {
+    border-radius: 50%;
+    height: 4em;
+    width: 4em;
+    max-width: 5em;
+    max-height: 5em;
+    flex-shrink: 0;
+}
+
+/* Hero Section */
+#textContainer {
+    height: 25em;
+    color: white;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.slider {
+    height: 100%;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 1.5s ease-in-out;
+    opacity: 0;
+    animation: fadeIn 2s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.title {
+    margin-bottom: -35px;
+}
+
+.text {
+    margin-bottom: -0.8em;
+}
+
+/* Why Us Section */
+.bg-custom-light {
+    background-color: #f5f6f7;
+}
+
+.barrier {
+    border: solid rgb(15, 103, 22) 1px;
+    width: 150px;
+    margin: 0 auto;
+}
+
+.barrier2 {
+    border: solid rgb(15, 103, 22) 1px;
+    width: 100px;
+    margin: 0 auto;
+}
+
+/* Features Section */
+.articolo {
+    transition: transform 0.3s ease;
+}
+
+.articolo:hover {
+    transform: translateY(-5px);
+}
+
+#shield {
+    color: rgb(73, 65, 221);
+}
+
+#handshake {
+    color: rgb(164, 210, 225);
+}
+
+#heart {
+    color: red;
+}
+
+/* Discover Section */
+.discover {
+    background-color: beige;
+}
+
+.piller {
+    border-bottom: solid black 1px;
+    border-top: solid black 1px;
+}
+
+.text-center h3.display-5 {
+  font-size: 2.5rem;
+  white-space: nowrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #textContainer {
+        height: 20em;
+    }
+    
+    .title {
+        font-size: 2.5rem;
+        margin-bottom: -15px;
+    }
+    
+    .text {
+        font-size: 1.2rem;
+    }
+
+    /*.text-center h3.display-5 {
+        display: inline-block; 
+        white-space: nowrap;
+    }*/
+
+    .text-center h3.display-5 {
+        font-size: 2rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .text-center h3.display-5 {
+    font-size: 1.75rem;
+    white-space: normal; 
+    display: inline-block; 
+  }
+  
+  /* Opzionale: regola i paragrafi per mobile */
+  .text-center p.why {
+    font-size: 0.7rem;
+  }
+}
