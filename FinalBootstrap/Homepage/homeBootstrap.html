@@ -10,8 +10,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <!-- Favicon -->
     <link rel="icon" href="/img/logoDef.png" type="image/png">
-    <!-- CSS personalizzato (minimo) -->
+    <!-- CSS file -->
     <link rel="stylesheet" href="homeBootstrap.css">
+    <!-- js file -->
+    <script src="homeBootstrap.js" defer></script>
 </head>
 <body class="bg-light">
 
@@ -50,7 +52,7 @@
                             <li><a class="dropdown-item" href="#"><i class="fas fa-door-open me-2"></i>Login</a></li>
                             <li><a class="dropdown-item" href="#"><i class="fas fa-file-signature me-2"></i>Registrati</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-store me-2"></i>Inizia la tua attività</a></li>
+                            <li><a class="dropdown-item" href="/FinalBootstrap/DiventaVenditore/page1.html"><i class="fas fa-store me-2"></i>Inizia la tua attività</a></li>
                         </ul>
                     </div>
                 </div>
@@ -79,22 +81,24 @@
     <!-- Banner -->
     <div class="container mb-5">
         <div class="banner bg-secondary rounded-3 p-5 text-center text-white">
-            <h2>Banner Promozionale</h2>
+            <h2 id="promo-text" class="animate-fade">Benvenuto su SaleCraft!</h2>
         </div>
     </div>
 
-    <!-- Prodotto del giorno -->
+    <!-- Prodotto in evidenza -->
     <div class="container mb-5">
-        <h4 class="text-center text-orange mb-4">🌟 Prodotto del giorno 🌟</h4>
+        <h4 class="text-center text-orange mb-4">🌟 Prodotto in evidenza🌟</h4>
         <div class="card border-0 shadow">
-            <div class="row g-0">
+            <div class="row g-0 align-items-center"> 
                 <div class="col-md-4">
-                    <img src="/img/placeholderProduct.png" class="img-fluid rounded-start" alt="Prodotto">
+                    <div class="product-image-container p-3"> 
+                        <img id="product-image" src="/img/placeholderProduct.png" class="product-thumbnail" alt="Prodotto">
+                    </div>
                 </div>
                 <div class="col-md-8">
                     <div class="card-body">
-                        <h4 class="card-title">Nome Prodotto</h4>
-                        <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti ipsum, placeat repellendus, ratione, quae magnam mollitia aliquam ut quibusdam delectus tempora beatae dolorem.</p>
+                        <h4 id="product-title" class="card-title">Nome Prodotto</h4>
+                        <p id="product-description" class="card-text">Descrizione...</p>
                         <button class="btn btn-orange">Acquista ora</button>
                     </div>
                 </div>
