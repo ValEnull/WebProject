@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Array di immagini (sostituire con i propri percorsi)
+    // Array di immagini
     const images = [
         '/img/fotoArtig/artigianato-handmade.jpg',
         '/img/fotoArtig/lavoro.jpg', 
