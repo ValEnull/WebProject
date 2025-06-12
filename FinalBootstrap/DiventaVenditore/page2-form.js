@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Simula un ritardo di rete (sostituire con fetch/axios)
             setTimeout(() => {
                 // Simula un successo (nella realtà, verificare la risposta del server)
-                const shouldFail = Math.random() < 0.1; // 10% di chance di errore per testing
+                const shouldFail = Math.random() < 0.1; // 10% di chance di errore per testing - cambiare a 100 per vedere il successo
                 
                 if (shouldFail) {
                     reject(new Error('Simulated server error'));
