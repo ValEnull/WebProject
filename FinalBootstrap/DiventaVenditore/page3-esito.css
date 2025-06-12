@@ -59,14 +59,14 @@ main p {
 /* === help buttons === */
 .linkContainer a {
     text-decoration: none;
-    color: #0e51bd;
+    color: rgb(32, 31, 31);
     font-size: 1rem;
     transition: color 0.2s;
 }
 
 .linkContainer a:hover {
-    color: #0a3a8a;
-    text-decoration: underline;
+    color: white;
+    text-decoration: none;
 }
 
 /* Responsive adjustments */
