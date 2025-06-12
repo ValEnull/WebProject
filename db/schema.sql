@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS artigiani (
     p_iva VARCHAR(11) NOT NULL,
     CAP NUMERIC(5) NOT NULL,
     CONSTRAINT artigiani_artigiano_id_fkey FOREIGN KEY (artigiano_id)
-        REFERENCES utente (id)
+        REFERENCES utenti (id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
     CONSTRAINT artigiani_tipologia_id_fkey FOREIGN KEY (tipologia_id)
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS ordini (
     data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     stato VARCHAR(20) NOT NULL,
     CONSTRAINT ordini_cliente_id_fkey FOREIGN KEY (cliente_id)
-        REFERENCES utente (id)
+        REFERENCES utenti (id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
     CONSTRAINT ordini_stato_check CHECK (stato IN ('non pagato', 'in spedizione', 'in controversia', 'concluso'))
@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS recensioni (
     valutazione INTEGER NOT NULL CHECK (valutazione >= 1 AND valutazione <= 5),
     descrizione VARCHAR(255),
     CONSTRAINT recensioni_cliente_id_fkey FOREIGN KEY (cliente_id)
-        REFERENCES utente (id)
+        REFERENCES utenti (id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
     CONSTRAINT recensioni_artigiano_id_fkey FOREIGN KEY (artigiano_id)
@@ -144,7 +144,7 @@ CREATE TABLE IF NOT EXISTS segnalazioni (
         ON UPDATE CASCADE
         ON DELETE CASCADE,
     CONSTRAINT segnalazioni_cliente_id_fkey FOREIGN KEY (cliente_id)
-        REFERENCES utente (id)
+        REFERENCES utenti (id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
     CONSTRAINT segnalazioni_stato_segnalazione_check CHECK (stato_segnalazione IN ('in attesa', 'risolta'))  
