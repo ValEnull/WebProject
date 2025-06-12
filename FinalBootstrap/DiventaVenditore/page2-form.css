@@ -1,0 +1,143 @@
+/* Custom styles to complement Bootstrap */
+
+body {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== HEADER STYLES ===== */
+/* Header */
+.myHeader {
+    background-color: whitesmoke;
+    border-bottom: solid 1px goldenrod;
+}
+
+#logo {
+    border-radius: 50%;
+    height: 4em;
+    width: 4em;
+    max-width: 5em;
+    max-height: 5em;
+    flex-shrink: 0;
+}
+
+.text-custom {
+    color: #d96b3f;
+}
+
+/* === registration form === */
+.registrationForm {
+    background-color: #e67a50;
+    color: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    animation: slideInUp 0.8s ease-out forwards;
+}
+
+/* Animazioni */
+@keyframes slideInUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutDown {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+.registrationForm {
+    animation: slideInUp 0.8s ease-out forwards;
+}
+
+.form-submitting {
+    animation: slideOutDown 0.8s ease-in forwards;
+}
+
+/* Spinner e stati del bottone */
+.btn .spinner-border {
+    vertical-align: middle;
+    margin-right: 0.5rem;
+}
+
+/* Validazione */
+.was-validated .form-control:invalid {
+    border-color: #dc3545;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.was-validated .form-control:invalid:focus {
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+/* Alert */
+.alert {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* === registration btn === */
+#myBTN {
+    background-color: #f8f9fa;
+    color: #e67a50;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    border: none;
+    padding: 0.75rem;
+}
+
+#myBTN:hover {
+    background-color: #ffc107;
+    color: #212529;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(230, 122, 80, 0.4);
+}
+
+#myBTN:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* === help buttons === */
+.linkContainer a {
+    color: #0d6efd;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.linkContainer a:hover {
+    color: #0a58ca;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .registrationForm {
+        padding: 2rem !important;
+    }
+    
+    #logo {
+        height: 3.5em;
+        width: 3.5em;
+    }
+}
