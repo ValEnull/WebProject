@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaleCraft</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Favicon
+    <link rel="icon" href="/img/logoDef.png" type="image/png"> -->
+    <!-- CSS file -->
+    <link rel="stylesheet" href="carrello.css">
+    <!-- js file -->
+    <script src="carrello.js" defer></script>
+    <!--<script src="homeBootstrap.js" defer></script> -->
+</head>
+    <div class="wrapper d-flex flex-column min-vh-100">
+        <!-- Header Bootstrap -->
+        <header class="bg-white py-2 px-3 shadow-sm sticky-top">
+            <div class="container-fluid">
+                <div class="d-flex flex-wrap align-items-center justify-content-between">
+                    <!-- Logo -->
+                    <div class="d-flex align-items-center">
+                        <img src="/img/logoDef.png" alt="Logo" class="rounded-circle" style="width: 50px; height: 50px;">
+                    </div>
+
+                    <!-- Search Bar -->
+                    <div class="flex-grow-1 mx-3" style="max-width: 600px;">
+                        <div class="input-group shadow">
+                            <input type="text" class="form-control rounded-pill border-0 bg-light" placeholder="Cerca...">
+                            <button class="btn btn-orange rounded-pill" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Icons -->
+                    <div class="d-flex gap-3">
+                        <button class="btn btn-outline-dark border-0 position-relative">
+                            <i class="fas fa-shopping-cart fs-5"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                        </button>
+                        
+                        <!-- Dropdown User -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-dark border-0 dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="fas fa-user fs-5"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-door-open me-2"></i>Login</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-file-signature me-2"></i>Registrati</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/FinalBootstrap/DiventaVenditore/page1.html"><i class="fas fa-store me-2"></i>Inizia la tua attività</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+
+        <!-- Carrello -->
+        <div class="container my-5">
+            <div class="row">
+                <!-- Carrello (2/3) -->
+                <div class="col-lg-8 mb-4">
+                <h2 class="mb-4">Il tuo carrello</h2>
+                <div id="cart-body">
+                <!-- Prodotto 1 -->
+                <div class="mb-3 position-relative mx-3" style="background:#e9ecef; border-radius:1rem;">
+                    <div class="row g-0 align-items-center">
+                        <div class="col-md-3 text-center">
+                            <div class="bg-secondary rounded my-3 ms-4 d-flex align-items-center justify-content-center" style="width:180px; height:180px;">
+                                <!-- Box vuoto per immagine -->
+                            </div>
+                        </div>
+                        <div class="col-md-9 ps-4">
+                            <div class="card-body border-0">
+                                <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 remove-btn"><i class="fas fa-trash"></i></button>
+                                <h5 class="card-title mb-1">Mouse Wireless</h5>
+                                <p class="card-text mb-2 text-muted" style="font-size: 0.95rem;">Mouse wireless ergonomico, perfetto per lavorare e giocare senza fili.</p>
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="me-3 fs-5">€ <span class="price">15.99</span></span>
+                                    <label class="me-2 mb-0" for="qty1">Quantità:</label>
+                                    <input type="number" id="qty1" class="form-control quantity" value="2" min="1" style="width: 70px;">
+                                    <span class="ms-3">Totale: € <span class="item-total">31.98</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Prodotto 2 -->
+                <div class="mb-3 position-relative mx-3" style="background:#e9ecef; border-radius:1rem;">
+                    <div class="row g-0 align-items-center">
+                        <div class="col-md-3 text-center">
+                            <div class="bg-secondary rounded my-3 ms-4 d-flex align-items-center justify-content-center" style="width:180px; height:180px;">
+                                <!-- Box vuoto per immagine -->
+                            </div>
+                        </div>
+                        <div class="col-md-9 ps-4">
+                            <div class="card-body border-0">
+                                <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 remove-btn"><i class="fas fa-trash"></i></button>
+                                <h5 class="card-title mb-1">Tastiera Meccanica</h5>
+                                <p class="card-text mb-2 text-muted" style="font-size: 0.95rem;">Tastiera meccanica retroilluminata, ideale per gaming e lavoro.</p>
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="me-3 fs-5">€ <span class="price">49.90</span></span>
+                                    <label class="me-2 mb-0" for="qty2">Quantità:</label>
+                                    <input type="number" id="qty2" class="form-control quantity" value="1" min="1" style="width: 70px;">
+                                    <span class="ms-3">Totale: € <span class="item-total">49.90</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Totale carrello -->
+                <div class="d-flex justify-content-end mt-4 mx-3">
+                    <h4>Totale carrello: € <span id="cart-total">81.88</span></h4>
+                </div>
+            </div>
+                </div>
+                <!-- Form spedizione (1/3) -->
+                <div class="col-lg-4">
+                <h4 class="mb-4">Dati di spedizione</h4>
+                <form>
+                    <div class="mb-3">
+                    <label for="indirizzo" class="form-label">Indirizzo</label>
+                    <input type="text" class="form-control" id="indirizzo" required>
+                    </div>
+                    <div class="mb-3">
+                    <label for="civico" class="form-label">Civico</label>
+                    <input type="text" class="form-control" id="civico" required>
+                    </div>
+                    <div class="mb-3">
+                    <label for="citta" class="form-label">Città</label>
+                    <input type="text" class="form-control" id="citta" required>
+                    </div>
+                    <div class="mb-3">
+                    <label for="provincia" class="form-label">Provincia</label>
+                    <input type="text" class="form-control" id="provincia" maxlength="2" required>
+                    </div>
+                    <div class="mb-3">
+                    <label for="cap" class="form-label">CAP</label>
+                    <input type="text" class="form-control" id="cap" maxlength="5" required>
+                    </div>
+                    <button class="btn btn-success btn-lg w-100 mt-3" type="submit">Procedi al pagamento</button>
+                </form>
+                </div>
+            </div>
+            </div>
+</div>
+<footer class="bg-dark text-white mt-auto">
+<!-- Footer -->
+    <footer class="bg-dark text-white pt-5 pb-3">
+        <div class="container">
+            <!-- Social Icons -->
+            <div class="d-flex justify-content-center gap-3 mb-4">
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-youtube"></i>
+                </a>
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+            </div>
+
+            <!-- Links -->
+            <div class="text-center mb-4">
+                <a href="#" class="text-white text-decoration-none mx-3">Home</a>
+                <a href="#" class="text-white text-decoration-none mx-3">About</a>
+                <a href="#" class="text-white text-decoration-none mx-3">Contatti</a>
+                <a href="#" class="text-white text-decoration-none mx-3">Il nostro team</a>
+            </div>
+
+            <hr class="border-success my-4">
+
+            <!-- Copyright -->
+            <p class="text-center small text-light mb-0">Copyfake* ©2025; Designed by Valerio & Co.</p>
+        </div>
+    </footer>
+        <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</html>
