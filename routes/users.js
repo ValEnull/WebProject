@@ -131,7 +131,7 @@ router.post('/login', async (req, res) => {
       ruolo_id: user.ruolo_id
     };
 
-    // 4. Se è un artigiano, aggiungi i dati extra (tipologia_id, p_iva, CAP)
+    // 4. Se è un artigiano, aggiungi i dati extra 
     if (user.ruolo_id === 2) {
       const artisanResult = await pool.query('SELECT tipologia_id, p_iva, CAP FROM artigiani WHERE artigiano_id = $1', [user.id]);
       if (artisanResult.rows.length > 0) {
