@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const pool = require('../db/db');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 
 // Rotta per la registrazione degli utenti
 
@@ -83,7 +84,7 @@ router.post('/register-admin', async (req, res) => {
     const ruolo_id = 3; // ADMIN
 
     const query = `
-      INSERT INTO utente (nome_utente, nome, cognome, email, password_hash, ruolo_id)
+      INSERT INTO utenti (nome_utente, nome, cognome, email, password_hash, ruolo_id)
       VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING id
     `;
@@ -154,6 +155,132 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     console.error('Errore durante il login:', error);
     res.status(500).json({ message: 'Errore del server' });
+  }
+});
+
+// GET urenti
+router.get('/users', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM utenti');
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Errore nel recupero utenti:', error);
+    res.status(500).json({ error: 'Errore interno del server' });
+  }
+});
+
+// GET artigiani
+router.get('/artisans', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM artigiani');
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Errore nel recupero artigiani:', error);
+    res.status(500).json({ error: 'Errore interno del server' });
+  }
+});
+
+// GET utente per ID
+router.get('/users/:id', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM utenti WHERE id = $1', [req.params.id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Utente non trovato' });
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Errore nel recupero utente:', error);
+    res.status(500).json({ error: 'Errore interno del server' });
+  }
+});
+
+// GET artigiano per ID
+router.get('/artisans/:id', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM artigiani WHERE artigiano_id = $1', [req.params.id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Artigiano non trovato' });
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Errore nel recupero artigiano:', error);
+    res.status(500).json({ error: 'Errore interno del server' });
+  }
+});
+
+// PATCH utente
+router.patch('/users/:id', async (req, res) => {
+  const { nome_utente, nome, cognome, email, ruolo_id } = req.body;
+
+  try {
+    const result = await pool.query(
+      `
+      UPDATE utenti
+      SET
+        nome_utente = COALESCE($1, nome_utente),
+        nome = COALESCE($2, nome),
+        cognome = COALESCE($3, cognome),
+        email = COALESCE($4, email),
+        ruolo_id = COALESCE($5, ruolo_id)
+      WHERE id = $6
+      RETURNING *
+      `,
+      [nome_utente, nome, cognome, email, ruolo_id, req.params.id]
+    );
+
+    if (result.rowCount === 0) return res.status(404).json({ error: 'Utente non trovato' });
+    res.json(result.rows[0]);
+
+  } catch (error) {
+    console.error('Errore aggiornamento utente:', error);
+    res.status(500).json({ error: 'Errore interno del server' });
+  }
+});
+
+// PATCH artigiano
+router.patch('/artisans/:id', async (req, res) => {
+  const { tipologia_id, p_iva, cap } = req.body;
+
+  try {
+    const result = await pool.query(
+      `
+      UPDATE artigiani
+      SET
+        tipologia_id = COALESCE($1, tipologia_id),
+        p_iva = COALESCE($2, p_iva),
+        cap = COALESCE($3, cap)
+      WHERE artigiano_id = $4
+      RETURNING *
+      `,
+      [tipologia_id, p_iva, cap, req.params.id]
+    );
+
+    if (result.rowCount === 0) return res.status(404).json({ error: 'Artigiano non trovato' });
+    res.json(result.rows[0]);
+
+  } catch (error) {
+    console.error('Errore aggiornamento artigiano:', error);
+    res.status(500).json({ error: 'Errore interno del server' });
+  }
+});
+
+// DELETE utente
+router.delete('/users/:id', async (req, res) => {
+  try {
+    const result = await pool.query('DELETE FROM utenti WHERE id = $1 RETURNING *', [req.params.id]);
+    if (result.rowCount === 0) return res.status(404).json({ error: 'Utente non trovato' });
+    res.json({ message: 'Utente eliminato con successo', user: result.rows[0] });
+  } catch (error) {
+    console.error('Errore eliminazione utente:', error);
+    res.status(500).json({ error: 'Errore interno del server' });
+  }
+});
+
+// DELETE artigiano
+router.delete('/artisans/:id', async (req, res) => {
+  try {
+    const result = await pool.query('DELETE FROM artigiani WHERE artigiano_id = $1 RETURNING *', [req.params.id]);
+    if (result.rowCount === 0) return res.status(404).json({ error: 'Artigiano non trovato' });
+    res.json({ message: 'Artigiano eliminato con successo', artisan: result.rows[0] });
+  } catch (error) {
+    console.error('Errore eliminazione artigiano:', error);
+    res.status(500).json({ error: 'Errore interno del server' });
   }
 });
 
