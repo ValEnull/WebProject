@@ -102,4 +102,59 @@ router.post('/register-admin', async (req, res) => {
   }
 });
 
+router.post('/login', async (req, res) => {
+  const { nome_utente, password } = req.body;
+
+  try {
+    // 1. Verifica se l'utente esiste
+    const result = await pool.query('SELECT * FROM utenti WHERE nome_utente = $1', [nome_utente]);
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({ message: 'Nome utente o password errati' });
+    }
+
+    const user = result.rows[0];
+
+    // 2. Verifica la password
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Nome utente o password errati' });
+    }
+
+    // 3. Crea il payload di base
+    const payload = {
+      id: user.id,
+      nome: user.nome,
+      cognome: user.cognome,
+      nome_utente: user.nome_utente,
+      email: user.email,
+      ruolo_id: user.ruolo_id
+    };
+
+    // 4. Se è un artigiano, aggiungi i dati extra (tipologia_id, p_iva, CAP)
+    if (user.ruolo_id === 2) {
+      const artisanResult = await pool.query('SELECT tipologia_id, p_iva, CAP FROM artigiani WHERE artigiano_id = $1', [user.id]);
+      if (artisanResult.rows.length > 0) {
+        const artisan = artisanResult.rows[0];
+        payload.tipologia_id = artisan.tipologia_id;
+        payload.p_iva = artisan.p_iva;
+        payload.CAP = artisan.cap; // attenzione a maiuscole/minuscole, verifica come la tua db restituisce il campo
+      }
+    }
+
+    // 5. Genera token
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    // 6. Risposta
+    res.status(200).json({
+      token,
+      user: payload
+    });
+
+  } catch (error) {
+    console.error('Errore durante il login:', error);
+    res.status(500).json({ message: 'Errore del server' });
+  }
+});
+
 module.exports = router;
