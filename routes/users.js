@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 const pool = require('../db/db');
 const router = express.Router();
 
+// Rotta per la registrazione degli utenti
+
 router.post('/register', async (req, res) => {
   const {
     nome_utente,
@@ -62,6 +64,41 @@ router.post('/register', async (req, res) => {
   } catch (error) {
     console.error('Errore durante la registrazione:', error);
     res.status(500).json({ error: 'Errore del server durante la registrazione' });
+  }
+});
+
+// Rotta per registrazione admin
+
+router.post('/register-admin', async (req, res) => {
+  const { nome_utente, nome, cognome, email, password } = req.body;
+
+  if (!nome_utente || !nome || !cognome || !email || !password) {
+    return res.status(400).json({ error: 'Tutti i campi obbligatori devono essere compilati.' });
+  }
+
+  try {
+    const saltRounds = 10;
+    const password_hash = await bcrypt.hash(password, saltRounds);
+
+    const ruolo_id = 3; // ADMIN
+
+    const query = `
+      INSERT INTO utente (nome_utente, nome, cognome, email, password_hash, ruolo_id)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING id
+    `;
+    const values = [nome_utente, nome, cognome, email, password_hash, ruolo_id];
+
+    const result = await pool.query(query, values);
+
+    res.status(201).json({
+      message: 'Admin creato con successo',
+      adminId: result.rows[0].id
+    });
+
+  } catch (error) {
+    console.error('Errore registrazione admin:', error);
+    res.status(500).json({ error: 'Errore del server durante la creazione dell\'admin' });
   }
 });
 
