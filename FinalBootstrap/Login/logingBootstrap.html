@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Accedi a SaleCraft</title>
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="loginBootstrap.css">
+        <!-- Favicon -->
+        <link rel="icon" href="/img/logoDef.png" type="image/png">
+    </head>
+    <body class="d-flex flex-column min-vh-100">
+        
+        <!-- Header -->
+        <header class="myHeader py-3">
+            <div class="container d-flex flex-wrap justify-content-center align-items-center gap-3">
+                <img src="/img/logoDef.png" alt="Logo SaleCraft" id="logo" class="img-fluid">
+                <h3 class="mb-0 fw-bold">SaleCraft</h3>
+            </div>
+        </header>
+
+        <!-- main content -->
+        <main class="container my-auto py-5">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-6">
+                    <h1 class="text-center mb-4">Accedi</h1>
+                    
+                    <div class="card shadow-lg">
+                        <div class="card-body p-4 p-md-5">
+                            <form action="" method="post" class="myLogIn">
+                                <div class="mb-4">
+                                    <label for="user" class="form-label">Email o Username</label>
+                                    <input type="text" class="form-control form-control-lg" id="user" 
+                                           placeholder="Inserisci il tuo nome o email" required>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="psw" class="form-label">Password</label>
+                                    <input type="password" class="form-control form-control-lg" id="psw" 
+                                           placeholder="Inserisci la tua password" required>
+                                    <div class="form-text text-end">
+                                        <a href="#" class="text-decoration-underline text-light" id="resetPSW">Password dimenticata?</a>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <button type="submit" class="btn accessBTN btn-lg py-3">Accedi</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- help buttons -->
+        <footer class="linkContainer mt-auto py-4 bg-light">
+            <div class="container text-center">
+                <a href="#" class="d-block mb-2">Torna alla Home</a>
+                <a href="#" class="d-block">Non hai un account? Registrati subito!</a>
+            </div>
+        </footer>
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>
