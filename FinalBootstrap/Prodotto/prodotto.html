@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaleCraft - Nome Prodotto</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Favicon -->
+    <link rel="icon" href="/img/logoDef.png" type="image/png">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="prodotto.css">
+    <!-- js file -->
+    <script src="prodotto.js" defer></script>
+</head>
+<body>
+    
+    <!-- Header Bootstrap -->
+    <header class="bg-white py-2 px-3 shadow-sm sticky-top">
+        <div class="container-fluid">
+            <div class="d-flex flex-wrap align-items-center justify-content-between">
+                <!-- Logo -->
+                <div class="d-flex align-items-center">
+                    <img src="/img/logoDef.png" alt="Logo" class="rounded-circle" style="width: 50px; height: 50px;">
+                </div>
+
+                <!-- Search Bar -->
+                <div class="flex-grow-1 mx-3" style="max-width: 600px;">
+                    <div class="input-group shadow">
+                        <input type="text" class="form-control rounded-pill border-0 bg-light" placeholder="Cerca...">
+                        <button class="btn btn-orange rounded-pill" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Icons -->
+                <div class="d-flex gap-3">
+                    <button class="btn btn-outline-dark border-0 position-relative">
+                        <i class="fas fa-shopping-cart fs-5"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                    </button>
+                    
+                    <!-- Dropdown User -->
+                    <div class="dropdown">
+                        <button class="btn btn-outline-dark border-0 dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="fas fa-user fs-5"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-door-open me-2"></i>Login</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-file-signature me-2"></i>Registrati</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/FinalBootstrap/DiventaVenditore/page1.html"><i class="fas fa-store me-2"></i>Inizia la tua attività</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Product Section -->
+    <div class="container my-5">
+        <div class="row">
+            <!-- Thumbnail Images Column -->
+            <div class="col-md-2 order-md-1">
+                <div class="d-flex flex-md-column gap-2">
+                    <img src="/img/fermaPortaPolli.jpg" alt="Thumbnail 1" class="img-thumbnail cursor-pointer active" onclick="changeMainImage(this)">
+                    <img src="/img/piattoApi.jpeg" alt="Thumbnail 2" class="img-thumbnail cursor-pointer" onclick="changeMainImage(this)">
+                    <img src="/img/placeholderProduct.png" alt="Thumbnail 3" class="img-thumbnail cursor-pointer" onclick="changeMainImage(this)">
+                    <img src="/img/placeholderProduct.png" alt="Thumbnail 4" class="img-thumbnail cursor-pointer" onclick="changeMainImage(this)">
+                    <img src="/img/placeholderProduct.png" alt="Thumbnail 5" class="img-thumbnail cursor-pointer" onclick="changeMainImage(this)">
+                </div>
+            </div>
+            
+            <!-- Product selected -->
+            <div class="col-md-5 order-md-2 mb-4 mb-md-0 d-flex align-items-stretch">
+                <div class="main-image-container w-100">
+                    <img id="mainProductImage" src="/img/placeholderProduct.png" alt="Main Product Image" class="img-fluid">
+                </div>
+            </div>
+            
+            <!-- Product Info Column -->
+            <div class="col-md-5 order-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h1 class="h2">Nome del Prodotto</h1>
+                        
+                        <div class="d-flex align-items-center my-3">
+                            <div class="text-warning me-2">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="text-muted">(45 recensioni)</span>
+                        </div>
+                        
+                        <h3 class="text-success mb-4">€49.99</h3>
+                        
+                        <p class="mb-4">Descrizione dettagliata del prodotto. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                        
+                        <div class="mb-4">
+                            <h5 class="mb-3">Specifiche:</h5>
+                            <ul class="list-unstyled">
+                                <li><strong>Materiale:</strong> Plastica di alta qualità</li>
+                                <li><strong>Dimensioni:</strong> 20cm x 15cm x 10cm</li>
+                                <li><strong>Peso:</strong> 500g</li>
+                                <li><strong>Colore:</strong> Nero</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="input-group me-3" style="width: 120px;">
+                                <button class="btn btn-outline-secondary" type="button" id="decrement">-</button>
+                                <input type="text" class="form-control text-center" value="1" id="quantity">
+                                <button class="btn btn-outline-secondary" type="button" id="increment">+</button>
+                            </div>
+                            <button class="btn btn-success flex-grow-1">
+                                <i class="fas fa-cart-plus me-2"></i>Aggiungi al carrello
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Details Tabs -->
+    <div class="container mb-5">
+        <ul class="nav nav-tabs" id="productTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab">Dettagli</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Recensioni</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="shipping-tab" data-bs-toggle="tab" data-bs-target="#shipping" type="button" role="tab">Spedizione</button>
+            </li>
+        </ul>
+        <div class="tab-content p-3 border border-top-0 rounded-bottom">
+            <div class="tab-pane fade show active" id="details" role="tabpanel">
+                <h4>Informazioni dettagliate</h4>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+            <div class="tab-pane fade" id="reviews" role="tabpanel">
+                <h4>Recensioni dei clienti</h4>
+                <p>Nessuna recensione ancora. Sii il primo a recensire questo prodotto!</p>
+            </div>
+            <div class="tab-pane fade" id="shipping" role="tabpanel">
+                <h4>Informazioni sulla spedizione</h4>
+                <p>Spedizione standard: 3-5 giorni lavorativi - €4.99</p>
+                <p>Spedizione espressa: 1-2 giorni lavorativi - €9.99</p>
+                <p>Spedizione gratuita per ordini superiori a €50</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white pt-5 pb-3">
+        <div class="container">
+            <!-- Social Icons -->
+            <div class="d-flex justify-content-center gap-3 mb-4">
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-youtube"></i>
+                </a>
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+            </div>
+
+            <!-- Links -->
+            <div class="text-center mb-4">
+                <a href="#" class="text-white text-decoration-none mx-3">Home</a>
+                <a href="#" class="text-white text-decoration-none mx-3">About</a>
+                <a href="#" class="text-white text-decoration-none mx-3">Contatti</a>
+                <a href="#" class="text-white text-decoration-none mx-3">Il nostro team</a>
+            </div>
+
+            <hr class="border-success my-4">
+
+            <!-- Copyright -->
+            <p class="text-center small text-light mb-0">Copyfake* ©2025; Designed by Valerio & Co.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        
+</body>
+</html>
