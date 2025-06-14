@@ -78,21 +78,32 @@ router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const query = `
-      SELECT p.prodotto_id, p.nome_prodotto, p.tipologia_id, p.prezzo, p.descrizione, p.quant,
-             a.tipologia_id AS artigiano_tipologia, u.nome_utente AS nome_artigiano
+    const prodottoQuery = `
+      SELECT p.prodotto_id, p.nome_prodotto, p.tipologia_id, p.prezzo, p.descrizione, p.quant, a.artigiano_id, u.nome_utente AS nome_artigiano
       FROM prodotti p
       JOIN artigiani a ON p.artigiano_id = a.artigiano_id
       JOIN utenti u ON a.artigiano_id = u.id
       WHERE p.prodotto_id = $1
     `;
-    const result = await pool.query(query, [id]);
+    const prodottoResult = await pool.query(prodottoQuery, [id]);
 
-    if (result.rows.length === 0) {
+    if (prodottoResult.rows.length === 0) {
       return res.status(404).json({ message: 'Prodotto non trovato' });
     }
 
-    res.status(200).json(result.rows[0]);
+    const prodotto = prodottoResult.rows[0];
+
+    const immaginiQuery = `
+      SELECT immagine_id, immagine_link
+      FROM immagini
+      WHERE prodotto_id = $1
+      ORDER BY immagine_id ASC
+    `;
+    const immaginiResult = await pool.query(immaginiQuery, [id]);
+
+    prodotto.immagini = immaginiResult.rows;
+
+    res.status(200).json(prodotto);
   } catch (error) {
     console.error('Errore nel recupero del prodotto:', error);
     res.status(500).json({ message: 'Errore del server durante il recupero del prodotto.' });
@@ -110,10 +121,18 @@ router.get('/', async (req, res) => {
         p.prezzo,
         p.descrizione,
         p.quant,
-        u.nome_utente AS nome_artigiano
+        u.nome_utente AS nome_artigiano,
+        img.immagine_link AS immagine_principale
       FROM prodotti p
       JOIN artigiani a ON p.artigiano_id = a.artigiano_id
       JOIN utenti u ON a.artigiano_id = u.id
+      LEFT JOIN LATERAL (
+        SELECT immagine_link
+        FROM immagini
+        WHERE prodotto_id = p.prodotto_id
+        ORDER BY immagine_id
+        LIMIT 1
+      ) img ON true
     `;
 
     const result = await pool.query(query);
@@ -130,10 +149,20 @@ router.get('/tipologia/:tipologia_id', async (req, res) => {
 
   try {
     const query = `
-      SELECT p.*, a.tipologia_id AS artigiano_tipologia, u.nome_utente AS nome_artigiano
+      SELECT 
+        p.*, 
+        u.nome_utente AS nome_artigiano,
+        img.immagine_link AS immagine_principale
       FROM prodotti p
       JOIN artigiani a ON p.artigiano_id = a.artigiano_id
       JOIN utenti u ON a.artigiano_id = u.id
+      LEFT JOIN LATERAL (
+        SELECT immagine_link
+        FROM immagini
+        WHERE prodotto_id = p.prodotto_id
+        ORDER BY immagine_id
+        LIMIT 1
+      ) img ON true
       WHERE p.tipologia_id = $1
     `;
 
@@ -152,10 +181,20 @@ router.get('/artigiano/:artigiano_id', async (req, res) => {
 
   try {
     const query = `
-      SELECT p.*, a.tipologia_id AS artigiano_tipologia, u.nome_utente AS nome_artigiano
+      SELECT 
+        p.*, 
+        u.nome_utente AS nome_artigiano,
+        img.immagine_link AS immagine_principale
       FROM prodotti p
       JOIN artigiani a ON p.artigiano_id = a.artigiano_id
       JOIN utenti u ON a.artigiano_id = u.id
+      LEFT JOIN LATERAL (
+        SELECT immagine_link
+        FROM immagini
+        WHERE prodotto_id = p.prodotto_id
+        ORDER BY immagine_id
+        LIMIT 1
+      ) img ON true
       WHERE p.artigiano_id = $1
     `;
 
@@ -203,34 +242,37 @@ router.delete('/:id', authMiddleware(2), async (req, res) => {
 // API immagini dei prodotti
 
 // Aggiungi immagine a un prodotto - protetta per artigiani
-router.post('/:id/images', authMiddleware(2), async (req, res) => {
-  const prodottoId = req.params.id;
-  const { url } = req.body;
-  const artigianoId = req.user.id;
+router.post('/:prodotto_id/images', authMiddleware(2), async (req, res) => {
+  const { prodotto_id } = req.params;
+  const { immagine_link } = req.body;
+  const user = req.user; 
 
-  if (!url) {
-    return res.status(400).json({ message: 'URL immagine mancante' });
+  if (!immagine_link) {
+    return res.status(400).json({ message: 'immagine_link è obbligatorio' });
   }
 
   try {
-    const prodCheck = await pool.query(
-      'SELECT * FROM prodotti WHERE prodotto_id = $1 AND artigiano_id = $2',
-      [prodottoId, artigianoId]
-    );
-
-    if (prodCheck.rows.length === 0) {
-      return res.status(403).json({ message: 'Non sei autorizzato a modificare questo prodotto' });
+    const prodottoResult = await pool.query('SELECT artigiano_id FROM prodotti WHERE prodotto_id = $1', [prodotto_id]);
+    if (prodottoResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Prodotto non trovato' });
     }
 
-    const result = await pool.query(
-      'INSERT INTO immagini (prodotto_id, url) VALUES ($1, $2) RETURNING *',
-      [prodottoId, url]
+    const artigianoId = prodottoResult.rows[0].artigiano_id;
+
+    if (user.ruolo_id !== 1 && user.id !== artigianoId) {
+      return res.status(403).json({ message: 'Non autorizzato ad aggiungere immagini a questo prodotto' });
+    }
+
+    const insertResult = await pool.query(
+      'INSERT INTO immagini (prodotto_id, immagine_link) VALUES ($1, $2) RETURNING *',
+      [prodotto_id, immagine_link]
     );
 
-    res.status(201).json({ message: 'Immagine aggiunta con successo', immagine: result.rows[0] });
+    res.status(201).json({ message: 'Immagine inserita', immagine: insertResult.rows[0] });
+
   } catch (error) {
-    console.error('Errore aggiunta immagine:', error);
-    res.status(500).json({ message: 'Errore del server durante l\'aggiunta dell\'immagine' });
+    console.error('Errore inserimento immagine:', error);
+    res.status(500).json({ message: 'Errore server durante inserimento immagine' });
   }
 });
 

@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS segnalazioni (
 CREATE TABLE IF NOT EXISTS immagini (
     immagine_id SERIAL PRIMARY KEY,
     prodotto_id INTEGER NOT NULL,
-    immagine BYTEA NOT NULL,
+    immagine_link TEXT NOT NULL,
     CONSTRAINT immagini_prodotto_id_fkey FOREIGN KEY (prodotto_id)
         REFERENCES prodotti (prodotto_id)
         ON UPDATE CASCADE
