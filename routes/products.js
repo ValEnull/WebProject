@@ -4,7 +4,6 @@ const pool = require('../db/db');
 const authMiddleware = require('../middleware/auth');
 
 // Inserimento di un nuovo prodotto - protetta per artigiani
-
 router.post('/', authMiddleware(2), async (req, res) => {
   const { nome_prodotto, tipologia_id, prezzo, descrizione, quant } = req.body;
   const artigiano_id = req.user.id;
@@ -34,7 +33,6 @@ router.post('/', authMiddleware(2), async (req, res) => {
 });
 
 // Aggiornamento di un prodotto - protetta per artigiani e solo per i loro prodotti
-
 router.patch('/:id', authMiddleware(2), async (req, res) => {
   const { id } = req.params;
   const artigiano_id = req.user.id;
@@ -101,6 +99,31 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// GET tutti i prodotti - pubblico
+router.get('/', async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        p.prodotto_id,
+        p.nome_prodotto,
+        p.tipologia_id,
+        p.prezzo,
+        p.descrizione,
+        p.quant,
+        u.nome_utente AS nome_artigiano
+      FROM prodotti p
+      JOIN artigiani a ON p.artigiano_id = a.artigiano_id
+      JOIN utenti u ON a.artigiano_id = u.id
+    `;
+
+    const result = await pool.query(query);
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Errore nel recupero dei prodotti:', error);
+    res.status(500).json({ message: 'Errore del server durante il recupero dei prodotti.' });
+  }
+});
+
 // GET con filtro su tipologia - pubblico
 router.get('/tipologia/:tipologia_id', async (req, res) => {
   const { tipologia_id } = req.params;
@@ -144,4 +167,37 @@ router.get('/artigiano/:artigiano_id', async (req, res) => {
     res.status(500).json({ message: 'Errore del server durante il recupero dei prodotti per artigiano.' });
   }
 });
+
+// Elimina un prodotto - protetta per artigiani e admin
+router.delete('/:id', authMiddleware(2), async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+  const userRole = req.user.ruolo_id;
+
+  try {
+    let query = 'SELECT * FROM prodotti WHERE prodotto_id = $1';
+    let values = [id];
+
+    if (userRole < 3) {
+      query += ' AND artigiano_id = $2';
+      values.push(userId);
+    }
+
+    const checkResult = await pool.query(query, values);
+
+    if (checkResult.rows.length === 0) {
+      return res.status(403).json({ message: 'Non sei autorizzato a eliminare questo prodotto.' });
+    }
+
+    await pool.query('DELETE FROM immagini WHERE prodotto_id = $1', [id]);
+
+    await pool.query('DELETE FROM prodotti WHERE prodotto_id = $1', [id]);
+
+    res.status(200).json({ message: 'Prodotto eliminato con successo.' });
+  } catch (error) {
+    console.error('Errore durante l’eliminazione del prodotto:', error);
+    res.status(500).json({ message: 'Errore del server durante l’eliminazione del prodotto.' });
+  }
+});
+
 module.exports = router;
