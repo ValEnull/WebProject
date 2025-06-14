@@ -14,7 +14,6 @@ router.post('/register', async (req, res) => {
     email,
     password,
     isArtigiano,
-    tipologia_id,
     p_iva,
     CAP
   } = req.body;
@@ -26,8 +25,8 @@ router.post('/register', async (req, res) => {
 
   // Campi obbligatori solo per artigiani
   if (isArtigiano) {
-    if (!tipologia_id || !p_iva || !CAP) {
-      return res.status(400).json({ error: 'Tipologia, Partita IVA e CAP sono obbligatori per gli artigiani.' });
+    if (!p_iva || !CAP) {
+      return res.status(400).json({ error:'Partita IVA e CAP sono obbligatori per gli artigiani.' });
     }
   }
 
@@ -53,10 +52,10 @@ router.post('/register', async (req, res) => {
     // Se artigiano, inserisci nella tabella artigiani
     if (isArtigiano) {
       const artisanInsertQuery = `
-        INSERT INTO artigiani (artigiano_id, tipologia_id, p_iva, CAP)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO artigiani (artigiano_id, p_iva, CAP)
+        VALUES ($1, $2, $3)
       `;
-      const artisanValues = [userId, tipologia_id, p_iva, CAP];
+      const artisanValues = [userId, p_iva, CAP];
       await pool.query(artisanInsertQuery, artisanValues);
     }
 
@@ -103,6 +102,8 @@ router.post('/register-admin', async (req, res) => {
   }
 });
 
+//login
+
 router.post('/login', async (req, res) => {
   const { nome_utente, password } = req.body;
 
@@ -130,10 +131,9 @@ router.post('/login', async (req, res) => {
     };
 
     if (user.ruolo_id === 2) {
-      const artisanResult = await pool.query('SELECT tipologia_id, p_iva, CAP FROM artigiani WHERE artigiano_id = $1', [user.id]);
+      const artisanResult = await pool.query('SELECT p_iva, CAP FROM artigiani WHERE artigiano_id = $1', [user.id]);
       if (artisanResult.rows.length > 0) {
         const artisan = artisanResult.rows[0];
-        payload.tipologia_id = artisan.tipologia_id;
         payload.p_iva = artisan.p_iva;
         payload.CAP = artisan.CAP; 
       }
@@ -229,20 +229,19 @@ router.patch('/:id', async (req, res) => {
 
 // PATCH artigiano
 router.patch('/artisans/:id', async (req, res) => {
-  const { tipologia_id, p_iva, CAP } = req.body;
+  const { p_iva, CAP } = req.body;
 
   try {
     const result = await pool.query(
       `
       UPDATE artigiani
       SET
-        tipologia_id = COALESCE($1, tipologia_id),
-        p_iva = COALESCE($2, p_iva),
-        CAP = COALESCE($3, CAP)
-      WHERE artigiano_id = $4
+        p_iva = COALESCE($1, p_iva),
+        CAP = COALESCE($2, CAP)
+      WHERE artigiano_id = $3
       RETURNING *
       `,
-      [tipologia_id, p_iva, CAP, req.params.id]
+      [p_iva, CAP, req.params.id]
     );
 
     if (result.rowCount === 0) return res.status(404).json({ error: 'Artigiano non trovato' });
