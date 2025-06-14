@@ -49,17 +49,12 @@ CREATE TABLE IF NOT EXISTS utenti (
 -- crea tabella artigiani
 CREATE TABLE IF NOT EXISTS artigiani (
     artigiano_id INTEGER PRIMARY KEY,
-    tipologia_id INTEGER,
     p_iva VARCHAR(11) NOT NULL,
     CAP NUMERIC(5) NOT NULL,
     CONSTRAINT artigiani_artigiano_id_fkey FOREIGN KEY (artigiano_id)
         REFERENCES utenti (id)
         ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT artigiani_tipologia_id_fkey FOREIGN KEY (tipologia_id)
-        REFERENCES tipologia (tipologia_id)
-        ON UPDATE CASCADE
-        ON DELETE SET NULL
+        ON DELETE CASCADE
 );
 
 -- crea tabella prodotti

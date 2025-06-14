@@ -102,7 +102,7 @@ router.post('/register-admin', async (req, res) => {
   }
 });
 
-//login
+// Rotta per login
 
 router.post('/login', async (req, res) => {
   const { nome_utente, password } = req.body;
