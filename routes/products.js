@@ -32,3 +32,49 @@ router.post('/', authMiddleware(2), async (req, res) => {
     res.status(500).json({ message: 'Errore del server durante la creazione del prodotto.' });
   }
 });
+
+// Aggiornamento di un prodotto - protetta per artigiani e solo per i loro prodotti
+
+router.patch('/:id', authMiddleware(2), async (req, res) => {
+  const { id } = req.params;
+  const artigiano_id = req.user.id;
+  const { nome_prodotto, tipologia_id, prezzo, descrizione, quant } = req.body;
+
+  try {
+    // Controlla che il prodotto esista e appartenga all'artigiano loggato
+    const productRes = await pool.query(
+      'SELECT * FROM prodotti WHERE prodotto_id = $1 AND artigiano_id = $2',
+      [id, artigiano_id]
+    );
+
+    if (productRes.rows.length === 0) {
+      return res.status(404).json({ message: 'Prodotto non trovato o non autorizzato' });
+    }
+
+    // Aggiorna solo i campi passati con COALESCE
+    const updateQuery = `
+      UPDATE prodotti SET
+        nome_prodotto = COALESCE($1, nome_prodotto),
+        tipologia_id = COALESCE($2, tipologia_id),
+        prezzo = COALESCE($3, prezzo),
+        descrizione = COALESCE($4, descrizione),
+        quant = COALESCE($5, quant)
+      WHERE prodotto_id = $6
+      RETURNING *
+    `;
+
+    const values = [nome_prodotto, tipologia_id, prezzo, descrizione, quant, id];
+
+    const updateRes = await pool.query(updateQuery, values);
+
+    res.status(200).json({
+      message: 'Prodotto aggiornato con successo',
+      prodotto: updateRes.rows[0],
+    });
+  } catch (error) {
+    console.error('Errore aggiornamento prodotto:', error);
+    res.status(500).json({ message: 'Errore del server durante l\'aggiornamento del prodotto' });
+  }
+});
+
+module.exports = router;

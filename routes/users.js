@@ -16,7 +16,7 @@ router.post('/register', async (req, res) => {
     isArtigiano,
     tipologia_id,
     p_iva,
-    cap
+    CAP
   } = req.body;
 
   // Campi obbligatori per tutti
@@ -26,7 +26,7 @@ router.post('/register', async (req, res) => {
 
   // Campi obbligatori solo per artigiani
   if (isArtigiano) {
-    if (!tipologia_id || !p_iva || !cap) {
+    if (!tipologia_id || !p_iva || !CAP) {
       return res.status(400).json({ error: 'Tipologia, Partita IVA e CAP sono obbligatori per gli artigiani.' });
     }
   }
@@ -56,7 +56,7 @@ router.post('/register', async (req, res) => {
         INSERT INTO artigiani (artigiano_id, tipologia_id, p_iva, CAP)
         VALUES ($1, $2, $3, $4)
       `;
-      const artisanValues = [userId, tipologia_id, p_iva, cap];
+      const artisanValues = [userId, tipologia_id, p_iva, CAP];
       await pool.query(artisanInsertQuery, artisanValues);
     }
 
@@ -139,7 +139,7 @@ router.post('/login', async (req, res) => {
         const artisan = artisanResult.rows[0];
         payload.tipologia_id = artisan.tipologia_id;
         payload.p_iva = artisan.p_iva;
-        payload.CAP = artisan.cap; // attenzione a maiuscole/minuscole, verifica come la tua db restituisce il campo
+        payload.CAP = artisan.CAP; 
       }
     }
 
@@ -235,7 +235,7 @@ router.patch('/:id', async (req, res) => {
 
 // PATCH artigiano
 router.patch('/artisans/:id', async (req, res) => {
-  const { tipologia_id, p_iva, cap } = req.body;
+  const { tipologia_id, p_iva, CAP } = req.body;
 
   try {
     const result = await pool.query(
@@ -244,11 +244,11 @@ router.patch('/artisans/:id', async (req, res) => {
       SET
         tipologia_id = COALESCE($1, tipologia_id),
         p_iva = COALESCE($2, p_iva),
-        cap = COALESCE($3, cap)
+        CAP = COALESCE($3, CAP)
       WHERE artigiano_id = $4
       RETURNING *
       `,
-      [tipologia_id, p_iva, cap, req.params.id]
+      [tipologia_id, p_iva, CAP, req.params.id]
     );
 
     if (result.rowCount === 0) return res.status(404).json({ error: 'Artigiano non trovato' });

@@ -69,7 +69,6 @@ CREATE TABLE IF NOT EXISTS prodotti (
     nome_prodotto VARCHAR(100) NOT NULL,
     tipologia_id INTEGER,
     prezzo NUMERIC(10,2) NOT NULL,
-    immagine BYTEA,
     descrizione VARCHAR(500),
     quant INTEGER,
     CONSTRAINT prodotti_artigiano_id_fkey FOREIGN KEY (artigiano_id)
