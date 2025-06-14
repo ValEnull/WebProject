@@ -124,4 +124,24 @@ router.get('/tipologia/:tipologia_id', async (req, res) => {
 });
 
 // GET con filtro su artigiano - pubblico
+router.get('/artigiano/:artigiano_id', async (req, res) => {
+  const { artigiano_id } = req.params;
+
+  try {
+    const query = `
+      SELECT p.*, a.tipologia_id AS artigiano_tipologia, u.nome_utente AS nome_artigiano
+      FROM prodotti p
+      JOIN artigiani a ON p.artigiano_id = a.artigiano_id
+      JOIN utenti u ON a.artigiano_id = u.id
+      WHERE p.artigiano_id = $1
+    `;
+
+    const result = await pool.query(query, [artigiano_id]);
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Errore nel recupero dei prodotti per artigiano:', error);
+    res.status(500).json({ message: 'Errore del server durante il recupero dei prodotti per artigiano.' });
+  }
+});
 module.exports = router;
