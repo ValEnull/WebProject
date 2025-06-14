@@ -148,4 +148,15 @@ CREATE TABLE IF NOT EXISTS segnalazioni (
         ON UPDATE CASCADE
         ON DELETE CASCADE,
     CONSTRAINT segnalazioni_stato_segnalazione_check CHECK (stato_segnalazione IN ('in attesa', 'risolta'))  
-)
+);
+
+--crea tabella immagini
+CREATE TABLE IF NOT EXISTS immagini (
+    immagine_id SERIAL PRIMARY KEY,
+    prodotto_id INTEGER NOT NULL,
+    immagine BYTEA NOT NULL,
+    CONSTRAINT immagini_prodotto_id_fkey FOREIGN KEY (prodotto_id)
+        REFERENCES prodotti (prodotto_id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
