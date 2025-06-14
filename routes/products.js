@@ -276,5 +276,84 @@ router.post('/:prodotto_id/images', authMiddleware(2), async (req, res) => {
   }
 });
 
+// PATCH immagine - solo artigiano proprietario del prodotto e admin può modificare 
+router.patch('/images/:immagine_id', authMiddleware(2), async (req, res) => {
+  const { immagine_id } = req.params;
+  const { immagine_link } = req.body;
+  const userId = req.user.id;
+
+  if (!immagine_link) {
+    return res.status(400).json({ message: 'immagine_link è obbligatorio' });
+  }
+
+  try {
+    const queryCheck = `
+      SELECT p.artigiano_id 
+      FROM immagini i
+      JOIN prodotti p ON i.prodotto_id = p.prodotto_id
+      WHERE i.immagine_id = $1
+    `;
+    const checkResult = await pool.query(queryCheck, [immagine_id]);
+
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Immagine non trovata' });
+    }
+
+    const artigianoId = checkResult.rows[0].artigiano_id;
+
+    if (req.user.ruolo_id !== 1 && artigianoId !== userId) {
+      return res.status(403).json({ message: 'Non autorizzato a modificare questa immagine' });
+    }
+
+    const queryUpdate = `
+      UPDATE immagini SET immagine_link = $1 WHERE immagine_id = $2
+      RETURNING *
+    `;
+    const updateResult = await pool.query(queryUpdate, [immagine_link, immagine_id]);
+
+    res.status(200).json({
+      message: 'Immagine aggiornata con successo',
+      immagine: updateResult.rows[0]
+    });
+
+  } catch (error) {
+    console.error('Errore nell\'aggiornamento dell\'immagine:', error);
+    res.status(500).json({ message: 'Errore del server durante l\'aggiornamento dell\'immagine.' });
+  }
+});
+
+// DELETE immagine - solo artigiano proprietario del prodotto o admin
+router.delete('/images/:immagine_id', authMiddleware(2), async (req, res) => {
+  const { immagine_id } = req.params;
+  const userId = req.user.id;
+
+  try {
+    const queryCheck = `
+      SELECT p.artigiano_id 
+      FROM immagini i
+      JOIN prodotti p ON i.prodotto_id = p.prodotto_id
+      WHERE i.immagine_id = $1
+    `;
+    const checkResult = await pool.query(queryCheck, [immagine_id]);
+
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Immagine non trovata' });
+    }
+
+    const artigianoId = checkResult.rows[0].artigiano_id;
+
+    if (req.user.ruolo_id !== 1 && artigianoId !== userId) {
+      return res.status(403).json({ message: 'Non autorizzato a cancellare questa immagine' });
+    }
+
+    await pool.query('DELETE FROM immagini WHERE immagine_id = $1', [immagine_id]);
+
+    res.status(200).json({ message: 'Immagine cancellata con successo' });
+
+  } catch (error) {
+    console.error('Errore nella cancellazione dell\'immagine:', error);
+    res.status(500).json({ message: 'Errore del server durante la cancellazione dell\'immagine.' });
+  }
+});
 
 module.exports = router;
