@@ -13,6 +13,10 @@ app.use(express.json());
 const utentiRouter = require('./routes/users');
 app.use('/api/users', utentiRouter);
 
+// Rotte prodotti
+const productsRouter = require('./routes/products');
+app.use('/api/products', productsRouter);
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server avviato su http://localhost:${PORT}`);
