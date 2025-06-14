@@ -102,7 +102,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // GET con filtro su tipologia - pubblico
-router.get('/tipologia/:tipologia_id', async (req, res) => {
+router.get('/:tipologia_id', async (req, res) => {
   const { tipologia_id } = req.params;
 
   try {
@@ -124,7 +124,7 @@ router.get('/tipologia/:tipologia_id', async (req, res) => {
 });
 
 // GET con filtro su artigiano - pubblico
-router.get('/artigiano/:artigiano_id', async (req, res) => {
+router.get('/:artigiano_id', async (req, res) => {
   const { artigiano_id } = req.params;
 
   try {
