@@ -41,7 +41,6 @@ router.patch('/:id', authMiddleware(2), async (req, res) => {
   const { nome_prodotto, tipologia_id, prezzo, descrizione, quant } = req.body;
 
   try {
-    // Controlla che il prodotto esista e appartenga all'artigiano loggato
     const productRes = await pool.query(
       'SELECT * FROM prodotti WHERE prodotto_id = $1 AND artigiano_id = $2',
       [id, artigiano_id]
@@ -51,7 +50,6 @@ router.patch('/:id', authMiddleware(2), async (req, res) => {
       return res.status(404).json({ message: 'Prodotto non trovato o non autorizzato' });
     }
 
-    // Aggiorna solo i campi passati con COALESCE
     const updateQuery = `
       UPDATE prodotti SET
         nome_prodotto = COALESCE($1, nome_prodotto),

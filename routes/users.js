@@ -107,7 +107,6 @@ router.post('/login', async (req, res) => {
   const { nome_utente, password } = req.body;
 
   try {
-    // 1. Verifica se l'utente esiste
     const result = await pool.query('SELECT * FROM utenti WHERE nome_utente = $1', [nome_utente]);
 
     if (result.rows.length === 0) {
@@ -116,13 +115,11 @@ router.post('/login', async (req, res) => {
 
     const user = result.rows[0];
 
-    // 2. Verifica la password
     const isMatch = await bcrypt.compare(password, user.password_hash);
     if (!isMatch) {
       return res.status(400).json({ message: 'Nome utente o password errati' });
     }
 
-    // 3. Crea il payload di base
     const payload = {
       id: user.id,
       nome: user.nome,
@@ -132,7 +129,6 @@ router.post('/login', async (req, res) => {
       ruolo_id: user.ruolo_id
     };
 
-    // 4. Se è un artigiano, aggiungi i dati extra 
     if (user.ruolo_id === 2) {
       const artisanResult = await pool.query('SELECT tipologia_id, p_iva, CAP FROM artigiani WHERE artigiano_id = $1', [user.id]);
       if (artisanResult.rows.length > 0) {
@@ -143,10 +139,8 @@ router.post('/login', async (req, res) => {
       }
     }
 
-    // 5. Genera token
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    // 6. Risposta
     res.status(200).json({
       token,
       user: payload
