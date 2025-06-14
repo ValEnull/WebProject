@@ -200,4 +200,39 @@ router.delete('/:id', authMiddleware(2), async (req, res) => {
   }
 });
 
+// API immagini dei prodotti
+
+// Aggiungi immagine a un prodotto - protetta per artigiani
+router.post('/:id/images', authMiddleware(2), async (req, res) => {
+  const prodottoId = req.params.id;
+  const { url } = req.body;
+  const artigianoId = req.user.id;
+
+  if (!url) {
+    return res.status(400).json({ message: 'URL immagine mancante' });
+  }
+
+  try {
+    const prodCheck = await pool.query(
+      'SELECT * FROM prodotti WHERE prodotto_id = $1 AND artigiano_id = $2',
+      [prodottoId, artigianoId]
+    );
+
+    if (prodCheck.rows.length === 0) {
+      return res.status(403).json({ message: 'Non sei autorizzato a modificare questo prodotto' });
+    }
+
+    const result = await pool.query(
+      'INSERT INTO immagini (prodotto_id, url) VALUES ($1, $2) RETURNING *',
+      [prodottoId, url]
+    );
+
+    res.status(201).json({ message: 'Immagine aggiunta con successo', immagine: result.rows[0] });
+  } catch (error) {
+    console.error('Errore aggiunta immagine:', error);
+    res.status(500).json({ message: 'Errore del server durante l\'aggiunta dell\'immagine' });
+  }
+});
+
+
 module.exports = router;
