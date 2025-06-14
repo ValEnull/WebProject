@@ -75,4 +75,53 @@ router.patch('/:id', authMiddleware(2), async (req, res) => {
   }
 });
 
+// GET prodotto singolo - pubblico
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const query = `
+      SELECT p.prodotto_id, p.nome_prodotto, p.tipologia_id, p.prezzo, p.descrizione, p.quant,
+             a.tipologia_id AS artigiano_tipologia, u.nome_utente AS nome_artigiano
+      FROM prodotti p
+      JOIN artigiani a ON p.artigiano_id = a.artigiano_id
+      JOIN utenti u ON a.artigiano_id = u.id
+      WHERE p.prodotto_id = $1
+    `;
+    const result = await pool.query(query, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Prodotto non trovato' });
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error('Errore nel recupero del prodotto:', error);
+    res.status(500).json({ message: 'Errore del server durante il recupero del prodotto.' });
+  }
+});
+
+// GET con filtro su tipologia - pubblico
+router.get('/tipologia/:tipologia_id', async (req, res) => {
+  const { tipologia_id } = req.params;
+
+  try {
+    const query = `
+      SELECT p.*, a.tipologia_id AS artigiano_tipologia, u.nome_utente AS nome_artigiano
+      FROM prodotti p
+      JOIN artigiani a ON p.artigiano_id = a.artigiano_id
+      JOIN utenti u ON a.artigiano_id = u.id
+      WHERE p.tipologia_id = $1
+    `;
+
+    const result = await pool.query(query, [tipologia_id]);
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Errore nel recupero dei prodotti per tipologia:', error);
+    res.status(500).json({ message: 'Errore del server durante il recupero dei prodotti per tipologia.' });
+  }
+});
+
+// GET con filtro su artigiano - pubblico
 module.exports = router;
