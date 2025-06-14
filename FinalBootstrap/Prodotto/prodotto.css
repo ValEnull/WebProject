@@ -1,0 +1,92 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.bg-orange {
+    background-color: #fd7e14;
+}
+
+.btn-orange {
+    background-color: #fd7e14;
+    color: white;
+}
+
+.btn-orange:hover {
+    background-color: #e67312;
+    color: white;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.img-thumbnail {
+    max-width: 80px;
+    transition: all 0.3s ease;
+}
+
+.img-thumbnail:hover, .img-thumbnail.active {
+    border-color: #0d6efd !important;
+    transform: scale(1.05);
+}
+
+#mainProductImage {
+    object-fit: contain;
+}
+
+/* Product Selected */
+/* Contenitore immagine principale */
+.main-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    min-height: 400px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+/* Immagine principale */
+#mainProductImage {
+    max-height: 500px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+/* Effetto hover per l'immagine principale */
+#mainProductImage:hover {
+    transform: scale(1.02);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .main-image-container {
+        min-height: 300px;
+    }
+    
+    #mainProductImage {
+        max-height: 350px;
+    }
+}
+
+@media (max-width: 768px) {
+    .img-thumbnail {
+        max-width: 60px;
+    }
+    
+    .col-md-2 {
+        order: 1;
+    }
+    
+    .col-md-5:nth-child(2) {
+        order: 3;
+        margin-top: 20px;
+    }
+    
+    .col-md-5:nth-child(3) {
+        order: 2;
+    }
+}
