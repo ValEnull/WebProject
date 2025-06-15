@@ -21,6 +21,10 @@ app.use('/api/products', productsRouter);
 const ordersRouter = require('./routes/orders');
 app.use('/api/orders', ordersRouter);
 
+// Rotte recensioni
+const ratingRouter = require('./routes/rating');
+app.use('/api/rating', ratingRouter);
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server avviato su http://localhost:${PORT}`);
