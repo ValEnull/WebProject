@@ -1,0 +1,36 @@
+/* navbar */
+:root {
+    --orange: rgb(235, 121, 80);
+}
+
+.bg-orange {
+    background-color: var(--orange) !important;
+}
+
+.text-orange {
+    color: var(--orange) !important;
+}
+
+.btn-orange {
+    background-color: var(--orange);
+    color: white;
+    border: none;
+}
+
+.btn-orange:hover {
+    background-color: #d35400;
+    color: white;
+}
+
+/* mobile */
+@media (max-width: 768px) {
+    /* navbar */
+    .navbar-nav {
+        gap: 0.5rem !important;
+    }
+
+    /* Prodotto in evidenza */
+    .card-body {
+        padding-left: 0 !important; 
+    }
+}
