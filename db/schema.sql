@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS dettagli_ordine (
 CREATE TABLE IF NOT EXISTS recensioni (
     recensione_id SERIAL PRIMARY KEY,
     cliente_id INTEGER NOT NULL,
-    artigiano_id INTEGER NOT NULL,
+    prodotto_id INTEGER NOT NULL,
     data_recensione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     valutazione INTEGER NOT NULL CHECK (valutazione >= 1 AND valutazione <= 5),
     descrizione VARCHAR(255),
@@ -118,8 +118,8 @@ CREATE TABLE IF NOT EXISTS recensioni (
         REFERENCES utenti (id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
-    CONSTRAINT recensioni_artigiano_id_fkey FOREIGN KEY (artigiano_id)
-        REFERENCES artigiani (artigiano_id)
+    CONSTRAINT recensioni_prodotto_id_fkey FOREIGN KEY (prodotto_id)
+        REFERENCES prodotti (prodotto_id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
