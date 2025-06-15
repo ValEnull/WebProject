@@ -14,9 +14,8 @@ router.post('/register', async (req, res) => {
     email,
     password,
     isArtigiano,
-    tipologia_id,
     p_iva,
-    cap
+    CAP
   } = req.body;
 
   // Campi obbligatori per tutti
@@ -26,8 +25,8 @@ router.post('/register', async (req, res) => {
 
   // Campi obbligatori solo per artigiani
   if (isArtigiano) {
-    if (!tipologia_id || !p_iva || !cap) {
-      return res.status(400).json({ error: 'Tipologia, Partita IVA e CAP sono obbligatori per gli artigiani.' });
+    if (!p_iva || !CAP) {
+      return res.status(400).json({ error:'Partita IVA e CAP sono obbligatori per gli artigiani.' });
     }
   }
 
@@ -53,10 +52,10 @@ router.post('/register', async (req, res) => {
     // Se artigiano, inserisci nella tabella artigiani
     if (isArtigiano) {
       const artisanInsertQuery = `
-        INSERT INTO artigiani (artigiano_id, tipologia_id, p_iva, CAP)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO artigiani (artigiano_id, p_iva, CAP)
+        VALUES ($1, $2, $3)
       `;
-      const artisanValues = [userId, tipologia_id, p_iva, cap];
+      const artisanValues = [userId, p_iva, CAP];
       await pool.query(artisanInsertQuery, artisanValues);
     }
 
@@ -103,11 +102,12 @@ router.post('/register-admin', async (req, res) => {
   }
 });
 
+// Rotta per login
+
 router.post('/login', async (req, res) => {
   const { nome_utente, password } = req.body;
 
   try {
-    // 1. Verifica se l'utente esiste
     const result = await pool.query('SELECT * FROM utenti WHERE nome_utente = $1', [nome_utente]);
 
     if (result.rows.length === 0) {
@@ -116,13 +116,11 @@ router.post('/login', async (req, res) => {
 
     const user = result.rows[0];
 
-    // 2. Verifica la password
     const isMatch = await bcrypt.compare(password, user.password_hash);
     if (!isMatch) {
       return res.status(400).json({ message: 'Nome utente o password errati' });
     }
 
-    // 3. Crea il payload di base
     const payload = {
       id: user.id,
       nome: user.nome,
@@ -132,21 +130,17 @@ router.post('/login', async (req, res) => {
       ruolo_id: user.ruolo_id
     };
 
-    // 4. Se è un artigiano, aggiungi i dati extra 
     if (user.ruolo_id === 2) {
-      const artisanResult = await pool.query('SELECT tipologia_id, p_iva, CAP FROM artigiani WHERE artigiano_id = $1', [user.id]);
+      const artisanResult = await pool.query('SELECT p_iva, CAP FROM artigiani WHERE artigiano_id = $1', [user.id]);
       if (artisanResult.rows.length > 0) {
         const artisan = artisanResult.rows[0];
-        payload.tipologia_id = artisan.tipologia_id;
         payload.p_iva = artisan.p_iva;
-        payload.CAP = artisan.cap; // attenzione a maiuscole/minuscole, verifica come la tua db restituisce il campo
+        payload.CAP = artisan.CAP; 
       }
     }
 
-    // 5. Genera token
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    // 6. Risposta
     res.status(200).json({
       token,
       user: payload
@@ -235,20 +229,19 @@ router.patch('/:id', async (req, res) => {
 
 // PATCH artigiano
 router.patch('/artisans/:id', async (req, res) => {
-  const { tipologia_id, p_iva, cap } = req.body;
+  const { p_iva, CAP } = req.body;
 
   try {
     const result = await pool.query(
       `
       UPDATE artigiani
       SET
-        tipologia_id = COALESCE($1, tipologia_id),
-        p_iva = COALESCE($2, p_iva),
-        cap = COALESCE($3, cap)
-      WHERE artigiano_id = $4
+        p_iva = COALESCE($1, p_iva),
+        CAP = COALESCE($2, CAP)
+      WHERE artigiano_id = $3
       RETURNING *
       `,
-      [tipologia_id, p_iva, cap, req.params.id]
+      [p_iva, CAP, req.params.id]
     );
 
     if (result.rowCount === 0) return res.status(404).json({ error: 'Artigiano non trovato' });

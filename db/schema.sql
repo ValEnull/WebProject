@@ -49,17 +49,12 @@ CREATE TABLE IF NOT EXISTS utenti (
 -- crea tabella artigiani
 CREATE TABLE IF NOT EXISTS artigiani (
     artigiano_id INTEGER PRIMARY KEY,
-    tipologia_id INTEGER,
     p_iva VARCHAR(11) NOT NULL,
     CAP NUMERIC(5) NOT NULL,
     CONSTRAINT artigiani_artigiano_id_fkey FOREIGN KEY (artigiano_id)
         REFERENCES utenti (id)
         ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT artigiani_tipologia_id_fkey FOREIGN KEY (tipologia_id)
-        REFERENCES tipologia (tipologia_id)
-        ON UPDATE CASCADE
-        ON DELETE SET NULL
+        ON DELETE CASCADE
 );
 
 -- crea tabella prodotti
@@ -69,7 +64,6 @@ CREATE TABLE IF NOT EXISTS prodotti (
     nome_prodotto VARCHAR(100) NOT NULL,
     tipologia_id INTEGER,
     prezzo NUMERIC(10,2) NOT NULL,
-    immagine BYTEA,
     descrizione VARCHAR(500),
     quant INTEGER,
     CONSTRAINT prodotti_artigiano_id_fkey FOREIGN KEY (artigiano_id)
@@ -148,4 +142,15 @@ CREATE TABLE IF NOT EXISTS segnalazioni (
         ON UPDATE CASCADE
         ON DELETE CASCADE,
     CONSTRAINT segnalazioni_stato_segnalazione_check CHECK (stato_segnalazione IN ('in attesa', 'risolta'))  
-)
+);
+
+--crea tabella immagini
+CREATE TABLE IF NOT EXISTS immagini (
+    immagine_id SERIAL PRIMARY KEY,
+    prodotto_id INTEGER NOT NULL,
+    immagine_link TEXT NOT NULL,
+    CONSTRAINT immagini_prodotto_id_fkey FOREIGN KEY (prodotto_id)
+        REFERENCES prodotti (prodotto_id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
