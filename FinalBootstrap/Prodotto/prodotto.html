@@ -92,6 +92,7 @@
                             <div class="text-warning me-2 stars-container">
                                 <!-- Stelle verranno generate dinamicamente -->
                             </div>
+                            <!-- questo valore deve aggiornarsi in base al numerodi recensioni sotto al prodotto, se non riusciamo a implemetarlo, RIMUOVERE!!! -->
                             <span class="text-muted reviews-count">(0 recensioni)</span>
                         </div>
                         
@@ -105,16 +106,15 @@
                                 <!-- Specifiche prodotto -->
                             </ul>
                         </div>
-                        
+                        <!-- quantity selector -->
                         <div class="product-actions d-flex align-items-center mb-4">
                             <div class="input-group me-3 quantity-selector" style="width: 120px;">
                                 <button class="btn btn-outline-secondary" type="button" id="decrement">-</button>
                                 <input type="text" class="form-control text-center" value="1" id="quantity">
                                 <button class="btn btn-outline-secondary" type="button" id="increment">+</button>
                             </div>
-                            <button class="btn btn-success flex-grow-1 add-to-cart">
-                                <i class="fas fa-cart-plus me-2"></i>Aggiungi al carrello
-                            </button>
+                            <!-- add to cart btn -->
+                            <button class="btn btn-success flex-grow-1 add-to-cart"><i class="fas fa-cart-plus me-2"></i>Aggiungi al carrello</button>
                         </div>
                     </div>
                 </div>
