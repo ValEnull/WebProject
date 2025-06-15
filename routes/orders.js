@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db/db');
-const authMiddleware = require('../middleware/authMiddleware');
+const authMiddleware = require('../middleware/auth');
 
 // Crea ordine con stato "non pagato"
 router.post('/', authMiddleware(1), async (req, res) => {
@@ -25,26 +25,33 @@ router.post('/', authMiddleware(1), async (req, res) => {
     const ordine_id = ordineResult.rows[0].ordine_id;
 
     for (const { prodotto_id, quantita } of prodotti) {
-      const { rows } = await client.query(
+    const { rows } = await client.query(
         'SELECT prezzo, quant FROM prodotti WHERE prodotto_id = $1',
         [prodotto_id]
-      );
+    );
 
-      if (rows.length === 0) {
+    if (rows.length === 0) {
         throw new Error(`Prodotto ID ${prodotto_id} non trovato.`);
-      }
-      const { prezzo, quant } = rows[0];
+    }
+    const { prezzo, quant } = rows[0];
 
-      if (quant < quantita) {
+    if (quant < quantita) {
         throw new Error(`Quantità non disponibile per prodotto ID ${prodotto_id}.`);
-      }
+    }
 
-      await client.query(
+    await client.query(
         `INSERT INTO dettagli_ordine
-         (ordine_id, prodotto_id, quantita, prezzo_unitario)
-         VALUES ($1,$2,$3,$4)`,
+        (ordine_id, prodotto_id, quantita, prezzo_unitario)
+        VALUES ($1,$2,$3,$4)`,
         [ordine_id, prodotto_id, quantita, prezzo]
-      );
+    );
+
+    await client.query(
+        `UPDATE prodotti
+        SET quant = quant - $1
+        WHERE prodotto_id = $2`,
+        [quantita, prodotto_id]
+    );
     }
 
     await client.query('COMMIT');
@@ -59,4 +66,65 @@ router.post('/', authMiddleware(1), async (req, res) => {
   }
 });
 
+// GET dettagli di un ordine - protetta per utente proprietario o admin
+router.get('/:id', authMiddleware(1), async (req, res) => {
+  const ordine_id = req.params.id;
+  const user_id = req.user.id;
+  const ruolo = req.user.ruolo_id;
+
+  try {
+    const ordineResult = await pool.query(
+      `SELECT ordine_id, cliente_id, data_ordine, stato
+       FROM ordini
+       WHERE ordine_id = $1`,
+      [ordine_id]
+    );
+
+    if (ordineResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Ordine non trovato.' });
+    }
+
+    const ordine = ordineResult.rows[0];
+
+    if (ordine.cliente_id !== user_id && ruolo !== 3) {
+      return res.status(403).json({ message: 'Non autorizzato a visualizzare questo ordine.' });
+    }
+
+    const dettagliResult = await pool.query(
+      `SELECT 
+         d.prodotto_id, 
+         d.quantita, 
+         d.prezzo_unitario,
+         (d.quantita * d.prezzo_unitario) AS totale,
+         p.nome_prodotto, 
+         p.descrizione,
+         i.immagine_link AS immagine_principale
+       FROM dettagli_ordine d
+       JOIN prodotti p ON d.prodotto_id = p.prodotto_id
+       LEFT JOIN LATERAL (
+         SELECT immagine_link
+         FROM immagini
+         WHERE prodotto_id = p.prodotto_id
+         ORDER BY immagine_id ASC
+         LIMIT 1
+       ) i ON true
+       WHERE d.ordine_id = $1`,
+      [ordine_id]
+    );
+
+    const prodotti = dettagliResult.rows;
+    const costo_totale = prodotti.reduce((sum, p) => sum + parseFloat(p.totale), 0);
+
+    res.status(200).json({
+      ordine_id: ordine.ordine_id,
+      data_ordine: ordine.data_ordine,
+      stato: ordine.stato,
+      costo_totale: costo_totale.toFixed(2),
+      prodotti
+    });
+  } catch (error) {
+    console.error('Errore nel recupero dettagli ordine:', error);
+    res.status(500).json({ message: 'Errore del server durante il recupero dell’ordine.' });
+  }
+});
 module.exports = router;

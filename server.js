@@ -17,6 +17,10 @@ app.use('/api/users', utentiRouter);
 const productsRouter = require('./routes/products');
 app.use('/api/products', productsRouter);
 
+//Rotte ordini
+const ordersRouter = require('./routes/orders');
+app.use('/api/orders', ordersRouter);
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server avviato su http://localhost:${PORT}`);
