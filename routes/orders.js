@@ -225,4 +225,24 @@ router.patch('/:id', authMiddleware(1), async (req, res) => {
   }
 });
 
+// DELETE ordine — protetta per admin
+router.delete('/:ordine_id', authMiddleware(0), async (req, res) => {
+  const { ordine_id } = req.params;
+
+  try {
+    const result = await pool.query(
+      'DELETE FROM ordini WHERE ordine_id = $1 RETURNING *',
+      [ordine_id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Ordine non trovato' });
+    }
+
+    res.status(200).json({ message: 'Ordine cancellato correttamente' });
+  } catch (error) {
+    console.error('Errore nella cancellazione ordine:', error);
+    res.status(500).json({ message: 'Errore del server' });
+  }
+});
 module.exports = router;
