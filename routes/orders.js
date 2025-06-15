@@ -128,6 +128,41 @@ router.get('/:id', authMiddleware(1), async (req, res) => {
   }
 });
 
+// GET degli oridni - protetta per cliente (ottiene solo i propri ordini) o admin (ottiene tutti gli ordini)
+router.get('/user', authMiddleware(1), async (req, res) => {
+  const userId = req.user.id;
+  const userRole = req.user.ruolo_id;
+
+  try {
+    let query;
+    let params = [];
+
+    if (userRole === 3) { // admin
+      query = `
+        SELECT o.*, u.nome_utente
+        FROM ordini o
+        JOIN utenti u ON o.cliente_id = u.id
+        ORDER BY o.data_ordine DESC
+      `;
+    } else {
+      query = `
+        SELECT o.*, u.nome_utente
+        FROM ordini o
+        JOIN utenti u ON o.cliente_id = u.id
+        WHERE o.cliente_id = $1
+        ORDER BY o.data_ordine DESC
+      `;
+      params = [userId];
+    }
+
+    const result = await pool.query(query, params);
+    res.status(200).json(result.rows);
+
+  } catch (error) {
+    console.error('Errore nel recupero degli ordini:', error);
+    res.status(500).json({ message: 'Errore del server durante il recupero degli ordini.' });
+  }
+});
 
 // PATCH aggiorna stato ordine - protetta per cliente o admin
 
