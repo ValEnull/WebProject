@@ -74,4 +74,78 @@ router.get('/:prodotto_id', async (req, res) => {
   }
 });
 
+// Aggiorna una recensione - protetta per cliente che ha scritto la recensione
+router.patch('/:recensione_id', authMiddleware(1), async (req, res) => {
+  const { recensione_id } = req.params;
+  const { valutazione, descrizione } = req.body;
+  const utente_id = req.user.id;
+
+  try {
+    const result = await pool.query(
+      `SELECT cliente_id FROM recensioni WHERE recensione_id = $1`,
+      [recensione_id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Recensione non trovata.' });
+    }
+
+    const recensione = result.rows[0];
+
+    if (recensione.cliente_id !== utente_id) {
+      return res.status(403).json({ message: 'Non autorizzato a modificare questa recensione.' });
+    }
+
+    await pool.query(
+      `UPDATE recensioni
+       SET 
+         valutazione = COALESCE($1, valutazione),
+         descrizione = COALESCE($2, descrizione)
+       WHERE recensione_id = $3`,
+      [valutazione, descrizione, recensione_id]
+    );
+
+    res.status(200).json({ message: 'Recensione aggiornata con successo.' });
+  } catch (error) {
+    console.error('Errore aggiornamento recensione:', error);
+    res.status(500).json({ message: 'Errore del server.' });
+  }
+});
+
+// Elimina una recensione - protetta per cliente che ha scritto la recensione e admin
+router.delete('/:recensione_id', authMiddleware(1), async (req, res) => {
+  const { recensione_id } = req.params;
+  const utente_id = req.user.id;
+  const ruolo = req.user.ruolo_id;
+
+  try {
+    // Recupera la recensione per verificarne l'esistenza e il proprietario
+    const { rows, rowCount } = await pool.query(
+      `SELECT cliente_id FROM recensioni WHERE recensione_id = $1`,
+      [recensione_id]
+    );
+
+    if (rowCount === 0) {
+      return res.status(404).json({ message: 'Recensione non trovata.' });
+    }
+
+    const isOwner = rows[0].cliente_id === utente_id;
+    const isAdmin = ruolo === 3;
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ message: 'Non autorizzato a cancellare questa recensione.' });
+    }
+
+    await pool.query(
+      `DELETE FROM recensioni WHERE recensione_id = $1`,
+      [recensione_id]
+    );
+
+    res.status(200).json({ message: 'Recensione eliminata con successo.' });
+  } catch (error) {
+    console.error('Errore durante la cancellazione recensione:', error);
+    res.status(500).json({ message: 'Errore del server.' });
+  }
+});
+
 module.exports = router;
