@@ -23,6 +23,9 @@ pool.connect(async (err, client, done) => {
         const schema = fs.readFileSync(schemaPath, 'utf-8');
         await client.query(schema);
         console.log(' Schema eseguito correttamente');
+
+        const seed = require('./seed');
+        console.log(' Seed eseguito correttamente');
     } catch (schemaErr) {
         console.error(' Errore nell\'esecuzione dello schema:', schemaErr);
     } finally {
@@ -32,4 +35,4 @@ pool.connect(async (err, client, done) => {
 });
 
 module.exports = pool;
-//prova 2
+
