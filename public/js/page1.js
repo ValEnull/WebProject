@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
         '/img/fotoArtig/vasoArgilla.jpeg',
         '/img/fotoArtig/vetrata.jpg'
     ];
-    
+    //commento per merge
     const slider = document.getElementById('slider');
     let currentIndex = 0;
     
