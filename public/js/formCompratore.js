@@ -36,6 +36,7 @@ function handleFormSubmission() {
             }
 
             alert('Registrazione avvenuta con successo!');
+            window.location.href = 'index.html';
             // Esempio: form.reset() o redirect
         } catch (error) {
             console.error('Error:', error);
