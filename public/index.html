@@ -11,9 +11,9 @@
     <!-- Favicon -->
     <link rel="icon" href="/img/logoDef.png" type="image/png">
     <!-- CSS file -->
-    <link rel="stylesheet" href="homeBootstrap.css">
+    <link rel="stylesheet" href="/public/css/index.css">
     <!-- js file -->
-    <script src="homeBootstrap.js" defer></script>
+    <script src="/public/js/index.js" defer></script>
 </head>
 <body class="bg-light">
 
@@ -38,10 +38,10 @@
 
                 <!-- Icons -->
                 <div class="d-flex gap-3">
-                    <button class="btn btn-outline-dark border-0 position-relative">
-                        <i class="fas fa-shopping-cart fs-5"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-                    </button>
+                        <button class="btn btn-outline-dark border-0 position-relative" onclick="location.href='carrello.html'">
+                            <i class="fas fa-shopping-cart fs-5"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                        </button>
                     
                     <!-- Dropdown User -->
                     <div class="dropdown">
@@ -49,10 +49,10 @@
                             <i class="fas fa-user fs-5"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-door-open me-2"></i>Login</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-file-signature me-2"></i>Registrati</a></li>
+                            <li><a class="dropdown-item" href="logingBootstrap.html"><i class="fas fa-door-open me-2"></i>Login</a></li>
+                            <li><a class="dropdown-item" href="formCompratore.html"><i class="fas fa-file-signature me-2"></i>Registrati</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/FinalBootstrap/DiventaVenditore/page1.html"><i class="fas fa-store me-2"></i>Inizia la tua attività</a></li>
+                            <li><a class="dropdown-item" href="page1.html"><i class="fas fa-store me-2"></i>Registra la tua attività</a></li>
                         </ul>
                     </div>
                 </div>
