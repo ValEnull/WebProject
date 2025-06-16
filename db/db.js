@@ -33,5 +33,5 @@ pool.connect(async (err, client, done) => {
     }
 
 });
-
+//prova se funziona db
 module.exports = pool;
