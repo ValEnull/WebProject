@@ -30,6 +30,11 @@
                     <div class="card shadow-lg">
                         <div class="card-body p-4 p-md-5">
                             <form action="" method="post" class="myForm">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Nome utente</label>
+                                    <input type="text" class="form-control form-control-lg" id="username" 
+                                        placeholder="Scegli un nome utente..." maxlength="42" required>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="name" class="form-label">Nome</label>
@@ -72,7 +77,9 @@
                 </div>
             </div>
         </main>
-
+        
+        <!-- JavaScript for form submission -->
+         <script src="formCompratore.js" defer></script>
         <!-- Footer Links -->
         <footer class="linkContainer mt-auto py-4 bg-light">
             <div class="container text-center">

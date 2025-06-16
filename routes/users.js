@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const pool = require('../db/db');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');// Abilita CORS per tutte le rotte in questo router
 
 // Rotta per la registrazione degli utenti
 
