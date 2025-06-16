@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area Utente</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Favicon -->
+    <link rel="icon" href="/img/logoDef.png" type="image/png">
+    <!-- CSS file -->
+    <link rel="stylesheet" href="/public/css/userArea.css">
+</head>
+<body>
+    <!-- Header Bootstrap -->
+    <header class="bg-white py-2 px-3 shadow-sm sticky-top">
+        <div class="container-fluid">
+            <div class="d-flex flex-wrap align-items-center justify-content-between">
+                <!-- Logo -->
+                <div class="d-flex align-items-center">
+                    <img src="/img/logoDef.png" alt="Logo" class="rounded-circle" style="width: 50px; height: 50px;">
+                </div>
+
+                <!-- Search Bar -->
+                <div class="flex-grow-1 mx-3" style="max-width: 600px;">
+                    <div class="input-group shadow">
+                        <input type="text" class="form-control rounded-pill border-0 bg-light" placeholder="Cerca...">
+                        <button class="btn btn-orange rounded-pill" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Icons -->
+                <div class="d-flex gap-3">
+                    <button class="btn btn-outline-dark border-0 position-relative">
+                        <i class="fas fa-shopping-cart fs-5"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                    </button>
+                    
+                    <!-- Dropdown User -->
+                    <div class="dropdown">
+                        <button class="btn btn-outline-dark border-0 dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="fas fa-user fs-5"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-door-open me-2"></i>Login</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-file-signature me-2"></i>Registrati</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="page1.html"><i class="fas fa-store me-2"></i>Inizia la tua attività</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container my-5">
+        <!-- Benvenuto -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-4 text-center mb-4">Benvenuto, <span class="text-orange">Nome Utente</span>!</h1>
+                <p class="lead text-center text-muted">Gestisci le tue informazioni personali e le impostazioni dell'account</p>
+            </div>
+        </div>
+
+        <!-- Informazioni Personali -->
+        <div class="row mb-4">
+            <div class="col-lg-6 mb-3 mb-lg-0">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-bottom-0">
+                        <h3 class="card-title mb-0"><i class="fas fa-user-circle me-2 text-orange"></i>Informazioni Personali</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Nome utente</label>
+                            <div class="p-2 bg-light rounded">nome_utente</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Nome completo</label>
+                            <div class="p-2 bg-light rounded">Nome Cognome</div>
+                        </div>
+                        <button class="btn btn-outline-orange mt-2" data-bs-toggle="modal" data-bs-target="#infoModal">
+                            Modifica informazioni
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-bottom-0">
+                        <h3 class="card-title mb-0"><i class="fas fa-envelope me-2 text-orange"></i>Email</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Indirizzo email</label>
+                            <div class="p-2 bg-light rounded">utente@esempio.com</div>
+                        </div>
+                        <button class="btn btn-outline-orange mt-2" data-bs-toggle="modal" data-bs-target="#emailModal">
+                            Modifica email
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Password -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom-0">
+                        <h3 class="card-title mb-0"><i class="fas fa-lock me-2 text-orange"></i>Sicurezza</h3>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="currentPassword" class="form-label text-muted">Password attuale</label>
+                                    <input type="password" class="form-control" id="currentPassword" placeholder="Inserisci password attuale">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="newPassword" class="form-label text-muted">Nuova password</label>
+                                    <input type="password" class="form-control" id="newPassword" placeholder="Inserisci nuova password">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="confirmPassword" class="form-label text-muted">Conferma password</label>
+                                    <input type="password" class="form-control" id="confirmPassword" placeholder="Conferma nuova password">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-orange">Cambia password</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+     <!-- Modal per modifica informazioni personali -->
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="infoModalLabel">Modifica informazioni personali</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="currentUsername" class="form-label">Nome utente attuale</label>
+                            <input type="text" class="form-control" id="currentUsername" value="nome_utente" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newUsername" class="form-label">Nuovo nome utente</label>
+                            <input type="text" class="form-control" id="newUsername" placeholder="Inserisci nuovo nome utente">
+                        </div>
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Nome completo</label>
+                            <input type="text" class="form-control" id="fullName" value="Nome Cognome">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-orange">Salva modifiche</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal per modifica email -->
+    <div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailModalLabel">Modifica indirizzo email</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="currentEmail" class="form-label">Email attuale</label>
+                            <input type="email" class="form-control" id="currentEmail" value="utente@esempio.com" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newEmail" class="form-label">Nuova email</label>
+                            <input type="email" class="form-control" id="newEmail" placeholder="Inserisci nuova email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmEmail" class="form-label">Conferma nuova email</label>
+                            <input type="email" class="form-control" id="confirmEmail" placeholder="Conferma nuova email">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-orange">Salva modifiche</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Section -->
+    <div class="container mt-5 pb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-bottom-0">
+                <h3 class="card-title mb-0 text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Area pericolosa!</h3>
+            </div>
+            <div class="card-body">
+                <h5 class="text-danger mb-4">Eliminazione account</h5>
+                <p class="text-muted mb-4">Una volta eliminato il tuo account, non potrai più recuperare i tuoi dati. Assicurati di volerlo fare davvero.</p>
+                <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                    <i class="fas fa-trash-alt me-2"></i>Elimina il mio account
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title text-danger" id="deleteAccountModalLabel">
+                        <i class="fas fa-exclamation-circle me-2"></i>Conferma eliminazione
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Attenzione!</strong> Questa azione è irreversibile.
+                    </div>
+                    
+                    <p class="mb-4">Stai per eliminare definitivamente il tuo account e tutti i dati associati. Sei assolutamente sicuro di voler procedere?</p>
+                    
+                    <form id="deleteAccountForm">
+                        <div class="mb-4">
+                            <label for="currentPasswordDelete" class="form-label">Inserisci la tua password attuale</label>
+                            <input type="password" class="form-control" id="currentPasswordDelete" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="confirmDelete" class="form-label">Digita "ELIMINA ACCOUNT" per confermare</label>
+                            <input type="text" class="form-control" id="confirmDelete" placeholder="ELIMINA ACCOUNT" required>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-trash-alt me-2"></i>Conferma eliminazione definitiva
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Annulla
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white pt-5 pb-3">
+        <div class="container">
+            <!-- Social Icons -->
+            <div class="d-flex justify-content-center gap-3 mb-4">
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-youtube"></i>
+                </a>
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+            </div>
+
+            <!-- Links -->
+            <div class="text-center mb-4">
+                <a href="#" class="text-white text-decoration-none mx-3">Home</a>
+                <a href="#" class="text-white text-decoration-none mx-3">About</a>
+                <a href="#" class="text-white text-decoration-none mx-3">Contatti</a>
+                <a href="#" class="text-white text-decoration-none mx-3">Il nostro team</a>
+            </div>
+
+            <hr class="border-success my-4">
+
+            <!-- Copyright -->
+            <p class="text-center small text-light mb-0">Copyfake* ©2025; Designed by Valerio & Co.</p>
+        </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
