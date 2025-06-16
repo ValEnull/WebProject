@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         form.classList.add('form-submitting');
         
-        // Simula l'invio dei dati (sostituire con chiamata API reale)
+        // Simula l'invio dei dati (sostituire con chiamata API reale) TODOOOOO
         simulateFormSubmission(form)
             .then(() => {
                 // Reindirizzamento dopo il successo
