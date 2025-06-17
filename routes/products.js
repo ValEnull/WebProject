@@ -73,39 +73,42 @@ router.patch('/:id', authMiddleware(2), async (req, res) => {
   }
 });
 
-// GET prodotto singolo - pubblico
+// GET dettagli prodotto con immagini codificate in base64
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const prodottoQuery = `
-      SELECT p.prodotto_id, p.nome_prodotto, p.tipologia_id, p.prezzo, p.descrizione, p.quant, a.artigiano_id, u.nome_utente AS nome_artigiano
-      FROM prodotti p
-      JOIN artigiani a ON p.artigiano_id = a.artigiano_id
-      JOIN utenti u ON a.artigiano_id = u.id
-      WHERE p.prodotto_id = $1
-    `;
-    const prodottoResult = await pool.query(prodottoQuery, [id]);
+    const prodottoResult = await pool.query(
+      `SELECT prodotto_id, nome_prodotto, descrizione, prezzo, quant, artigiano_id 
+       FROM prodotti 
+       WHERE prodotto_id = $1`,
+      [id]
+    );
 
     if (prodottoResult.rows.length === 0) {
-      return res.status(404).json({ message: 'Prodotto non trovato' });
+      return res.status(404).json({ message: 'Prodotto non trovato.' });
     }
 
     const prodotto = prodottoResult.rows[0];
 
-    const immaginiQuery = `
-      SELECT immagine_id, immagine_link
-      FROM immagini
-      WHERE prodotto_id = $1
-      ORDER BY immagine_id ASC
-    `;
-    const immaginiResult = await pool.query(immaginiQuery, [id]);
+    const immaginiResult = await pool.query(
+      `SELECT immagine_id, immagine 
+       FROM immagini 
+       WHERE prodotto_id = $1`,
+      [id]
+    );
 
-    prodotto.immagini = immaginiResult.rows;
+    // Converti campo BYTEA (Buffer) in base64 string
+    const immagini = immaginiResult.rows.map(img => ({
+      immagine_id: img.immagine_id,
+      immagine_base64: img.immagine.toString('base64')
+    }));
+
+    prodotto.immagini = immagini;
 
     res.status(200).json(prodotto);
   } catch (error) {
-    console.error('Errore nel recupero del prodotto:', error);
+    console.error('Errore nel recupero prodotto:', error);
     res.status(500).json({ message: 'Errore del server durante il recupero del prodotto.' });
   }
 });
@@ -122,21 +125,29 @@ router.get('/', async (req, res) => {
         p.descrizione,
         p.quant,
         u.nome_utente AS nome_artigiano,
-        img.immagine_link AS immagine_principale
+        img.immagine -- qui BYTEA, non immagine_link
       FROM prodotti p
       JOIN artigiani a ON p.artigiano_id = a.artigiano_id
       JOIN utenti u ON a.artigiano_id = u.id
       LEFT JOIN LATERAL (
-        SELECT immagine_link
+        SELECT immagine
         FROM immagini
         WHERE prodotto_id = p.prodotto_id
         ORDER BY immagine_id
         LIMIT 1
       ) img ON true
+       ORDER BY p.prodotto_id
     `;
 
     const result = await pool.query(query);
-    res.status(200).json(result.rows);
+
+    // Converti la colonna BYTEA immagine in base64 string
+    const prodotti = result.rows.map(({ immagine, ...rest }) => ({
+  ...rest,
+  immagine_principale: immagine ? immagine.toString('base64') : null
+  }));
+
+    res.status(200).json(prodotti);
   } catch (error) {
     console.error('Errore nel recupero dei prodotti:', error);
     res.status(500).json({ message: 'Errore del server durante il recupero dei prodotti.' });
@@ -152,23 +163,29 @@ router.get('/tipologia/:tipologia_id', async (req, res) => {
       SELECT 
         p.*, 
         u.nome_utente AS nome_artigiano,
-        img.immagine_link AS immagine_principale
+        img.immagine
       FROM prodotti p
       JOIN artigiani a ON p.artigiano_id = a.artigiano_id
       JOIN utenti u ON a.artigiano_id = u.id
       LEFT JOIN LATERAL (
-        SELECT immagine_link
+        SELECT immagine
         FROM immagini
         WHERE prodotto_id = p.prodotto_id
         ORDER BY immagine_id
         LIMIT 1
       ) img ON true
       WHERE p.tipologia_id = $1
+      ORDER BY p.prodotto_id
     `;
 
     const result = await pool.query(query, [tipologia_id]);
 
-    res.status(200).json(result.rows);
+    const prodotti = result.rows.map(({ immagine, ...rest }) => ({
+  ...rest,
+  immagine_principale: immagine ? immagine.toString('base64') : null
+}));
+
+    res.status(200).json(prodotti);
   } catch (error) {
     console.error('Errore nel recupero dei prodotti per tipologia:', error);
     res.status(500).json({ message: 'Errore del server durante il recupero dei prodotti per tipologia.' });
@@ -184,23 +201,29 @@ router.get('/artigiano/:artigiano_id', async (req, res) => {
       SELECT 
         p.*, 
         u.nome_utente AS nome_artigiano,
-        img.immagine_link AS immagine_principale
+        img.immagine
       FROM prodotti p
       JOIN artigiani a ON p.artigiano_id = a.artigiano_id
       JOIN utenti u ON a.artigiano_id = u.id
       LEFT JOIN LATERAL (
-        SELECT immagine_link
+        SELECT immagine
         FROM immagini
         WHERE prodotto_id = p.prodotto_id
         ORDER BY immagine_id
         LIMIT 1
       ) img ON true
       WHERE p.artigiano_id = $1
+      ORDER BY p.prodotto_id
     `;
 
     const result = await pool.query(query, [artigiano_id]);
 
-    res.status(200).json(result.rows);
+    const prodotti = result.rows.map(({ immagine, ...rest }) => ({
+  ...rest,
+  immagine_principale: immagine ? immagine.toString('base64') : null
+}));
+
+    res.status(200).json(prodotti);
   } catch (error) {
     console.error('Errore nel recupero dei prodotti per artigiano:', error);
     res.status(500).json({ message: 'Errore del server durante il recupero dei prodotti per artigiano.' });
@@ -244,15 +267,20 @@ router.delete('/:id', authMiddleware(2), async (req, res) => {
 // Aggiungi immagine a un prodotto - protetta per artigiani
 router.post('/:prodotto_id/images', authMiddleware(2), async (req, res) => {
   const { prodotto_id } = req.params;
-  const { immagine_link } = req.body;
-  const user = req.user; 
+  const { immagine_base64 } = req.body;
+  const user = req.user;
 
-  if (!immagine_link) {
-    return res.status(400).json({ message: 'immagine_link è obbligatorio' });
+  if (!immagine_base64) {
+    return res.status(400).json({ message: 'immagine_base64 è obbligatorio' });
   }
 
   try {
-    const prodottoResult = await pool.query('SELECT artigiano_id FROM prodotti WHERE prodotto_id = $1', [prodotto_id]);
+    // Verifica che il prodotto esista e appartenga all’artigiano
+    const prodottoResult = await pool.query(
+      'SELECT artigiano_id FROM prodotti WHERE prodotto_id = $1',
+      [prodotto_id]
+    );
+
     if (prodottoResult.rows.length === 0) {
       return res.status(404).json({ message: 'Prodotto non trovato' });
     }
@@ -263,12 +291,19 @@ router.post('/:prodotto_id/images', authMiddleware(2), async (req, res) => {
       return res.status(403).json({ message: 'Non autorizzato ad aggiungere immagini a questo prodotto' });
     }
 
+    // Converti base64 in buffer
+    const immagineBuffer = Buffer.from(immagine_base64, 'base64');
+
+    // Inserisci nel DB
     const insertResult = await pool.query(
-      'INSERT INTO immagini (prodotto_id, immagine_link) VALUES ($1, $2) RETURNING *',
-      [prodotto_id, immagine_link]
+      'INSERT INTO immagini (prodotto_id, immagine) VALUES ($1, $2) RETURNING immagine_id',
+      [prodotto_id, immagineBuffer]
     );
 
-    res.status(201).json({ message: 'Immagine inserita', immagine: insertResult.rows[0] });
+    res.status(201).json({
+      message: 'Immagine inserita con successo',
+      immagine_id: insertResult.rows[0].immagine_id
+    });
 
   } catch (error) {
     console.error('Errore inserimento immagine:', error);
@@ -276,40 +311,44 @@ router.post('/:prodotto_id/images', authMiddleware(2), async (req, res) => {
   }
 });
 
-// PATCH immagine - solo artigiano proprietario del prodotto e admin può modificare 
+// PATCH immagine - solo artigiano proprietario del prodotto o admin può modificare
 router.patch('/images/:immagine_id', authMiddleware(2), async (req, res) => {
   const { immagine_id } = req.params;
-  const { immagine_link } = req.body;
+  const { immagine_base64 } = req.body;
   const userId = req.user.id;
 
-  if (!immagine_link) {
-    return res.status(400).json({ message: 'immagine_link è obbligatorio' });
+  if (!immagine_base64) {
+    return res.status(400).json({ message: 'immagine_base64 è obbligatorio' });
   }
 
   try {
-    const queryCheck = `
-      SELECT p.artigiano_id 
-      FROM immagini i
-      JOIN prodotti p ON i.prodotto_id = p.prodotto_id
-      WHERE i.immagine_id = $1
-    `;
-    const checkResult = await pool.query(queryCheck, [immagine_id]);
+    // Controlla che l'immagine esista e che l'utente sia autorizzato
+    const checkResult = await pool.query(
+      `SELECT p.artigiano_id 
+       FROM immagini i
+       JOIN prodotti p ON i.prodotto_id = p.prodotto_id
+       WHERE i.immagine_id = $1`,
+      [immagine_id]
+    );
 
     if (checkResult.rows.length === 0) {
       return res.status(404).json({ message: 'Immagine non trovata' });
     }
 
     const artigianoId = checkResult.rows[0].artigiano_id;
+    const isAdmin = req.user.ruolo_id === 1;
 
-    if (req.user.ruolo_id !== 1 && artigianoId !== userId) {
+    if (!isAdmin && artigianoId !== userId) {
       return res.status(403).json({ message: 'Non autorizzato a modificare questa immagine' });
     }
 
-    const queryUpdate = `
-      UPDATE immagini SET immagine_link = $1 WHERE immagine_id = $2
-      RETURNING *
-    `;
-    const updateResult = await pool.query(queryUpdate, [immagine_link, immagine_id]);
+    // Converte il base64 in buffer binario
+    const immagineBuffer = Buffer.from(immagine_base64, 'base64');
+
+    const updateResult = await pool.query(
+      `UPDATE immagini SET immagine = $1 WHERE immagine_id = $2 RETURNING immagine_id, prodotto_id`,
+      [immagineBuffer, immagine_id]
+    );
 
     res.status(200).json({
       message: 'Immagine aggiornata con successo',
@@ -317,8 +356,8 @@ router.patch('/images/:immagine_id', authMiddleware(2), async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Errore nell\'aggiornamento dell\'immagine:', error);
-    res.status(500).json({ message: 'Errore del server durante l\'aggiornamento dell\'immagine.' });
+    console.error("Errore nell'aggiornamento dell'immagine:", error);
+    res.status(500).json({ message: "Errore del server durante l'aggiornamento dell'immagine." });
   }
 });
 
