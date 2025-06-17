@@ -1,5 +1,26 @@
 const bcrypt = require('bcrypt');
 const pool = require('./db');
+const fs = require('fs').promises;
+
+async function inserisciImmagineDaFile(prodotto_id, pathFile) {
+  try {
+    // Leggi il file immagine come buffer
+    const imgBuffer = await fs.readFile(pathFile);
+
+    // Inserisci nel db (query parametrizzata)
+    const insertQuery = `
+      INSERT INTO immagini (prodotto_id, immagine_link)
+      VALUES ($1, $2)
+      RETURNING immagine_id
+    `;
+
+    const result = await pool.query(insertQuery, [prodotto_id, imgBuffer]);
+
+    console.log(`Immagine inserita per prodotto ${prodotto_id} con id ${result.rows[0].immagine_id}`);
+  } catch (err) {
+    console.error(`Errore inserimento immagine per prodotto ${prodotto_id}:`, err);
+  }
+}
 
 async function seed() {
     console.log('Esecuzione seed...');
