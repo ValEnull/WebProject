@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db/db'); 
-const authMiddleware = require('../middleware/authMiddleware');
+const authMiddleware = require('../middleware/auth');
 
 // POST /report - nuova segnalazione
-router.post('/', authMiddleware(1), async (req, res) => {
-  const { ordine_id, motivazione, testo } = req.body;
+router.post('/:ordine_id', authMiddleware(1), async (req, res) => {
+  const ordine_id = parseInt(req.params.ordine_id, 10);
+  const { motivazione, testo } = req.body;
   const cliente_id = req.user.id;
 
   if (!ordine_id || !motivazione) {
@@ -17,12 +18,12 @@ router.post('/', authMiddleware(1), async (req, res) => {
 
     // Verifica che l’ordine appartenga al cliente loggato
     const checkOrderQuery = `
-      SELECT * FROM ordini
+      SELECT 1 FROM ordini
       WHERE ordine_id = $1 AND cliente_id = $2
     `;
     const checkOrderResult = await pool.query(checkOrderQuery, [ordine_id, cliente_id]);
 
-    if (checkOrderResult.rows.length === 0) {
+    if (checkOrderResult.rowCount === 0) {
       await pool.query('ROLLBACK');
       return res.status(403).json({ message: 'Non hai i permessi per segnalare questo ordine' });
     }
@@ -55,5 +56,4 @@ router.post('/', authMiddleware(1), async (req, res) => {
     res.status(500).json({ message: 'Errore del server durante l\'invio della segnalazione' });
   }
 });
-
 module.exports = router;
