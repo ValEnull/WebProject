@@ -9,7 +9,8 @@ const app = express();
 // Allow requests from your actual frontend origin (127.0.0.1:5501)
 app.use(cors());
 
-app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(express.static(path.join(__dirname,'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 

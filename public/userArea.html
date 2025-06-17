@@ -11,7 +11,9 @@
     <!-- Favicon -->
     <link rel="icon" href="/img/logoDef.png" type="image/png">
     <!-- CSS file -->
-    <link rel="stylesheet" href="/public/css/userArea.css">
+    <link rel="stylesheet" href="/css/userArea.css">
+    <!-- Custom JS -->
+    <script src="/js/userArea.js" defer></script>
 </head>
 <body>
     <!-- Header Bootstrap -->
@@ -98,7 +100,7 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label class="form-label text-muted">Indirizzo email</label>
-                            <div class="p-2 bg-light rounded">utente@esempio.com</div>
+                            <div id="emailDisplay" class="p-2 bg-light rounded">utente@esempio.com</div>
                         </div>
                         <button class="btn btn-outline-orange mt-2" data-bs-toggle="modal" data-bs-target="#emailModal">
                             Modifica email
@@ -262,6 +264,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- Footer -->
     <footer class="bg-dark text-white pt-5 pb-3">
