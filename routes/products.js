@@ -162,12 +162,12 @@ router.get('/tipologia/:tipologia_id', async (req, res) => {
       SELECT 
         p.*, 
         u.nome_utente AS nome_artigiano,
-        img.immagine_link AS immagine_principale
+        img.immagine
       FROM prodotti p
       JOIN artigiani a ON p.artigiano_id = a.artigiano_id
       JOIN utenti u ON a.artigiano_id = u.id
       LEFT JOIN LATERAL (
-        SELECT immagine_link
+        SELECT immagine
         FROM immagini
         WHERE prodotto_id = p.prodotto_id
         ORDER BY immagine_id
@@ -178,7 +178,12 @@ router.get('/tipologia/:tipologia_id', async (req, res) => {
 
     const result = await pool.query(query, [tipologia_id]);
 
-    res.status(200).json(result.rows);
+    const prodotti = result.rows.map(prod => ({
+      ...prod,
+      immagine_principale: prod.immagine ? prod.immagine.toString('base64') : null
+    }));
+
+    res.status(200).json(prodotti);
   } catch (error) {
     console.error('Errore nel recupero dei prodotti per tipologia:', error);
     res.status(500).json({ message: 'Errore del server durante il recupero dei prodotti per tipologia.' });
@@ -194,12 +199,12 @@ router.get('/artigiano/:artigiano_id', async (req, res) => {
       SELECT 
         p.*, 
         u.nome_utente AS nome_artigiano,
-        img.immagine_link AS immagine_principale
+        img.immagine
       FROM prodotti p
       JOIN artigiani a ON p.artigiano_id = a.artigiano_id
       JOIN utenti u ON a.artigiano_id = u.id
       LEFT JOIN LATERAL (
-        SELECT immagine_link
+        SELECT immagine
         FROM immagini
         WHERE prodotto_id = p.prodotto_id
         ORDER BY immagine_id
@@ -210,7 +215,12 @@ router.get('/artigiano/:artigiano_id', async (req, res) => {
 
     const result = await pool.query(query, [artigiano_id]);
 
-    res.status(200).json(result.rows);
+    const prodotti = result.rows.map(prod => ({
+      ...prod,
+      immagine_principale: prod.immagine ? prod.immagine.toString('base64') : null
+    }));
+
+    res.status(200).json(prodotti);
   } catch (error) {
     console.error('Errore nel recupero dei prodotti per artigiano:', error);
     res.status(500).json({ message: 'Errore del server durante il recupero dei prodotti per artigiano.' });
