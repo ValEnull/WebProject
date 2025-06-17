@@ -244,15 +244,20 @@ router.delete('/:id', authMiddleware(2), async (req, res) => {
 // Aggiungi immagine a un prodotto - protetta per artigiani
 router.post('/:prodotto_id/images', authMiddleware(2), async (req, res) => {
   const { prodotto_id } = req.params;
-  const { immagine_link } = req.body;
-  const user = req.user; 
+  const { immagine_base64 } = req.body;
+  const user = req.user;
 
-  if (!immagine_link) {
-    return res.status(400).json({ message: 'immagine_link è obbligatorio' });
+  if (!immagine_base64) {
+    return res.status(400).json({ message: 'immagine_base64 è obbligatorio' });
   }
 
   try {
-    const prodottoResult = await pool.query('SELECT artigiano_id FROM prodotti WHERE prodotto_id = $1', [prodotto_id]);
+    // Verifica che il prodotto esista e appartenga all’artigiano
+    const prodottoResult = await pool.query(
+      'SELECT artigiano_id FROM prodotti WHERE prodotto_id = $1',
+      [prodotto_id]
+    );
+
     if (prodottoResult.rows.length === 0) {
       return res.status(404).json({ message: 'Prodotto non trovato' });
     }
@@ -263,12 +268,19 @@ router.post('/:prodotto_id/images', authMiddleware(2), async (req, res) => {
       return res.status(403).json({ message: 'Non autorizzato ad aggiungere immagini a questo prodotto' });
     }
 
+    // Converti base64 in buffer
+    const immagineBuffer = Buffer.from(immagine_base64, 'base64');
+
+    // Inserisci nel DB
     const insertResult = await pool.query(
-      'INSERT INTO immagini (prodotto_id, immagine_link) VALUES ($1, $2) RETURNING *',
-      [prodotto_id, immagine_link]
+      'INSERT INTO immagini (prodotto_id, immagine) VALUES ($1, $2) RETURNING immagine_id',
+      [prodotto_id, immagineBuffer]
     );
 
-    res.status(201).json({ message: 'Immagine inserita', immagine: insertResult.rows[0] });
+    res.status(201).json({
+      message: 'Immagine inserita con successo',
+      immagine_id: insertResult.rows[0].immagine_id
+    });
 
   } catch (error) {
     console.error('Errore inserimento immagine:', error);
