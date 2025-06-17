@@ -136,6 +136,7 @@ router.get('/', async (req, res) => {
         ORDER BY immagine_id
         LIMIT 1
       ) img ON true
+       ORDER BY p.prodotto_id
     `;
 
     const result = await pool.query(query);
@@ -174,6 +175,7 @@ router.get('/tipologia/:tipologia_id', async (req, res) => {
         LIMIT 1
       ) img ON true
       WHERE p.tipologia_id = $1
+      ORDER BY p.prodotto_id
     `;
 
     const result = await pool.query(query, [tipologia_id]);
@@ -211,6 +213,7 @@ router.get('/artigiano/:artigiano_id', async (req, res) => {
         LIMIT 1
       ) img ON true
       WHERE p.artigiano_id = $1
+      ORDER BY p.prodotto_id
     `;
 
     const result = await pool.query(query, [artigiano_id]);
