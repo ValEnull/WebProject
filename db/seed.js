@@ -9,7 +9,7 @@ async function inserisciImmagineDaFile(prodotto_id, pathFile) {
 
     // Inserisci nel db (query parametrizzata)
     const insertQuery = `
-      INSERT INTO immagini (prodotto_id, immagine_link)
+      INSERT INTO immagini (prodotto_id, immagine)
       VALUES ($1, $2)
       RETURNING immagine_id
     `;
@@ -130,6 +130,12 @@ async function seed() {
                 prodottiInseriti.push({ prodotto_id: res.rows[0].prodotto_id, artigiano_id: artigianoId });
             }
         }
+
+        // --- INSERISCI IMMAGINI ---
+
+        await inserisciImmagineDaFile(prodottiInseriti[0].prodotto_id, './img/seedImages/tagliere_ulivo.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[1].prodotto_id, './img/seedImages/tavolino_rustico.jpg');
+
 
         // --- CREA RECENSIONI ---
         const clienti = [utentiMap['cliente1'], utentiMap['cliente2']];
