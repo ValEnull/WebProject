@@ -125,12 +125,12 @@ router.get('/', async (req, res) => {
         p.descrizione,
         p.quant,
         u.nome_utente AS nome_artigiano,
-        img.immagine_link AS immagine_principale
+        img.immagine -- qui BYTEA, non immagine_link
       FROM prodotti p
       JOIN artigiani a ON p.artigiano_id = a.artigiano_id
       JOIN utenti u ON a.artigiano_id = u.id
       LEFT JOIN LATERAL (
-        SELECT immagine_link
+        SELECT immagine
         FROM immagini
         WHERE prodotto_id = p.prodotto_id
         ORDER BY immagine_id
@@ -139,7 +139,14 @@ router.get('/', async (req, res) => {
     `;
 
     const result = await pool.query(query);
-    res.status(200).json(result.rows);
+
+    // Converti la colonna BYTEA immagine in base64 string
+    const prodotti = result.rows.map(prod => ({
+      ...prod,
+      immagine_principale: prod.immagine ? prod.immagine.toString('base64') : null
+    }));
+
+    res.status(200).json(prodotti);
   } catch (error) {
     console.error('Errore nel recupero dei prodotti:', error);
     res.status(500).json({ message: 'Errore del server durante il recupero dei prodotti.' });
