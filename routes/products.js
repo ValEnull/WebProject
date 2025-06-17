@@ -141,10 +141,10 @@ router.get('/', async (req, res) => {
     const result = await pool.query(query);
 
     // Converti la colonna BYTEA immagine in base64 string
-    const prodotti = result.rows.map(prod => ({
-      ...prod,
-      immagine_principale: prod.immagine ? prod.immagine.toString('base64') : null
-    }));
+    const prodotti = result.rows.map(({ immagine, ...rest }) => ({
+  ...rest,
+  immagine_principale: immagine ? immagine.toString('base64') : null
+  }));
 
     res.status(200).json(prodotti);
   } catch (error) {
@@ -178,10 +178,10 @@ router.get('/tipologia/:tipologia_id', async (req, res) => {
 
     const result = await pool.query(query, [tipologia_id]);
 
-    const prodotti = result.rows.map(prod => ({
-      ...prod,
-      immagine_principale: prod.immagine ? prod.immagine.toString('base64') : null
-    }));
+    const prodotti = result.rows.map(({ immagine, ...rest }) => ({
+  ...rest,
+  immagine_principale: immagine ? immagine.toString('base64') : null
+}));
 
     res.status(200).json(prodotti);
   } catch (error) {
@@ -215,10 +215,10 @@ router.get('/artigiano/:artigiano_id', async (req, res) => {
 
     const result = await pool.query(query, [artigiano_id]);
 
-    const prodotti = result.rows.map(prod => ({
-      ...prod,
-      immagine_principale: prod.immagine ? prod.immagine.toString('base64') : null
-    }));
+    const prodotti = result.rows.map(({ immagine, ...rest }) => ({
+  ...rest,
+  immagine_principale: immagine ? immagine.toString('base64') : null
+}));
 
     res.status(200).json(prodotti);
   } catch (error) {
