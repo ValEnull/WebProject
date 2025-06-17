@@ -1,5 +1,25 @@
 const bcrypt = require('bcrypt');
 const pool = require('./db');
+const fs = require('fs').promises;
+
+async function inserisciImmagineDaFile(prodotto_id, pathFile) {
+  try {
+    // Leggi il file immagine come buffer
+    const imgBuffer = await fs.readFile(pathFile);
+
+    // Inserisci nel db (query parametrizzata)
+    const insertQuery = `
+      INSERT INTO immagini (prodotto_id, immagine)
+      VALUES ($1, $2)
+      RETURNING immagine_id
+    `;
+
+    const result = await pool.query(insertQuery, [prodotto_id, imgBuffer]);
+
+  } catch (err) {
+    console.error(`Errore inserimento immagine per prodotto ${prodotto_id}:`, err);
+  }
+}
 
 async function seed() {
     console.log('Esecuzione seed...');
@@ -109,6 +129,26 @@ async function seed() {
                 prodottiInseriti.push({ prodotto_id: res.rows[0].prodotto_id, artigiano_id: artigianoId });
             }
         }
+
+        // --- INSERISCI IMMAGINI ---
+
+        await inserisciImmagineDaFile(prodottiInseriti[0].prodotto_id, './img/seedImages/tagliere_ulivo.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[1].prodotto_id, './img/seedImages/tavolino_rustico.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[2].prodotto_id, './img/seedImages/cornice_intagliata.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[3].prodotto_id, './img/seedImages/sciarpa_lana.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[4].prodotto_id, './img/seedImages/cuscino_ricamato.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[5].prodotto_id, './img/seedImages/tenda_cotone.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[6].prodotto_id, './img/seedImages/orecchini_argento.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[7].prodotto_id, './img/seedImages/bracciale_rame.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[8].prodotto_id, './img/seedImages/anello_in_filigrana.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[9].prodotto_id, './img/seedImages/lampada_vetro_soffiato.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[10].prodotto_id, './img/seedImages/bicchieri_decorati.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[11].prodotto_id, './img/seedImages/specchio_vetro.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[12].prodotto_id, './img/seedImages/portacandele_ferro.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[13].prodotto_id, './img/seedImages/scultura_metallo.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[14].prodotto_id, './img/seedImages/maniglia_vintage.jpg');
+
+
 
         // --- CREA RECENSIONI ---
         const clienti = [utentiMap['cliente1'], utentiMap['cliente2']];
