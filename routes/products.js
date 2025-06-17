@@ -73,39 +73,42 @@ router.patch('/:id', authMiddleware(2), async (req, res) => {
   }
 });
 
-// GET prodotto singolo - pubblico
+// GET dettagli prodotto con immagini codificate in base64
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const prodottoQuery = `
-      SELECT p.prodotto_id, p.nome_prodotto, p.tipologia_id, p.prezzo, p.descrizione, p.quant, a.artigiano_id, u.nome_utente AS nome_artigiano
-      FROM prodotti p
-      JOIN artigiani a ON p.artigiano_id = a.artigiano_id
-      JOIN utenti u ON a.artigiano_id = u.id
-      WHERE p.prodotto_id = $1
-    `;
-    const prodottoResult = await pool.query(prodottoQuery, [id]);
+    const prodottoResult = await pool.query(
+      `SELECT prodotto_id, nome_prodotto, descrizione, prezzo, quant, artigiano_id 
+       FROM prodotti 
+       WHERE prodotto_id = $1`,
+      [id]
+    );
 
     if (prodottoResult.rows.length === 0) {
-      return res.status(404).json({ message: 'Prodotto non trovato' });
+      return res.status(404).json({ message: 'Prodotto non trovato.' });
     }
 
     const prodotto = prodottoResult.rows[0];
 
-    const immaginiQuery = `
-      SELECT immagine_id, immagine_link
-      FROM immagini
-      WHERE prodotto_id = $1
-      ORDER BY immagine_id ASC
-    `;
-    const immaginiResult = await pool.query(immaginiQuery, [id]);
+    const immaginiResult = await pool.query(
+      `SELECT immagine_id, immagine 
+       FROM immagini 
+       WHERE prodotto_id = $1`,
+      [id]
+    );
 
-    prodotto.immagini = immaginiResult.rows;
+    // Converti campo BYTEA (Buffer) in base64 string
+    const immagini = immaginiResult.rows.map(img => ({
+      immagine_id: img.immagine_id,
+      immagine_base64: img.immagine.toString('base64')
+    }));
+
+    prodotto.immagini = immagini;
 
     res.status(200).json(prodotto);
   } catch (error) {
-    console.error('Errore nel recupero del prodotto:', error);
+    console.error('Errore nel recupero prodotto:', error);
     res.status(500).json({ message: 'Errore del server durante il recupero del prodotto.' });
   }
 });
