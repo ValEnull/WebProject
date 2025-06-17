@@ -288,40 +288,44 @@ router.post('/:prodotto_id/images', authMiddleware(2), async (req, res) => {
   }
 });
 
-// PATCH immagine - solo artigiano proprietario del prodotto e admin può modificare 
+// PATCH immagine - solo artigiano proprietario del prodotto o admin può modificare
 router.patch('/images/:immagine_id', authMiddleware(2), async (req, res) => {
   const { immagine_id } = req.params;
-  const { immagine_link } = req.body;
+  const { immagine_base64 } = req.body;
   const userId = req.user.id;
 
-  if (!immagine_link) {
-    return res.status(400).json({ message: 'immagine_link è obbligatorio' });
+  if (!immagine_base64) {
+    return res.status(400).json({ message: 'immagine_base64 è obbligatorio' });
   }
 
   try {
-    const queryCheck = `
-      SELECT p.artigiano_id 
-      FROM immagini i
-      JOIN prodotti p ON i.prodotto_id = p.prodotto_id
-      WHERE i.immagine_id = $1
-    `;
-    const checkResult = await pool.query(queryCheck, [immagine_id]);
+    // Controlla che l'immagine esista e che l'utente sia autorizzato
+    const checkResult = await pool.query(
+      `SELECT p.artigiano_id 
+       FROM immagini i
+       JOIN prodotti p ON i.prodotto_id = p.prodotto_id
+       WHERE i.immagine_id = $1`,
+      [immagine_id]
+    );
 
     if (checkResult.rows.length === 0) {
       return res.status(404).json({ message: 'Immagine non trovata' });
     }
 
     const artigianoId = checkResult.rows[0].artigiano_id;
+    const isAdmin = req.user.ruolo_id === 1;
 
-    if (req.user.ruolo_id !== 1 && artigianoId !== userId) {
+    if (!isAdmin && artigianoId !== userId) {
       return res.status(403).json({ message: 'Non autorizzato a modificare questa immagine' });
     }
 
-    const queryUpdate = `
-      UPDATE immagini SET immagine_link = $1 WHERE immagine_id = $2
-      RETURNING *
-    `;
-    const updateResult = await pool.query(queryUpdate, [immagine_link, immagine_id]);
+    // Converte il base64 in buffer binario
+    const immagineBuffer = Buffer.from(immagine_base64, 'base64');
+
+    const updateResult = await pool.query(
+      `UPDATE immagini SET immagine = $1 WHERE immagine_id = $2 RETURNING immagine_id, prodotto_id`,
+      [immagineBuffer, immagine_id]
+    );
 
     res.status(200).json({
       message: 'Immagine aggiornata con successo',
@@ -329,8 +333,8 @@ router.patch('/images/:immagine_id', authMiddleware(2), async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Errore nell\'aggiornamento dell\'immagine:', error);
-    res.status(500).json({ message: 'Errore del server durante l\'aggiornamento dell\'immagine.' });
+    console.error("Errore nell'aggiornamento dell'immagine:", error);
+    res.status(500).json({ message: "Errore del server durante l'aggiornamento dell'immagine." });
   }
 });
 
