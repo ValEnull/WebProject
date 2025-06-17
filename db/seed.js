@@ -16,7 +16,6 @@ async function inserisciImmagineDaFile(prodotto_id, pathFile) {
 
     const result = await pool.query(insertQuery, [prodotto_id, imgBuffer]);
 
-    console.log(`Immagine inserita per prodotto ${prodotto_id} con id ${result.rows[0].immagine_id}`);
   } catch (err) {
     console.error(`Errore inserimento immagine per prodotto ${prodotto_id}:`, err);
   }
@@ -135,6 +134,20 @@ async function seed() {
 
         await inserisciImmagineDaFile(prodottiInseriti[0].prodotto_id, './img/seedImages/tagliere_ulivo.jpg');
         await inserisciImmagineDaFile(prodottiInseriti[1].prodotto_id, './img/seedImages/tavolino_rustico.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[2].prodotto_id, './img/seedImages/cornice_intagliata.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[3].prodotto_id, './img/seedImages/]sciarpa_lana.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[4].prodotto_id, './img/seedImages/cuscino_ricamato.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[5].prodotto_id, './img/seedImages/tenda_cotone.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[6].prodotto_id, './img/seedImages/orecchini_argento.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[7].prodotto_id, './img/seedImages/bracciale_rame.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[8].prodotto_id, './img/seedImages/anello_filigrana.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[9].prodotto_id, './img/seedImages/lampada_vetro.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[10].prodotto_id, './img/seedImages/bicchieri_decorati.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[11].prodotto_id, './img/seedImages/specchio_vetro.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[12].prodotto_id, './img/seedImages/portacandele_ferro.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[13].prodotto_id, './img/seedImages/scultura_metallo.jpg');
+        await inserisciImmagineDaFile(prodottiInseriti[14].prodotto_id, './img/seedImages/maniglia_porta.jpg');
+        
 
 
         // --- CREA RECENSIONI ---
