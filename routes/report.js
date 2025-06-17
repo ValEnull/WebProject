@@ -1,18 +1,33 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db/db'); 
+const authMiddleware = require('../middleware/authMiddleware');
 
 // POST /report - nuova segnalazione
-router.post('/', async (req, res) => {
-  const { ordine_id, cliente_id, motivazione, testo } = req.body;
+router.post('/', authMiddleware(1), async (req, res) => {
+  const { ordine_id, motivazione, testo } = req.body;
+  const cliente_id = req.user.id;
 
-  if (!ordine_id || !cliente_id || !motivazione) {
-    return res.status(400).json({ message: 'ordine_id, cliente_id e motivazione sono obbligatori' });
+  if (!ordine_id || !motivazione) {
+    return res.status(400).json({ message: 'ordine_id e motivazione sono obbligatori' });
   }
 
   try {
     await pool.query('BEGIN');
 
+    // Verifica che l’ordine appartenga al cliente loggato
+    const checkOrderQuery = `
+      SELECT * FROM ordini
+      WHERE ordine_id = $1 AND cliente_id = $2
+    `;
+    const checkOrderResult = await pool.query(checkOrderQuery, [ordine_id, cliente_id]);
+
+    if (checkOrderResult.rows.length === 0) {
+      await pool.query('ROLLBACK');
+      return res.status(403).json({ message: 'Non hai i permessi per segnalare questo ordine' });
+    }
+
+    // Inserisci la segnalazione
     const insertQuery = `
       INSERT INTO segnalazioni (ordine_id, cliente_id, motivazione, testo)
       VALUES ($1, $2, $3, $4)
@@ -20,6 +35,7 @@ router.post('/', async (req, res) => {
     `;
     const insertResult = await pool.query(insertQuery, [ordine_id, cliente_id, motivazione, testo]);
 
+    // Aggiorna lo stato dell’ordine
     const updateQuery = `
       UPDATE ordini
       SET stato = 'in controversia'
