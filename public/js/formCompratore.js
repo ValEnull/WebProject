@@ -12,7 +12,7 @@ function handleFormSubmission() {
             email: document.getElementById('email').value,
             password: document.getElementById('psw').value,
             password_confirmation: document.getElementById('pswConf').value,
-            roulo_id: 1
+            isArtigiano: false // Impostato a false per un compratore
         };
 
         if (formData.password !== formData.password_confirmation) {
