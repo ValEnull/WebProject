@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const pool = require('../db/db');
 const router = express.Router();
+const authMiddleware = require('../middleware/auth');
 const jwt = require('jsonwebtoken');// Abilita CORS per tutte le rotte in questo router
 
 // Rotta per la registrazione degli utenti
@@ -199,8 +200,13 @@ router.get('/artisans/:id', async (req, res) => {
 });
 
 // PATCH utente
-router.patch('/:id', async (req, res) => {
-  const { nome_utente, nome, cognome, email, ruolo_id } = req.body;
+router.patch('/:id', authMiddleware(1), async (req, res) => {
+  const { nome_utente, nome, cognome, email } = req.body;
+  const { id } = req.params;
+
+  if (parseInt(id) !== req.user.id) {
+    return res.status(403).json({ error: 'Non puoi modificare un altro utente' });
+  }
 
   try {
     const result = await pool.query(
@@ -210,15 +216,17 @@ router.patch('/:id', async (req, res) => {
         nome_utente = COALESCE($1, nome_utente),
         nome = COALESCE($2, nome),
         cognome = COALESCE($3, cognome),
-        email = COALESCE($4, email),
-        ruolo_id = COALESCE($5, ruolo_id)
-      WHERE id = $6
+        email = COALESCE($4, email)
+      WHERE id = $5
       RETURNING *
       `,
-      [nome_utente, nome, cognome, email, ruolo_id, req.params.id]
+      [nome_utente, nome, cognome, email, id]
     );
 
-    if (result.rowCount === 0) return res.status(404).json({ error: 'Utente non trovato' });
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Utente non trovato' });
+    }
+
     res.json(result.rows[0]);
 
   } catch (error) {
@@ -227,9 +235,58 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
-// PATCH artigiano
-router.patch('/artisans/:id', async (req, res) => {
+// PATCH password - protetta per utente proprietareio, conferma password
+router.patch('/:id/password', authMiddleware(1), async (req, res) => {
+  const { id } = req.params;
+  const { oldPassword, newPassword } = req.body;
+  const loggedUserId = req.user.id;
+
+  if (!oldPassword || !newPassword) {
+    return res.status(400).json({ message: 'oldPassword e newPassword sono obbligatorie' });
+  }
+
+  if (parseInt(id) !== loggedUserId) {
+    return res.status(403).json({ message: 'Non puoi modificare la password di un altro utente' });
+  }
+
+  try {
+    const result = await pool.query(
+      'SELECT password_hash FROM utenti WHERE id = $1',
+      [id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Utente non trovato' });
+    }
+
+    const passwordMatch = await bcrypt.compare(oldPassword, result.rows[0].password_hash);
+
+    if (!passwordMatch) {
+      return res.status(403).json({ message: 'Password attuale non corretta' });
+    }
+
+    const newHashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await pool.query(
+      'UPDATE utenti SET password_hash = $1 WHERE id = $2',
+      [newHashedPassword, id]
+    );
+
+    res.json({ message: 'Password aggiornata con successo' });
+  } catch (error) {
+    console.error('Errore durante il cambio password:', error);
+    res.status(500).json({ message: 'Errore del server durante il cambio password' });
+  }
+});
+
+// PATCH artigiano - protetta per artigiano proprietario
+router.patch('/artisans/:id', authMiddleware(2), async (req, res) => {
   const { p_iva, CAP } = req.body;
+  const { id } = req.params;
+
+  if (parseInt(id) !== req.user.id) {
+    return res.status(403).json({ error: 'Non puoi modificare i dati di un altro artigiano' });
+  }
 
   try {
     const result = await pool.query(
@@ -241,10 +298,13 @@ router.patch('/artisans/:id', async (req, res) => {
       WHERE artigiano_id = $3
       RETURNING *
       `,
-      [p_iva, CAP, req.params.id]
+      [p_iva, CAP, id]
     );
 
-    if (result.rowCount === 0) return res.status(404).json({ error: 'Artigiano non trovato' });
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Artigiano non trovato' });
+    }
+
     res.json(result.rows[0]);
 
   } catch (error) {
@@ -253,10 +313,18 @@ router.patch('/artisans/:id', async (req, res) => {
   }
 });
 
-// DELETE utente
-router.delete('/:id', async (req, res) => {
+// DELETE utente - protetta per utente proprietario o admin
+router.delete('/:id', authMiddleware(1), async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+  const userRole = req.user.ruolo_id;
+
+  if (parseInt(id) !== userId && userRole !== 3) {
+    return res.status(403).json({ error: 'Non autorizzato a eliminare questo utente' });
+  }
+
   try {
-    const result = await pool.query('DELETE FROM utenti WHERE id = $1 RETURNING *', [req.params.id]);
+    const result = await pool.query('DELETE FROM utenti WHERE id = $1 RETURNING *', [id]);
     if (result.rowCount === 0) return res.status(404).json({ error: 'Utente non trovato' });
     res.json({ message: 'Utente eliminato con successo', user: result.rows[0] });
   } catch (error) {
@@ -265,10 +333,18 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// DELETE artigiano
-router.delete('/artisans/:id', async (req, res) => {
+// DELETE artigiano - protetta per artigiano proprietario o admin
+router.delete('/artisans/:id', authMiddleware(2), async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+  const userRole = req.user.ruolo_id;
+
+  if (parseInt(id) !== userId && userRole !== 3) {
+    return res.status(403).json({ error: 'Non autorizzato a eliminare questo artigiano' });
+  }
+
   try {
-    const result = await pool.query('DELETE FROM artigiani WHERE artigiano_id = $1 RETURNING *', [req.params.id]);
+    const result = await pool.query('DELETE FROM artigiani WHERE artigiano_id = $1 RETURNING *', [id]);
     if (result.rowCount === 0) return res.status(404).json({ error: 'Artigiano non trovato' });
     res.json({ message: 'Artigiano eliminato con successo', artisan: result.rows[0] });
   } catch (error) {
