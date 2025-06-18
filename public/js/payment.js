@@ -28,3 +28,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // Esempio di chiamata (dovresti collegarlo al tuo carrello reale)
     calculateShipping(0); // Inizializza a 0
 });
+
+// Simulazione pagamento
+document.addEventListener('DOMContentLoaded', function() {
+    // Genera un numero di transazione casuale quando il modal viene mostrato
+    document.getElementById('paymentConfirmationModal').addEventListener('show.bs.modal', function() {
+        const transactionCode = 'SIM-' + Math.floor(Math.random() * 1000000);
+        document.querySelector('#paymentConfirmationModal .text-muted').textContent = 
+            'Codice transazione: ' + transactionCode;
+        
+        // Simula un ritardo di elaborazione (opzionale)
+        const submitBtn = document.querySelector('[data-bs-target="#paymentConfirmationModal"]');
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Elaborazione...';
+        submitBtn.disabled = true;
+        
+        setTimeout(function() {
+            submitBtn.innerHTML = '<i class="fas fa-lock me-2"></i>Completa l\'ordine';
+            submitBtn.disabled = false;
+        }, 1500);
+    });
+});

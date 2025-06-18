@@ -9,7 +9,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <!-- Favicon -->
-    <link rel="icon" href="/img/logoDef.png" type="image/png">
+    <link rel="icon" href="img/logoDef.png" type="image/png">
     <!-- CSS file -->
     <link rel="stylesheet" href="/public/css/payment.css">
     <!-- js file -->
@@ -23,7 +23,7 @@
             <div class="d-flex flex-wrap align-items-center justify-content-between">
                 <!-- Logo -->
                 <div class="d-flex align-items-center gap-2">
-                    <img src="/img/logoDef.png" alt="Logo" class="rounded-circle" style="width: 50px; height: 50px;">
+                    <img src="img/logoDef.png" alt="Logo" class="rounded-circle" style="width: 50px; height: 50px;">
                     <h5 class="mb-0">SaleCraft</h5>
                 </div>
                 
@@ -161,7 +161,7 @@
                             </label>
                         </div>
                         
-                        <button class="btn btn-orange btn-lg w-100 py-3">
+                        <button class="btn btn-orange btn-lg w-100 py-3" data-bs-toggle="modal" data-bs-target="#paymentConfirmationModal">
                             <i class="fas fa-lock me-2"></i>Completa l'ordine
                         </button>
                         
@@ -177,6 +177,27 @@
             </div>
         </div>
     </main>
+
+    <!-- Modal Conferma Pagamento -->
+    <div class="modal fade" id="paymentConfirmationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title text-success"><i class="fas fa-check-circle me-2"></i>Pagamento completato!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-check-circle text-success mb-3" style="font-size: 5rem;"></i>
+                <h4 class="mb-3">Grazie per il tuo ordine!</h4>
+                <p>Il tuo pagamento è stato processato con successo.</p>
+                <p class="small text-muted">Codice transazione: #SIM-{{Math.floor(Math.random()*1000000)}}</p>
+            </div>
+                <div class="modal-footer border-0 justify-content-center">
+                    <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">Continua</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="bg-dark text-white pt-5 pb-3 mt-5">
