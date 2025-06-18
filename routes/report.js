@@ -100,6 +100,35 @@ router.patch('/:segnalazione_id/close', authMiddleware(3), async (req, res) => {
   }
 });
 
+// GET generico -protetta per admin
+router.get('/', authMiddleware(3), async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT * FROM segnalazioni ORDER BY data_segnalazione DESC`
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error('Errore recupero segnalazioni admin:', error);
+    res.status(500).json({ message: 'Errore del server' });
+  }
+});
+
+// GET per cliente - protetta per cliente
+router.get('/cliente', authMiddleware(1), async (req, res) => {
+  const cliente_id = req.user.id;
+
+  try {
+    const { rows } = await pool.query(
+      `SELECT * FROM segnalazioni WHERE cliente_id = $1 ORDER BY data_segnalazione DESC`,
+      [cliente_id]
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error('Errore recupero segnalazioni cliente:', error);
+    res.status(500).json({ message: 'Errore del server' });
+  }
+});
+
 // DELETE rimozione segnalazione - protetta per utente proprietario
 router.delete('/:id', authMiddleware(1), async (req, res) => {
   const segnalazione_id = parseInt(req.params.id, 10);
