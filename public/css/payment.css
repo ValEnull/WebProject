@@ -1,0 +1,69 @@
+/* Stili ereditati da userArea.css */
+:root {
+    --orange: rgb(235, 121, 80);
+    --orange-hover: #d35400;
+    --light-bg: #f8f9fa;
+}
+
+.bg-orange {
+    background-color: var(--orange) !important;
+}
+
+.text-orange {
+    color: var(--orange) !important;
+}
+
+.btn-orange {
+    background-color: var(--orange);
+    color: white;
+    border: none;
+}
+
+.btn-orange:hover {
+    background-color: var(--orange-hover);
+    color: white;
+}
+
+.btn-outline-orange {
+    color: var(--orange);
+    border-color: var(--orange);
+}
+
+.btn-outline-orange:hover {
+    background-color: var(--orange);
+    color: white;
+}
+
+/* Stili specifici per la pagina di pagamento */
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 0.5rem !important;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 0.25rem rgba(235, 121, 80, 0.25);
+}
+
+/* Stile per l'alert info */
+.alert-info {
+    background-color: #e7f5fe;
+    border-color: #b8e2fb;
+    color: #0c5460;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2.5rem;
+    }
+    
+    .sticky-top {
+        position: static !important;
+    }
+}
