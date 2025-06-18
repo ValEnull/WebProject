@@ -125,7 +125,7 @@ router.get('/', async (req, res) => {
         p.descrizione,
         p.quant,
         u.nome_utente AS nome_artigiano,
-        img.immagine -- qui BYTEA, non immagine_link
+        img.immagine 
       FROM prodotti p
       JOIN artigiani a ON p.artigiano_id = a.artigiano_id
       JOIN utenti u ON a.artigiano_id = u.id
@@ -141,7 +141,6 @@ router.get('/', async (req, res) => {
 
     const result = await pool.query(query);
 
-    // Converti la colonna BYTEA immagine in base64 string
     const prodotti = result.rows.map(({ immagine, ...rest }) => ({
   ...rest,
   immagine_principale: immagine ? immagine.toString('base64') : null
