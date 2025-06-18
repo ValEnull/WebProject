@@ -131,6 +131,8 @@ CREATE TABLE IF NOT EXISTS segnalazioni (
     cliente_id INTEGER NOT NULL,
     testo TEXT,
     motivazione TEXT NOT NULL, 
+    risoluzione TEXT,
+    data_risoluzione TIMESTAMP,
     data_segnalazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     stato_segnalazione VARCHAR(20) NOT NULL DEFAULT 'in attesa',
     CONSTRAINT segnalazioni_ordine_id_fkey FOREIGN KEY (ordine_id)
