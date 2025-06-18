@@ -54,7 +54,7 @@ router.post('/:ordine_id', authMiddleware(1), async (req, res) => {
   }
 });
 
-// POST chiusura segnalazione
+// PATCH chiusura segnalazione
 router.patch('/:segnalazione_id/close', authMiddleware(3), async (req, res) => {
   const segnalazione_id = parseInt(req.params.segnalazione_id, 10);
   const { risoluzione } = req.body;
@@ -62,7 +62,6 @@ router.patch('/:segnalazione_id/close', authMiddleware(3), async (req, res) => {
   try {
     await pool.query('BEGIN');
 
-    // Recupera l'ordine associato alla segnalazione
     const segnalazioneRes = await pool.query(
       'SELECT ordine_id FROM segnalazioni WHERE segnalazione_id = $1 AND stato_segnalazione = $2',
       [segnalazione_id, 'in attesa']
@@ -74,8 +73,8 @@ router.patch('/:segnalazione_id/close', authMiddleware(3), async (req, res) => {
     }
 
     const ordine_id = segnalazioneRes.rows[0].ordine_id;
+  
 
-    // Aggiorna segnalazione
     await pool.query(
       `UPDATE segnalazioni
        SET risoluzione = $1, data_risoluzione = NOW(), stato_segnalazione = 'risolta'
@@ -83,7 +82,6 @@ router.patch('/:segnalazione_id/close', authMiddleware(3), async (req, res) => {
       [risoluzione, segnalazione_id]
     );
 
-    // Aggiorna stato ordine
     await pool.query(
       `UPDATE ordini
        SET stato = 'chiuso'
@@ -99,6 +97,45 @@ router.patch('/:segnalazione_id/close', authMiddleware(3), async (req, res) => {
     await pool.query('ROLLBACK');
     console.error('Errore durante la chiusura della segnalazione:', error);
     res.status(500).json({ message: 'Errore interno del server' });
+  }
+});
+
+// DELETE rimozione segnalazione - protetta per utente proprietario
+router.delete('/:id', authMiddleware(1), async (req, res) => {
+  const segnalazione_id = parseInt(req.params.id, 10);
+  const cliente_id = req.user.id;
+
+  try {
+    const { rows } = await pool.query(
+      `SELECT cliente_id, stato_segnalazione
+       FROM segnalazioni
+       WHERE segnalazione_id = $1`,
+      [segnalazione_id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Segnalazione non trovata' });
+    }
+
+    const segnalazione = rows[0];
+
+    if (segnalazione.cliente_id !== cliente_id) {
+      return res.status(403).json({ message: 'Non hai i permessi per eliminare questa segnalazione' });
+    }
+
+    if (segnalazione.stato_segnalazione !== 'in attesa') {
+      return res.status(400).json({ message: 'Non è possibile eliminare una segnalazione già risolta' });
+    }
+
+    await pool.query(
+      `DELETE FROM segnalazioni WHERE segnalazione_id = $1`,
+      [segnalazione_id]
+    );
+
+    res.status(200).json({ message: 'Segnalazione eliminata con successo' });
+  } catch (error) {
+    console.error('Errore durante la cancellazione della segnalazione:', error);
+    res.status(500).json({ message: 'Errore del server' });
   }
 });
 module.exports = router;
