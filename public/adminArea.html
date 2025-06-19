@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area Admin - SaleCraft</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Favicon -->
+    <link rel="icon" href="/public/img/logoDef.png" type="image/png">
+    <!-- CSS file -->
+    <link rel="stylesheet" href="/public/css/adminArea.css">
+    <!-- Custom JS -->
+    <script src="/public/js/adminArea.js" defer></script>
+</head>
+<body>
+    
+    <!-- Header -->
+    <header class="bg-white py-2 px-3 shadow-sm sticky-top">
+        <div class="container-fluid">
+            <div class="d-flex flex-wrap align-items-center justify-content-between">
+                <!-- Logo -->
+                <div class="d-flex align-items-center gap-2">
+                    <img src="img/logoDef.png" alt="Logo" class="rounded-circle" style="width: 50px; height: 50px;">
+                    <h5 class="mb-0">SaleCraft <span class="badge bg-danger">Admin</span></h5>
+                </div>
+                
+                <!-- Admin Menu -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-orange dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-shield me-2"></i>Admin
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container my-5">
+        <!-- Dashboard -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-4 text-center mb-4">Dashboard <span class="text-orange">Admin</span></h1>
+                <p class="lead text-center text-muted">Gestisci gli ordini, le segnalazioni e le recensioni</p>
+            </div>
+        </div>
+
+        <!-- Statistiche -->
+        <div class="row mb-5">
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h2 class="text-orange">24</h2>
+                        <p class="text-muted mb-0"><i class="fas fa-shopping-bag me-2"></i>Ordini oggi</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h2 class="text-orange">8</h2>
+                        <p class="text-muted mb-0"><i class="fas fa-flag me-2"></i>Segnalazioni attive</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h2 class="text-orange">3</h2>
+                        <p class="text-muted mb-0"><i class="fas fa-star-half-alt me-2"></i>Recensioni da moderare</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Ordini Recenti -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0"><i class="fas fa-shopping-bag me-2 text-orange"></i>Ordini Recenti</h3>
+                        <a href="#" class="btn btn-sm btn-outline-orange">Vedi tutti</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID Ordine</th>
+                                        <th>Cliente</th>
+                                        <th>Data</th>
+                                        <th>Totale</th>
+                                        <th>Stato</th>
+                                        <th>Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#SC-10025</td>
+                                        <td>Mario Rossi</td>
+                                        <td>19/06/2025</td>
+                                        <td>€ 89,99</td>
+                                        <td><span class="badge bg-success">Completato</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-orange"><i class="fas fa-eye"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#SC-10024</td>
+                                        <td>Luigi Bianchi</td>
+                                        <td>19/06/2025</td>
+                                        <td>€ 124,50</td>
+                                        <td><span class="badge bg-warning">In elaborazione</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-orange"><i class="fas fa-eye"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#SC-10023</td>
+                                        <td>Anna Verdi</td>
+                                        <td>18/06/2025</td>
+                                        <td>€ 56,75</td>
+                                        <td><span class="badge bg-primary">Spedito</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-orange"><i class="fas fa-eye"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Segnalazioni -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0"><i class="fas fa-flag me-2 text-orange"></i>Segnalazioni Recenti</h3>
+                        <a href="#" class="btn btn-sm btn-outline-orange">Vedi tutte</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Tipo</th>
+                                        <th>Utente</th>
+                                        <th>Data</th>
+                                        <th>Stato</th>
+                                        <th>Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#REP-045</td>
+                                        <td>Prodotto non conforme</td>
+                                        <td>user123</td>
+                                        <td>19/06/2025</td>
+                                        <td><span class="badge bg-warning">In attesa</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-orange me-1"><i class="fas fa-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-success"><i class="fas fa-check"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#REP-044</td>
+                                        <td>Recensione inappropriata</td>
+                                        <td>user456</td>
+                                        <td>18/06/2025</td>
+                                        <td><span class="badge bg-success">Risolto</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-orange me-1"><i class="fas fa-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-success"><i class="fas fa-check"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#REP-043</td>
+                                        <td>Problema con il pagamento</td>
+                                        <td>user789</td>
+                                        <td>17/06/2025</td>
+                                        <td><span class="badge bg-danger">Rifiutato</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-orange me-1"><i class="fas fa-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-success"><i class="fas fa-check"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Recensioni da Moderare -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0"><i class="fas fa-star-half-alt me-2 text-orange"></i>Recensioni da Moderare</h3>
+                        <a href="#" class="btn btn-sm btn-outline-orange">Vedi tutte</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Prodotto</th>
+                                        <th>Utente</th>
+                                        <th>Valutazione</th>
+                                        <th>Data</th>
+                                        <th>Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Smartphone XYZ</td>
+                                        <td>user123</td>
+                                        <td>
+                                            <div class="text-warning">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="far fa-star"></i>
+                                            </div>
+                                        </td>
+                                        <td>19/06/2025</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-orange me-1 view-review-btn" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#viewReviewModal"
+                                                    data-product="Smartphone XYZ"
+                                                    data-user="user123"
+                                                    data-rating="4"
+                                                    data-date="19/06/2025"
+                                                    data-id="#REV-1001"
+                                                    data-text="Il prodotto è arrivato in tempi rapidi e ben imballato. La qualità è buona ma la batteria dura meno di quanto pubblicizzato. Nel complesso sono soddisfatto dell'acquisto."
+                                                    data-reason="L'utente ha riportato informazioni non veritiere sulla durata della batteria">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Smartphone XYZ</td>
+                                        <td>user123</td>
+                                        <td>
+                                            <div class="text-warning">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="far fa-star"></i>
+                                            </div>
+                                        </td>
+                                        <td>19/06/2025</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-orange me-1 view-review-btn" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#viewReviewModal"
+                                                    data-product="Smartphone XYZ"
+                                                    data-user="user123"
+                                                    data-rating="4"
+                                                    data-date="19/06/2025"
+                                                    data-id="#REV-1001"
+                                                    data-text="Il prodotto è arrivato in tempi rapidi e ben imballato. La qualità è buona ma la batteria dura meno di quanto pubblicizzato. Nel complesso sono soddisfatto dell'acquisto."
+                                                    data-reason="L'utente ha riportato informazioni non veritiere sulla durata della batteria">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Smartphone XYZ</td>
+                                        <td>user123</td>
+                                        <td>
+                                            <div class="text-warning">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="far fa-star"></i>
+                                            </div>
+                                        </td>
+                                        <td>19/06/2025</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-orange me-1 view-review-btn" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#viewReviewModal"
+                                                    data-product="Smartphone XYZ"
+                                                    data-user="user123"
+                                                    data-rating="4"
+                                                    data-date="19/06/2025"
+                                                    data-id="#REV-1001"
+                                                    data-text="Il prodotto è arrivato in tempi rapidi e ben imballato. La qualità è buona ma la batteria dura meno di quanto pubblicizzato. Nel complesso sono soddisfatto dell'acquisto."
+                                                    data-reason="L'utente ha riportato informazioni non veritiere sulla durata della batteria">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Visualizza Recensione -->
+    <div class="modal fade" id="viewReviewModal" tabindex="-1" aria-labelledby="viewReviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewReviewModalLabel"><i class="fas fa-star me-2 text-warning"></i>Dettaglio Recensione</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Prodotto: <span class="text-orange" id="reviewProduct">Smartphone XYZ</span></h5>
+                            <p class="text-muted mb-2">Utente: <span id="reviewUser">user123</span></p>
+                            <div class="mb-3">
+                                <span class="text-warning" id="reviewRating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </span>
+                                <span class="ms-2">4/5</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Data: <span id="reviewDate">19/06/2025</span></p>
+                            <p class="text-muted">ID Recensione: <span id="reviewId">#REV-1001</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="card bg-light p-4 mb-4">
+                        <h6 class="mb-3">Testo della recensione:</h6>
+                        <p id="reviewText" class="mb-0">Il prodotto è arrivato in tempi rapidi e ben imballato. La qualità è buona ma la batteria dura meno di quanto pubblicizzato. Nel complesso sono soddisfatto dell'acquisto.</p>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Motivo segnalazione:</strong> 
+                        <span id="reportReason">L'utente ha riportato informazioni non veritiere sulla durata della batteria</span>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" id="rejectReviewBtn">
+                        <i class="fas fa-trash-alt me-2"></i>Elimina Recensione
+                    </button>
+                    <div>
+                        <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Chiudi
+                        </button>
+                        <button type="button" class="btn btn-orange" id="approveReviewBtn">
+                            <i class="fas fa-check me-2"></i>Approva Recensione
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+/* Stili base ereditati da userArea.css */
+:root {
+    --orange: rgb(235, 121, 80);
+    --orange-hover: #d35400;
+    --light-bg: #f8f9fa;
+}
+
+.bg-orange {
+    background-color: var(--orange) !important;
+}
+
+.text-orange {
+    color: var(--orange) !important;
+}
+
+.btn-orange {
+    background-color: var(--orange);
+    color: white;
+    border: none;
+}
+
+.btn-orange:hover {
+    background-color: var(--orange-hover);
+    color: white;
+}
+
+.btn-outline-orange {
+    color: var(--orange);
+    border-color: var(--orange);
+}
+
+.btn-outline-orange:hover {
+    background-color: var(--orange);
+    color: white;
+}
+
+/* Stili specifici per l'area admin */
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 0.5rem;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.25rem 1.5rem;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+}
+
+/* Stili per le tabelle */
+.table-hover tbody tr:hover {
+    background-color: rgba(235, 121, 80, 0.05);
+}
+
+/* Stili per i bottoni delle azioni */
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+/* Stili per il modal di eliminazione */
+#deleteReviewModal .modal-header {
+    border-bottom: none;
+}
+
+#deleteReviewModal .modal-footer {
+    border-top: none;
+}
+
+#viewReviewModal .modal-content {
+    border-radius: 0.8rem;
+}
+
+#viewReviewModal .modal-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+#viewReviewModal .modal-body {
+    padding: 2rem;
+}
+
+#viewReviewModal .modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 1rem 2rem;
+}
+
+#reviewText {
+    line-height: 1.6;
+    white-space: pre-line;
+}
+
+@media (max-width: 768px) {
+    #viewReviewModal .modal-dialog {
+        margin: 0.5rem;
+    }
+    
+    #viewReviewModal .modal-body {
+        padding: 1rem;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2.5rem;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .card-header .btn {
+        margin-top: 0.5rem;
+        align-self: flex-end;
+    }
+}
