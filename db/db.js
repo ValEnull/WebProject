@@ -3,11 +3,9 @@ const fs = require('fs');
 const path = require('path');
 
 const pool = new Pool({
-    user: process.env.PGUSER,
-    host: process.env.PGHOST,
-    database: process.env.PGDATABASE,
-    password: process.env.PGPASSWORD,
-    port: process.env.PGPORT,
+    connectionString: process.env.DATABASE_URL, // o altri parametri singoli
+    idleTimeoutMillis: 10000, // 10 secondi inattività
+     connectionTimeoutMillis: 5000, // 5 secondi per tentare la connessione
 });
 
 pool.connect(async (err, client, done) => {

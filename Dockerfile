@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 3000
 
 # Comando per avviare l'app
-CMD [ "npm", "start" ]
+CMD [ "node", "server.js" ]
