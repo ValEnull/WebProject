@@ -3,66 +3,68 @@ const router = express.Router();
 const pool = require('../db/db');
 const authMiddleware = require('../middleware/auth');
 
-// Crea ordine con stato "non pagato"
-router.post('/', authMiddleware(1), async (req, res) => {
-  const cliente_id = req.user.id;
-  const { prodotti } = req.body;
+// POST ordine - protetta per cliente - Aggiunta al carrello 
+router.post('/:prodotto_id', authMiddleware(1), async (req, res) => {
+  const utenteId = req.user.id;
+  const prodottoId = parseInt(req.params.prodotto_id, 10);
+  const { quantita } = req.body;
 
-  if (!Array.isArray(prodotti) || prodotti.length === 0) {
-    return res.status(400).json({ message: 'Prodotti mancanti o formato non valido.' });
+  if (!prodottoId || !quantita || quantita <= 0) {
+    return res.status(400).json({ message: 'ID prodotto e quantità validi richiesti.' });
   }
 
-  const client = await pool.connect();
-
   try {
-    await client.query('BEGIN');
+    await pool.query('BEGIN');
 
-    const ordineResult = await client.query(
-      `INSERT INTO ordini (cliente_id, stato)
-       VALUES ($1, 'non pagato') RETURNING ordine_id`,
-      [cliente_id]
-    );
-    const ordine_id = ordineResult.rows[0].ordine_id;
+    // 1. Verifica se l'utente ha già un carrello (ordine non pagato)
+    const ordineResult = await pool.query(`
+      SELECT ordine_id FROM ordini 
+      WHERE cliente_id = $1 AND stato = 'non pagato'
+      LIMIT 1
+    `, [utenteId]);
 
-    for (const { prodotto_id, quantita } of prodotti) {
-    const { rows } = await client.query(
-        'SELECT prezzo, quant FROM prodotti WHERE prodotto_id = $1',
-        [prodotto_id]
-    );
+    let ordineId;
 
-    if (rows.length === 0) {
-        throw new Error(`Prodotto ID ${prodotto_id} non trovato.`);
-    }
-    const { prezzo, quant } = rows[0];
-
-    if (quant < quantita) {
-        throw new Error(`Quantità non disponibile per prodotto ID ${prodotto_id}.`);
-    }
-
-    await client.query(
-        `INSERT INTO dettagli_ordine
-        (ordine_id, prodotto_id, quantita, prezzo_unitario)
-        VALUES ($1,$2,$3,$4)`,
-        [ordine_id, prodotto_id, quantita, prezzo]
-    );
-
-    await client.query(
-        `UPDATE prodotti
-        SET quant = quant - $1
-        WHERE prodotto_id = $2`,
-        [quantita, prodotto_id]
-    );
+    if (ordineResult.rowCount === 0) {
+      // 2. Nessun ordine aperto: creane uno
+      const nuovoOrdine = await pool.query(`
+        INSERT INTO ordini (cliente_id, stato) 
+        VALUES ($1, 'non pagato') 
+        RETURNING ordine_id
+      `, [utenteId]);
+      ordineId = nuovoOrdine.rows[0].ordine_id;
+    } else {
+      ordineId = ordineResult.rows[0].ordine_id;
     }
 
-    await client.query('COMMIT');
-    res.status(201).json({ message: 'Ordine creato', ordine_id });
+    // 3. Inserisci o aggiorna il prodotto nei dettagli
+    const dettaglioResult = await pool.query(`
+      SELECT * FROM dettagli_ordini
+      WHERE ordine_id = $1 AND prodotto_id = $2
+    `, [ordineId, prodottoId]);
 
-  } catch (err) {
-    await client.query('ROLLBACK');
-    console.error('Errore creazione ordine:', err);
-    res.status(500).json({ message: err.message });
-  } finally {
-    client.release();
+    if (dettaglioResult.rowCount > 0) {
+      // Se esiste già, aggiorna la quantità
+      await pool.query(`
+        UPDATE dettagli_ordini
+        SET quantita = quantita + $1
+        WHERE ordine_id = $2 AND prodotto_id = $3
+      `, [quantita, ordineId, prodottoId]);
+    } else {
+      // Altrimenti, inserisci
+      await pool.query(`
+        INSERT INTO dettagli_ordini (ordine_id, prodotto_id, quantita)
+        VALUES ($1, $2, $3)
+      `, [ordineId, prodottoId, quantita]);
+    }
+
+    await pool.query('COMMIT');
+
+    res.status(201).json({ message: 'Prodotto aggiunto al carrello.', ordine_id: ordineId });
+  } catch (error) {
+    await pool.query('ROLLBACK');
+    console.error('Errore aggiunta prodotto al carrello:', error);
+    res.status(500).json({ message: 'Errore del server.' });
   }
 });
 
