@@ -113,8 +113,146 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// GET tutti i prodotti - pubblico
+// GET con paginazione e filtri - protetta per artigiani e admin
 router.get('/', async (req, res) => {
+  const { tipologia, search, page = 1, limit = 12 } = req.query;
+  const offset = (parseInt(page) - 1) * parseInt(limit);
+
+  try {
+    let baseQuery = `
+      SELECT 
+        p.prodotto_id,
+        p.nome_prodotto,
+        p.tipologia_id,
+        p.prezzo,
+        p.descrizione,
+        p.quant,
+        u.nome_utente AS nome_artigiano,
+        img.immagine
+      FROM prodotti p
+      JOIN artigiani a ON p.artigiano_id = a.artigiano_id
+      JOIN utenti u ON a.artigiano_id = u.id
+      LEFT JOIN LATERAL (
+        SELECT immagine
+        FROM immagini
+        WHERE prodotto_id = p.prodotto_id
+        ORDER BY immagine_id
+        LIMIT 1
+      ) img ON true
+      WHERE 1=1
+    `;
+
+    let countQuery = `
+      SELECT COUNT(*) AS total
+      FROM prodotti p
+      WHERE 1=1
+    `;
+
+    const params = [];
+    const countParams = [];
+    let paramIndex = 1;
+
+    if (tipologia) {
+      baseQuery += ` AND p.tipologia_id = $${paramIndex}`;
+      countQuery += ` AND p.tipologia_id = $${paramIndex}`;
+      params.push(tipologia);
+      countParams.push(tipologia);
+      paramIndex++;
+    }
+
+    if (search) {
+      baseQuery += ` AND (p.nome_prodotto ILIKE $${paramIndex} OR p.descrizione ILIKE $${paramIndex})`;
+      countQuery += ` AND (p.nome_prodotto ILIKE $${paramIndex} OR p.descrizione ILIKE $${paramIndex})`;
+      const searchValue = `%${search}%`;
+      params.push(searchValue);
+      countParams.push(searchValue);
+      paramIndex++;
+    }
+
+    baseQuery += ` ORDER BY p.prodotto_id LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+    params.push(limit, offset);
+
+    const data = await pool.query(baseQuery, params);
+    const count = await pool.query(countQuery, countParams);
+
+    const prodotti = data.rows.map(({ immagine, ...rest }) => ({
+      ...rest,
+      immagine_principale: immagine ? immagine.toString('base64') : null
+    }));
+
+    res.status(200).json({
+      prodotti,
+      total: parseInt(count.rows[0].total),
+      page: parseInt(page),
+      limit: parseInt(limit)
+    });
+  } catch (err) {
+    console.error('Errore nel recupero dei prodotti:', err);
+    res.status(500).json({ message: 'Errore server.' });
+  }
+});
+
+
+// GET con filtro su tipologia - pubblico, con paginazione
+router.get('/tipologia/:tipologia_id', async (req, res) => {
+  const { tipologia_id } = req.params;
+  const { page = 1, limit = 12, search } = req.query;
+  const offset = (parseInt(page) - 1) * parseInt(limit);
+
+  try {
+    let baseQuery = `
+      SELECT 
+        p.*, 
+        u.nome_utente AS nome_artigiano,
+        img.immagine
+      FROM prodotti p
+      JOIN artigiani a ON p.artigiano_id = a.artigiano_id
+      JOIN utenti u    ON a.artigiano_id = u.id
+      LEFT JOIN LATERAL (
+        SELECT immagine
+        FROM immagini
+        WHERE prodotto_id = p.prodotto_id
+        ORDER BY immagine_id
+        LIMIT 1
+      ) img ON true
+      WHERE p.tipologia_id = $1
+    `;
+
+    let countQuery = `SELECT COUNT(*) FROM prodotti WHERE tipologia_id = $1`;
+    const params = [tipologia_id];
+    let idx = 2;
+
+    if (search) {
+      baseQuery  += ` AND (p.nome_prodotto ILIKE $${idx} OR p.descrizione ILIKE $${idx})`;
+      countQuery += ` AND (nome_prodotto ILIKE $${idx} OR descrizione ILIKE $${idx})`;
+      params.push(`%${search}%`);
+      idx++;
+    }
+
+    baseQuery += ` ORDER BY p.prodotto_id LIMIT $${idx} OFFSET $${idx + 1}`;
+    params.push(limit, offset);
+
+    const data  = await pool.query(baseQuery, params);
+    const count = await pool.query(countQuery, [tipologia_id, ...(search ? [`%${search}%`] : [])]);
+
+    const prodotti = data.rows.map(({ immagine, ...rest }) => ({
+      ...rest,
+      immagine_principale: immagine ? immagine.toString('base64') : null
+    }));
+
+    res.status(200).json({
+      prodotti,
+      total: parseInt(count.rows[0].count),
+      page:  parseInt(page),
+      limit: parseInt(limit)
+    });
+  } catch (error) {
+    console.error('Errore nel recupero prodotti per tipologia:', error);
+    res.status(500).json({ message: 'Errore server.' });
+  }
+});
+// GET tutti i prodotti - pubblico
+/*router.get('/', async (req, res) => {
   try {
     const query = `
       SELECT 
@@ -152,6 +290,7 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: 'Errore del server durante il recupero dei prodotti.' });
   }
 });
+*/
 
 // GET con filtro su tipologia - pubblico
 router.get('/tipologia/:tipologia_id', async (req, res) => {
@@ -190,6 +329,7 @@ router.get('/tipologia/:tipologia_id', async (req, res) => {
     res.status(500).json({ message: 'Errore del server durante il recupero dei prodotti per tipologia.' });
   }
 });
+
 
 // GET con filtro su artigiano - pubblico
 router.get('/artigiano/:artigiano_id', async (req, res) => {
