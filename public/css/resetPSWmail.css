@@ -1,0 +1,131 @@
+body {
+    background-color: #f5f5dc;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header */
+.myHeader {
+    background-color: whitesmoke;
+    border-bottom: solid 1px goldenrod;
+}
+
+#logo {
+    border-radius: 50%;
+    height: 4em;
+    width: 4em;
+    max-width: 5em;
+    max-height: 5em;
+    flex-shrink: 0;
+}
+
+/* Form Title */
+h1 {
+    color: #eb7750;
+    font-weight: 700;
+    text-decoration: underline;
+    font-size: 2.5rem;
+}
+
+/* Card Form */
+.card {
+    border: none;
+    border-radius: 1rem;
+    overflow: hidden;
+    background-color: #eb7750;
+    color: white;
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    border: 2px solid #ced4da;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #a86a5a;
+    box-shadow: 0 0 0 0.25rem rgba(235, 119, 80, 0.25);
+}
+
+/* Reset Button */
+.btn-reset {
+    background-color: #f5f5dc;
+    color: #eb7750;
+    font-weight: 600;
+    border: none;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-reset:hover {
+    background-color: #e8e8d0;
+    color: #e05d30;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.btn-reset:active {
+    transform: translateY(0);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+}
+
+#backLogin {
+    text-decoration: none;
+    color: #0e51bd;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+
+#backLogin:hover {
+    color: #0a3a8a;
+    text-decoration: underline;
+}
+
+/* Footer Links */
+.linkContainer a {
+    text-decoration: none;
+    color: #0e51bd;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+
+.linkContainer a:hover {
+    color: #0a3a8a;
+    text-decoration: underline;
+}
+
+/* Additional text styling */
+.text-white {
+    color: white !important;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.text-white:hover {
+    color: #f5f5dc !important;
+    text-decoration: underline;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+    }
+    
+    .card {
+        padding: 1.5rem;
+    }
+    
+    .form-control {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .btn-reset {
+        width: 100%;
+    }
+}
