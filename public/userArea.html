@@ -127,21 +127,38 @@
                 </div>
                 <div class="modal-body">
                     <form>
+                        <!-- Nome utente attuale -->
                         <div class="mb-3">
                             <label for="currentUsername" class="form-label">Nome utente attuale</label>
-                            <input type="text" class="form-control" id="currentUsername" value="nome_utente" readonly>
+                            <input type="text" class="form-control" id="currentUsername" readonly>
                         </div>
+
+                        <!-- Nuovo nome utente -->
                         <div class="mb-3">
                             <label for="newUsername" class="form-label">Nuovo nome utente</label>
-                            <input type="text" class="form-control" id="newUsername" min="7" max="42" placeholder="Inserisci nuovo nome utente">
+                            <input type="text" class="form-control" id="newUsername" minlength="7" maxlength="42" placeholder="Inserisci nuovo nome utente">
                         </div>
+
+                        <!-- Nuovo nome -->
+                        <div class="mb-3">
+                            <label for="newFirstName" class="form-label">Nuovo nome</label>
+                            <input type="text" class="form-control" id="newFirstName" minlength="2" maxlength="42" placeholder="Es. Mario">
+                        </div>
+
+                        <!-- Nuovo cognome -->
+                        <div class="mb-3">
+                            <label for="newLastName" class="form-label">Nuovo cognome</label>
+                            <input type="text" class="form-control" id="newLastName" minlength="2" maxlength="42" placeholder="Es. Rossi">
+                        </div>
+
+                        <!-- Nome completo (readonly) -->
                         <div class="mb-3">
                             <label for="fullName" class="form-label">Nome completo</label>
-                            <input type="text" class="form-control" id="fullName" min="7" max="42" value="Nome Cognome">
+                            <input type="text" class="form-control" id="fullName" readonly>
                         </div>
                     </form>
-                </div>
-                <div class="modal-footer">
+                                    </div>
+                                    <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annulla</button>
                     <button type="button" class="btn btn-orange">Salva modifiche</button>
                 </div>
