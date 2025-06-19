@@ -77,6 +77,7 @@ router.post('/carrello/:prodotto_id', authMiddleware(1), async (req, res) => {
     res.status(500).json({ message: 'Errore del server.' });
   }
 });
+
 // GET carrello - protetta per cliente - ottiene i dettagli del carrello
 router.get('/carrello', authMiddleware(1), async (req, res) => {
   const userId = req.user.id;
