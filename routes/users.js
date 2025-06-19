@@ -153,7 +153,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// GET urenti
+// GET utenti
 router.get('/users', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM utenti');
@@ -198,86 +198,88 @@ router.get('/artisans/:id', async (req, res) => {
     res.status(500).json({ error: 'Errore interno del server' });
   }
 });
-
-// PATCH utente
+// -----------------------------------------------------------------------------
+// PATCH /api/users/:id  ─ modifica nome_utente, nome, cognome, email (uno o più)
+// -----------------------------------------------------------------------------
 router.patch('/:id', authMiddleware(1), async (req, res) => {
   const { nome_utente, nome, cognome, email } = req.body;
   const { id } = req.params;
 
-  if (parseInt(id) !== req.user.id) {
-    return res.status(403).json({ error: 'Non puoi modificare un altro utente' });
-  }
+  // vieta di modificare altri account
+  if (+id !== req.user.id) return res.status(403).json({ error: 'Operazione non consentita' });
 
   try {
-    const result = await pool.query(
+    const { rows, rowCount } = await pool.query(
       `
       UPDATE utenti
       SET
         nome_utente = COALESCE($1, nome_utente),
-        nome = COALESCE($2, nome),
-        cognome = COALESCE($3, cognome),
-        email = COALESCE($4, email)
+        nome        = COALESCE($2, nome),
+        cognome     = COALESCE($3, cognome),
+        email       = COALESCE($4, email)
       WHERE id = $5
-      RETURNING *
+      RETURNING id, nome_utente, nome, cognome, email;
       `,
       [nome_utente, nome, cognome, email, id]
     );
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: 'Utente non trovato' });
-    }
-
-    res.json(result.rows[0]);
-
-  } catch (error) {
-    console.error('Errore aggiornamento utente:', error);
+    if (!rowCount) return res.status(404).json({ error: 'Utente non trovato' });
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('Errore aggiornamento utente:', err);
     res.status(500).json({ error: 'Errore interno del server' });
   }
 });
 
-// PATCH password - protetta per utente proprietareio, conferma password
+// -----------------------------------------------------------------------------
+// PATCH /api/users/:id/email  ─ modifica solo email
+// -----------------------------------------------------------------------------
+router.patch('/:id/email', authMiddleware(1), async (req, res) => {
+  const { id } = req.params;
+  const { email } = req.body;
+
+  if (+id !== req.user.id) return res.status(403).json({ error: 'Operazione non consentita' });
+
+  try {
+    const { rows, rowCount } = await pool.query(
+      'UPDATE utenti SET email = $1 WHERE id = $2 RETURNING id, nome_utente, nome, cognome, email;',
+      [email, id]
+    );
+    if (!rowCount) return res.status(404).json({ error: 'Utente non trovato' });
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('Errore aggiornamento email:', err);
+    res.status(500).json({ error: 'Errore del server' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// PATCH /api/users/:id/password  ─ cambio password con verifica oldPassword
+// -----------------------------------------------------------------------------
 router.patch('/:id/password', authMiddleware(1), async (req, res) => {
   const { id } = req.params;
   const { oldPassword, newPassword } = req.body;
-  const loggedUserId = req.user.id;
 
-  if (!oldPassword || !newPassword) {
-    return res.status(400).json({ message: 'oldPassword e newPassword sono obbligatorie' });
-  }
-
-  if (parseInt(id) !== loggedUserId) {
-    return res.status(403).json({ message: 'Non puoi modificare la password di un altro utente' });
-  }
+  if (+id !== req.user.id) return res.status(403).json({ error: 'Operazione non consentita' });
 
   try {
-    const result = await pool.query(
-      'SELECT password_hash FROM utenti WHERE id = $1',
-      [id]
-    );
+    const userRes = await pool.query('SELECT password_hash FROM utenti WHERE id = $1;', [id]);
+    if (!userRes.rowCount) return res.status(404).json({ error: 'Utente non trovato' });
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({ message: 'Utente non trovato' });
-    }
+    const match = await bcrypt.compare(oldPassword, userRes.rows[0].password_hash);
+    if (!match) return res.status(401).json({ error: 'Password attuale errata' });
 
-    const passwordMatch = await bcrypt.compare(oldPassword, result.rows[0].password_hash);
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await pool.query('UPDATE utenti SET password_hash = $1 WHERE id = $2;', [hashed, id]);
 
-    if (!passwordMatch) {
-      return res.status(403).json({ message: 'Password attuale non corretta' });
-    }
-
-    const newHashedPassword = await bcrypt.hash(newPassword, 10);
-
-    await pool.query(
-      'UPDATE utenti SET password_hash = $1 WHERE id = $2',
-      [newHashedPassword, id]
-    );
-
-    res.json({ message: 'Password aggiornata con successo' });
-  } catch (error) {
-    console.error('Errore durante il cambio password:', error);
-    res.status(500).json({ message: 'Errore del server durante il cambio password' });
+    res.sendStatus(204);
+  } catch (err) {
+    console.error('Errore cambio password:', err);
+    res.status(500).json({ error: 'Errore del server' });
   }
 });
+
+
 
 // PATCH artigiano - protetta per artigiano proprietario
 router.patch('/artisans/:id', authMiddleware(2), async (req, res) => {

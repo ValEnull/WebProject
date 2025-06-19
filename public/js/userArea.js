@@ -1,214 +1,120 @@
-// Global scope variables to hold token and userData
-let token = null;
-let userData = null;
+/* ============================================================================
+   USER AREA – script unico (userArea.js)
+   Aggiorna dinamicamente:          
+     • dati personali (username, nome, cognome)
+     • email                         
+     • password                     
+     • eliminazione account         
+   ========================================================================= */
 
-// Decode JWT token and return user data
-function parseJwt(token) {
-    try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(
-            atob(base64)
-                .split('')
-                .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-                .join('')
-        );
-        return JSON.parse(jsonPayload);
-    } catch (e) {
-        console.error('Token non valido:', e);
-        return null;
-    }
+/**************** CONFIG ****************/ 
+const API_BASE = "/api/users";     // modificare se la tua route è diversa
+
+/**************** UTILS ****************/ 
+const $  = (sel) => document.querySelector(sel);
+const $$ = (sel) => [...document.querySelectorAll(sel)];
+
+const toast = (msg, ok = true) => {
+  const el = document.createElement("div");
+  el.className = `toast text-bg-${ok ? "success" : "danger"} show position-fixed bottom-0 end-0 m-3`;
+  el.role = "alert";
+  el.innerHTML = `<div class="d-flex"><div class="toast-body">${msg}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),4000);
+};
+
+const parseJwt = (t) => {
+  try { return JSON.parse(atob(t.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))); } catch { return null; }
+};
+
+const authHeaders = () => {
+  const t = localStorage.getItem("token");
+  return t ? { Authorization: `Bearer ${t}` } : {};
+};
+
+const api = async (url, opts={}) => {
+  const res = await fetch(url, { ...opts, headers: { "Content-Type":"application/json", ...authHeaders(), ...(opts.headers||{}) } });
+  if (!res.ok) throw new Error(await res.text()||res.status);
+  return res.status===204?{}:res.json();
+};
+
+/**************** RENDER ****************/ 
+function renderStatic(u){
+  // username in header e nella card
+  ["#usernameHeader","#usernameDisplay"].forEach(sel=> $(sel).textContent = u.nome_utente);
+  $("#fullNameDisplay").textContent = `${u.nome} ${u.cognome}`.trim();
+  $("#emailDisplay").textContent    = u.email;
+}
+function renderInputs(u){
+  $("#currentUsername").value = u.nome_utente;
+  $("#fullName").value        = `${u.nome} ${u.cognome}`.trim();
+  $("#currentEmail").value    = u.email;
+}
+async function loadUser(id){
+  const u = await api(`${API_BASE}/${id}`);
+  renderStatic(u); renderInputs(u);
+  return u;
 }
 
-// Logout function, removes token and redirects to login page
-function logout() {
-    localStorage.removeItem('token');
-    window.location.href = '/login.html';
-}
+/**************** MAIN ****************/ 
+document.addEventListener("DOMContentLoaded", async () => {
+  const token = localStorage.getItem("token");
+  const payload = parseJwt(token||"");
+  if(!payload || payload.exp*1000<Date.now()) return location.replace("/login.html");
+  const uid = payload.id;
+  let user;
+  try{ user = await loadUser(uid); }catch{ toast("Utente non trovato",false); return; }
 
-// Populate UI fields with user data
-function populateUserData(userData) {
-    const nomeUtente = userData.nome_utente || 'Utente';
-    const nomeCompleto = `${userData.nome || ''} ${userData.cognome || ''}`.trim();
-    const email = userData.email || 'N/A';
+  /*---- MODIFICA INFO PERSONALI ----*/
+  $("#infoModal .btn.btn-orange")?.addEventListener("click",async()=>{
+    const [nome,cognome=""] = $("#fullName").value.trim().split(" ");
+    const nuovoUsername = $("#newUsername").value.trim() || $("#currentUsername").value.trim();
+    try{
+      user = await api(`${API_BASE}/${uid}`,{method:"PATCH",body:JSON.stringify({ nome_utente:nuovoUsername,nome,cognome })});
+      renderStatic(user); renderInputs(user);
+      toast("Informazioni aggiornate");
+      bootstrap.Modal.getInstance($("#infoModal")).hide();
+    }catch(e){ toast(e.message||"Errore aggiornamento",false); }
+  });
 
-    const selectors = {
-        'h1 span.text-orange': nomeUtente,
-        '.card-body div.bg-light:nth-of-type(1)': nomeUtente,
-        '.card-body .mb-3:nth-of-type(2) .bg-light': nomeCompleto,
-        '#emailDisplay': email,
-    };
+  /*---- MODIFICA EMAIL ----*/
+  $("#emailModal .btn.btn-orange")?.addEventListener("click",async()=>{
+    const newE = $("#newEmail").value.trim();
+    const confE= $("#confirmEmail").value.trim();
+    if(newE!==confE) return toast("Le email non coincidono",false);
+    try{
+      user = await api(`${API_BASE}/${uid}/email`,{method:"PATCH",body:JSON.stringify({email:newE})});
+      renderStatic(user); renderInputs(user);
+      toast("Email aggiornata");
+      $("#newEmail").value=$("#confirmEmail").value="";
+      bootstrap.Modal.getInstance($("#emailModal")).hide();
+    }catch(e){ toast(e.message||"Errore email",false); }
+  });
 
-    for (const [selector, text] of Object.entries(selectors)) {
-        const el = document.querySelector(selector);
-        if (el) el.textContent = text;
-        else console.warn(`Elemento non trovato: ${selector}`);
-    }
+  /*---- CAMBIO PASSWORD ----*/
+  $("#passwordForm")?.addEventListener("submit",async e=>{
+    e.preventDefault();
+    const oldP=$("#currentPassword").value; const newP=$("#newPassword").value; const confP=$("#confirmPassword").value;
+    if(newP!==confP) return toast("Le password non coincidono",false);
+    try{
+      await api(`${API_BASE}/${uid}/password`,{method:"PATCH",body:JSON.stringify({oldPassword:oldP,newPassword:newP})});
+      toast("Password aggiornata");
+      ["#currentPassword","#newPassword","#confirmPassword"].forEach(s=>$(s).value="");
+    }catch(e){ toast(e.message||"Errore password",false); }
+  });
 
-    const inputs = {
-        'currentUsername': nomeUtente,
-        'fullName': nomeCompleto,
-        'emailDisplay' :email,
-        'currentEmail': email,
-    };
+  /*---- ELIMINA ACCOUNT ----*/
+  $("#deleteAccountForm")?.addEventListener("submit",async e=>{
+    e.preventDefault();
+    if($("#confirmDelete").value.trim()!=="ELIMINA ACCOUNT") return toast("Conferma errata",false);
+    try{
+      await api(`${API_BASE}/${uid}`,{method:"DELETE",body:JSON.stringify({password:$("#currentPasswordDelete").value})});
+      localStorage.removeItem("token");
+      alert("Account eliminato");
+      location.replace("/index.html");
+    }catch(e){ toast(e.message||"Errore eliminazione",false); }
+  });
 
-    for (const [id, value] of Object.entries(inputs)) {
-        const input = document.getElementById(id);
-        if (input) input.value = value;
-        else console.warn(`Input non trovato: ${id}`);
-    }
-}
-
-// Initialize after DOM content is loaded
-window.addEventListener('DOMContentLoaded', () => {
-    token = localStorage.getItem('token');
-    if (!token) {
-        logout();
-        return;
-    }
-
-    userData = parseJwt(token);
-    if (!userData) {
-        logout();
-        return;
-    }
-
-    const now = Math.floor(Date.now() / 1000);
-    if (userData.exp && userData.exp < now) {
-        console.warn("Token scaduto");
-        logout();
-        return;
-    }
-
-    populateUserData(userData);
-
-    document.addEventListener('DOMContentLoaded', () => {
-  const userId = localStorage.getItem('userId'); // or get it however you store user info
-  const token = localStorage.getItem('token');
-
-  if (!userId || !token) {
-    console.warn('User not logged in');
-    return;
-  }
-
-  fetch(`/api/users/${userId}`, {
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  })
-    .then(res => {
-      if (!res.ok) throw new Error('Failed to fetch user data');
-      return res.json();
-    })
-    .then(user => {
-      // Update the email on the page
-      const emailDisplay = document.querySelector('#emailDisplay');
-      const emailDiv = document.querySelector('#emailDisplay');
-      const currentEmailInput = document.querySelector('#currentEmail');
-     
-      if (emailDisplay) emailDisplay.textContent = user.email;
-      if (emailDiv) emailDiv.textContent = user.email;
-      if (currentEmailInput) currentEmailInput.value = user.email;
-
-      // Similarly update username and full name if you want
-      const usernameDiv = document.querySelector('#usernameDisplay');
-      if (usernameDiv) usernameDiv.textContent = user.username;
-
-      const fullNameInput = document.querySelector('#fullName');
-      if (fullNameInput) fullNameInput.value = user.fullName;
-    })
-    .catch(err => {
-      console.error(err);
-      alert('Impossibile caricare i dati utente.');
-    });
-});
-
-    // Register event listeners here, so userData and token are available
-
-    // Modifica e-mail
-    const emailModalBtn = document.querySelector('#emailModal .btn.btn-orange');
-    if (emailModalBtn) {
-        emailModalBtn.addEventListener('click', async () => {
-            if (!userData || !token) {
-                alert("Utente non autenticato");
-                logout();
-                return;
-            }
-            const newEmail = document.getElementById('newEmail').value;
-            const confirmEmail = document.getElementById('confirmEmail').value;
-
-            if (newEmail !== confirmEmail) {
-                return alert("Le email non coincidono.");
-            }
-
-            try {
-                const response = await fetch(`/api/users/${userData.id}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ email: newEmail })
-                });
-
-                if (response.ok) {
-                    alert("Email aggiornata con successo!");
-                    location.reload();
-                } else {
-                    alert("Errore nell'aggiornamento dell'email.");
-                }
-            } catch (error) {
-                console.error("Errore aggiornamento email:", error);
-                alert("Si è verificato un errore durante la richiesta.");
-            }
-        });
-    }
-
-//modifica password
-//modifica dati anagrafici
-
-
-
-    // Elimina account
-    const deleteForm = document.getElementById('deleteAccountForm');
-    if (deleteForm) {
-        deleteForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            if (!userData || !token) {
-                alert("Utente non autenticato");
-                logout();
-                return;
-            }
-
-            const password = document.getElementById('currentPasswordDelete').value;
-            const confirmText = document.getElementById('confirmDelete').value;
-
-            if (confirmText !== "ELIMINA ACCOUNT") {
-                return alert("Conferma non valida");
-            }
-
-            try {
-                const response = await fetch(`/api/users/${userData.id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ password })
-                });
-
-                if (response.ok) {
-                    alert("Account eliminato");
-                    logout();
-                } else {
-                    const data = await response.json();
-                    alert(data.error || "Errore nell'eliminazione");
-                }
-            } catch (error) {
-                console.error("Errore eliminazione account:", error);
-                alert("Si è verificato un errore durante la richiesta.");
-            }
-        });
-    }
+  /*---- LOGOUT ----*/
+  $("#logout-btn")?.addEventListener("click",()=>{ localStorage.removeItem("token"); location.replace("/index.html"); });
 });

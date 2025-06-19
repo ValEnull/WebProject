@@ -28,7 +28,7 @@
                     window.location.href = '/artigiano/dashboard.html';
                     break;
                     case 3: // Admin
-                    window.location.href = '/admin/pannello.html';
+                    window.location.href = 'adminArea.html';
                     break;
                     default:
                     alert('Ruolo sconosciuto');

@@ -44,7 +44,9 @@ async function seed() {
             { nome_utente: 'artigiano_metallo', nome: 'Francesca', cognome: 'Ferro', email: 'francesca@metallo.it', ruolo: 'artigiano', password: 'pass5' },
             // Clienti
             { nome_utente: 'cliente1', nome: 'Elena', cognome: 'Rossi', email: 'elena@clienti.it', ruolo: 'cliente', password: 'cliente1' },
-            { nome_utente: 'cliente2', nome: 'Davide', cognome: 'Bianchi', email: 'davide@clienti.it', ruolo: 'cliente', password: 'cliente2' }
+            { nome_utente: 'cliente2', nome: 'Davide', cognome: 'Bianchi', email: 'davide@clienti.it', ruolo: 'cliente', password: 'cliente2' },
+            // Admin
+            { nome_utente: 'admin1', nome: 'Admin', cognome: 'Admin', email: 'admin@admin.com', ruolo: 'admin', password: 'admin123' },
         ];
 
         // Recupera ruoli

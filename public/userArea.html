@@ -28,7 +28,7 @@
                 </div>
                 
                 <!-- Torna allo shopping -->
-                <a href="#" class="btn btn-outline-orange">
+                <a href="index.html" class="btn btn-outline-orange">
                     <i class="fas fa-arrow-left me-2"></i>Torna allo shopping
                 </a>
             </div>
@@ -39,7 +39,7 @@
         <!-- Benvenuto -->
         <div class="row mb-4">
             <div class="col-12">
-                <h1 class="display-4 text-center mb-4">Benvenuto, <span class="text-orange">Nome Utente</span>!</h1>
+                <h1 class="display-4 text-center mb-4">Benvenuto, <span id="usernameHeader" class="text-orange">Nome Utente</span>!</h1>
                 <p class="lead text-center text-muted">Gestisci le tue informazioni personali e le impostazioni dell'account</p>
             </div>
         </div>
@@ -54,11 +54,11 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label class="form-label text-muted">Nome utente</label>
-                            <div class="p-2 bg-light rounded">nome_utente</div>
+                            <div id="usernameDisplay" class="p-2 bg-light rounded">nome_utente</div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label text-muted">Nome completo</label>
-                            <div class="p-2 bg-light rounded">Nome Cognome</div>
+                            <div id="fullNameDisplay" class="p-2 bg-light rounded">Nome Cognome</div>
                         </div>
                         <button class="btn btn-outline-orange mt-2" data-bs-toggle="modal" data-bs-target="#infoModal">
                             Modifica informazioni
@@ -94,7 +94,7 @@
                         <h3 class="card-title mb-0"><i class="fas fa-lock me-2 text-orange"></i>Sicurezza</h3>
                     </div>
                     <div class="card-body">
-                        <form>
+                        <form id="passwordForm">
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label for="currentPassword" class="form-label text-muted">Password attuale</label>
@@ -137,7 +137,13 @@
                         </div>
                         <div class="mb-3">
                             <label for="fullName" class="form-label">Nome completo</label>
-                            <input type="text" class="form-control" id="fullName" min="7" max="42" value="Nome Cognome">
+                            <input type="text" class="form-control" id="fullName" min="7" max="42" value="Nome Cognome" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Nuovo nome</label>
+                            <input type="text" class="form-control" id="fullName" min="7" max="42" value="Nome nome" readonly>
+                            <label for="fullName" class="form-label">Nuovo cognome</label>
+                            <input type="text" class="form-control" id="fullName" min="7" max="42" value="Nome cognome" readonly>
                         </div>
                     </form>
                 </div>
