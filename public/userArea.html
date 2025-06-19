@@ -28,7 +28,7 @@
                 </div>
                 
                 <!-- Torna allo shopping -->
-                <a href="#" class="btn btn-outline-orange">
+                <a href="index.html" class="btn btn-outline-orange">
                     <i class="fas fa-arrow-left me-2"></i>Torna allo shopping
                 </a>
             </div>
@@ -139,6 +139,12 @@
                             <input type="text" class="form-control" id="newUsername" minlength="7" maxlength="42" placeholder="Inserisci nuovo nome utente">
                         </div>
 
+                        <!-- Nome completo (readonly) -->
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Nome completo</label>
+                            <input type="text" class="form-control" id="fullName" readonly>
+                        </div>
+
                         <!-- Nuovo nome -->
                         <div class="mb-3">
                             <label for="newFirstName" class="form-label">Nuovo nome</label>
@@ -151,11 +157,6 @@
                             <input type="text" class="form-control" id="newLastName" minlength="2" maxlength="42" placeholder="Es. Rossi">
                         </div>
 
-                        <!-- Nome completo (readonly) -->
-                        <div class="mb-3">
-                            <label for="fullName" class="form-label">Nome completo</label>
-                            <input type="text" class="form-control" id="fullName" readonly>
-                        </div>
                     </form>
                                     </div>
                                     <div class="modal-footer">
@@ -202,10 +203,9 @@
     <div class="container mt-5 pb-4">
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white border-bottom-0">
-                <h3 class="card-title mb-0 text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Area pericolosa!</h3>
+                <h3 class="card-title mb-0 text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Elimina account</h3>
             </div>
             <div class="card-body">
-                <h5 class="text-danger mb-4">Eliminazione account</h5>
                 <p class="text-muted mb-4">Una volta eliminato il tuo account, non potrai più recuperare i tuoi dati. Assicurati di volerlo fare davvero.</p>
                 <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
                     <i class="fas fa-trash-alt me-2"></i>Elimina il mio account
