@@ -1,10 +1,17 @@
-/* Stili base ereditati da userArea.css */
+/* =============== VARIABLES =============== */
 :root {
-    --orange: rgb(235, 121, 80);
+    --orange: #eb7950;
     --orange-hover: #d35400;
+    --orange-active: #ba4a00;
     --light-bg: #f8f9fa;
 }
 
+/* =============== BASE STYLES =============== */
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* =============== UTILITY CLASSES =============== */
 .bg-orange {
     background-color: var(--orange) !important;
 }
@@ -13,43 +20,58 @@
     color: var(--orange) !important;
 }
 
+/* =============== BUTTONS =============== */
 .btn-orange {
-    background-color: var(--orange);
-    color: white;
-    border: none;
+    background-color: var(--orange) !important;
+    border-color: var(--orange) !important;
+    color: white !important;
+    transition: all 0.3s ease;
 }
 
 .btn-orange:hover {
-    background-color: var(--orange-hover);
-    color: white;
+    background-color: var(--orange-hover) !important;
+    border-color: var(--orange-hover) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .btn-outline-orange {
-    color: var(--orange);
-    border-color: var(--orange);
+    color: var(--orange) !important;
+    border-color: var(--orange) !important;
+    transition: all 0.3s ease;
 }
 
 .btn-outline-orange:hover {
-    background-color: var(--orange);
-    color: white;
+    background-color: var(--orange) !important;
+    color: white !important;
 }
 
-/* Stili specifici per l'area admin */
+/* =============== CARDS & HOVER EFFECTS =============== */
 .card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 0.8rem;
+    overflow: hidden;
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
 }
 
 .card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
 }
 
-.card-header {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    padding: 1.25rem 1.5rem;
+.cart-item {
+    background: #e9ecef;
+    border-radius: 1rem;
+    transition: all 0.3s ease;
 }
 
+.cart-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+}
+
+/* =============== TABLES =============== */
 .table {
     margin-bottom: 0;
 }
@@ -58,88 +80,127 @@
     border-top: none;
     font-weight: 600;
     color: #495057;
+    background-color: #f8f9fa;
 }
 
-.table td {
-    vertical-align: middle;
-}
-
-.badge {
-    font-weight: 500;
-    padding: 0.35em 0.65em;
-}
-
-/* Stili per le tabelle */
 .table-hover tbody tr:hover {
     background-color: rgba(235, 121, 80, 0.05);
 }
 
-/* Stili per i bottoni delle azioni */
-.btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-    line-height: 1.5;
-}
-
-/* Stili per il modal di eliminazione */
-#deleteReviewModal .modal-header {
-    border-bottom: none;
-}
-
-#deleteReviewModal .modal-footer {
-    border-top: none;
-}
-
-#viewReviewModal .modal-content {
+/* =============== MODALS =============== */
+.modal-content {
     border-radius: 0.8rem;
+    border: none;
 }
 
-#viewReviewModal .modal-header {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+.modal-header {
+    border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 
-#viewReviewModal .modal-body {
-    padding: 2rem;
+.modal-footer {
+    border-top: 1px solid rgba(0,0,0,0.1);
 }
 
-#viewReviewModal .modal-footer {
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    padding: 1rem 2rem;
-}
-
-#reviewText {
-    line-height: 1.6;
-    white-space: pre-line;
-}
-
-@media (max-width: 768px) {
-    #viewReviewModal .modal-dialog {
-        margin: 0.5rem;
+/* =============== RESPONSIVE STYLES =============== */
+@media (max-width: 575px) {
+    .h4.text-orange {
+        font-size: 1.1rem;
     }
     
-    #viewReviewModal .modal-body {
-        padding: 1rem;
-    }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .display-4 {
-        font-size: 2.5rem;
+    .product-image-container {
+        width: 100px;
+        height: 100px;
     }
     
-    .table-responsive {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+    .card-title {
+        font-size: 1rem;
     }
     
-    .card-header {
+    .product-description {
+        font-size: 0.8rem;
+    }
+    
+    .price-section {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: flex-start !important;
+        gap: 0.5rem;
     }
     
-    .card-header .btn {
-        margin-top: 0.5rem;
-        align-self: flex-end;
+    .quantity-control {
+        width: 100%;
     }
+    
+    .total-display {
+        margin-left: 0 !important;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 991px) {
+    .product-image-container {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+    }
+    
+    .product-description {
+        font-size: 0.9rem;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1024px) {
+    .product-image-container {
+        width: 140px;
+        height: 140px;
+    }
+}
+
+@media (min-width: 1025px) {
+    .product-image-container {
+        width: 180px;
+        height: 180px;
+    }
+}
+
+/* =============== SPECIAL STYLES =============== */
+/* Top Seller medals */
+.table-hover tbody tr:nth-child(1) td:first-child::after {
+    content: "🥇";
+    margin-left: 5px;
+}
+
+.table-hover tbody tr:nth-child(2) td:first-child::after {
+    content: "🥈";
+    margin-left: 5px;
+}
+
+.table-hover tbody tr:nth-child(3) td:first-child::after {
+    content: "🥉";
+    margin-left: 5px;
+}
+
+/* Animations */
+#promo-text {
+    transition: opacity 0.9s ease-in-out, transform 0.9s ease-in-out;
+}
+
+.text-fade-out {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.text-fade-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Footer */
+footer {
+    background-color: #343a40 !important;
 }

@@ -9,11 +9,11 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <!-- Favicon -->
-    <link rel="icon" href="/img/logoDef.png" type="image/png">
+    <link rel="icon" href="/public/img/logoDef.png" type="image/png">
     <!-- CSS file -->
-    <link rel="stylesheet" href="/css/adminArea.css">
+    <link rel="stylesheet" href="/public/css/adminArea.css">
     <!-- Custom JS -->
-    <script src="/js/adminArea.js" defer></script>
+    <script src="/public/js/adminArea.js" defer></script>
 </head>
 <body>
     
@@ -23,7 +23,7 @@
             <div class="d-flex flex-wrap align-items-center justify-content-between">
                 <!-- Logo -->
                 <div class="d-flex align-items-center gap-2">
-                    <img src="/img/logoDef.png" alt="Logo" class="rounded-circle" style="width: 50px; height: 50px;">
+                    <img src="/public/img/logoDef.png" alt="Logo" class="rounded-circle" style="width: 50px; height: 50px;">
                     <h5 class="mb-0">SaleCraft <span class="badge bg-danger">Admin</span></h5>
                 </div>
                 
@@ -45,13 +45,12 @@
         <div class="row mb-4">
             <div class="col-12">
                 <h1 class="display-4 text-center mb-4">Dashboard <span class="text-orange">Admin</span></h1>
-                <p class="lead text-center text-muted">Gestisci gli ordini, le segnalazioni e le recensioni</p>
             </div>
         </div>
 
         <!-- Statistiche -->
-        <div class="row mb-5">
-            <div class="col-md-4 mb-3">
+        <div class="row mb-5 justify-content-center">
+            <div class="col-md-3 mb-3">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body text-center">
                         <h2 class="text-orange">24</h2>
@@ -59,75 +58,67 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body text-center">
                         <h2 class="text-orange">8</h2>
-                        <p class="text-muted mb-0"><i class="fas fa-flag me-2"></i>Segnalazioni attive</p>
+                        <p class="text-muted mb-0"><i class="fas fa-flag me-2"></i>Segnalazioni</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body text-center">
-                        <h2 class="text-orange">3</h2>
-                        <p class="text-muted mb-0"><i class="fas fa-star-half-alt me-2"></i>Recensioni da moderare</p>
+                        <h2 class="text-orange">€1,245</h2>
+                        <p class="text-muted mb-0"><i class="fas fa-euro-sign me-2"></i>Fatturato oggi</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Tab Ordini Recenti -->
+        <!-- Top Seller (solo i primi 3 visibili) -->
         <div class="row mb-5">
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center">
-                        <h3 class="card-title mb-0"><i class="fas fa-shopping-bag me-2 text-orange"></i>Ordini Recenti</h3>
-                        <a href="#" class="btn btn-sm btn-outline-orange">Vedi tutti</a>
+                        <h3 class="card-title mb-0"><i class="fas fa-trophy me-2 text-orange"></i>Top Seller</h3>
+                        <button class="btn btn-sm btn-outline-orange" data-bs-toggle="modal" data-bs-target="#topSellersModal">
+                            Vedi tutti (Top 5)
+                        </button>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>ID Ordine</th>
-                                        <th>Cliente</th>
-                                        <th>Data</th>
-                                        <th>Totale</th>
-                                        <th>Stato</th>
-                                        <th>Azioni</th>
+                                        <th>Posizione</th>
+                                        <th>Prodotto</th>
+                                        <th>Categoria</th>
+                                        <th>Vendite</th>
+                                        <th>Fatturato</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>#SC-10025</td>
-                                        <td>Mario Rossi</td>
-                                        <td>19/06/2025</td>
-                                        <td>€ 89,99</td>
-                                        <td><span class="badge bg-success">Completato</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-orange"><i class="fas fa-eye"></i></button>
-                                        </td>
+                                        <td>1</td>
+                                        <td>Smartphone XYZ</td>
+                                        <td>Elettronica</td>
+                                        <td>156</td>
+                                        <td>€ 12,450</td>
                                     </tr>
                                     <tr>
-                                        <td>#SC-10024</td>
-                                        <td>Luigi Bianchi</td>
-                                        <td>19/06/2025</td>
-                                        <td>€ 124,50</td>
-                                        <td><span class="badge bg-warning">In elaborazione</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-orange"><i class="fas fa-eye"></i></button>
-                                        </td>
+                                        <td>2</td>
+                                        <td>Cuffie Wireless Pro</td>
+                                        <td>Accessori</td>
+                                        <td>89</td>
+                                        <td>€ 4,273</td>
                                     </tr>
                                     <tr>
-                                        <td>#SC-10023</td>
-                                        <td>Anna Verdi</td>
-                                        <td>18/06/2025</td>
-                                        <td>€ 56,75</td>
-                                        <td><span class="badge bg-primary">Spedito</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-orange"><i class="fas fa-eye"></i></button>
-                                        </td>
+                                        <td>3</td>
+                                        <td>Smartwatch Fitness</td>
+                                        <td>Elettronica</td>
+                                        <td>76</td>
+                                        <td>€ 5,548</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -136,6 +127,74 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal Top 5 Sellers -->
+        <div class="modal fade" id="topSellersModal" tabindex="-1" aria-labelledby="topSellersModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="topSellersModalLabel"><i class="fas fa-trophy me-2 text-orange"></i>Top 5 Prodotti</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Posizione</th>
+                                        <th>Prodotto</th>
+                                        <th>Categoria</th>
+                                        <th>Vendite</th>
+                                        <th>Fatturato</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Smartphone XYZ</td>
+                                        <td>Elettronica</td>
+                                        <td>156</td>
+                                        <td>€ 12,450</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Cuffie Wireless Pro</td>
+                                        <td>Accessori</td>
+                                        <td>89</td>
+                                        <td>€ 4,273</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>Smartwatch Fitness</td>
+                                        <td>Elettronica</td>
+                                        <td>76</td>
+                                        <td>€ 5,548</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>Zaino Ergonomico</td>
+                                        <td>Accessori</td>
+                                        <td>65</td>
+                                        <td>€ 1,950</td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>PowerBank 20.000mAh</td>
+                                        <td>Accessori</td>
+                                        <td>58</td>
+                                        <td>€ 1,392</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-orange" data-bs-dismiss="modal">Chiudi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <!-- Tab Segnalazioni -->
         <div class="row mb-5">
@@ -190,119 +249,6 @@
                                         <td>
                                             <button class="btn btn-sm btn-outline-orange me-1"><i class="fas fa-eye"></i></button>
                                             <button class="btn btn-sm btn-outline-success"><i class="fas fa-check"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tab Recensioni da Moderare -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center">
-                        <h3 class="card-title mb-0"><i class="fas fa-star-half-alt me-2 text-orange"></i>Recensioni da Moderare</h3>
-                        <a href="#" class="btn btn-sm btn-outline-orange">Vedi tutte</a>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Prodotto</th>
-                                        <th>Utente</th>
-                                        <th>Valutazione</th>
-                                        <th>Data</th>
-                                        <th>Azioni</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Smartphone XYZ</td>
-                                        <td>user123</td>
-                                        <td>
-                                            <div class="text-warning">
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                            </div>
-                                        </td>
-                                        <td>19/06/2025</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-orange me-1 view-review-btn" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#viewReviewModal"
-                                                    data-product="Smartphone XYZ"
-                                                    data-user="user123"
-                                                    data-rating="4"
-                                                    data-date="19/06/2025"
-                                                    data-id="#REV-1001"
-                                                    data-text="Il prodotto è arrivato in tempi rapidi e ben imballato. La qualità è buona ma la batteria dura meno di quanto pubblicizzato. Nel complesso sono soddisfatto dell'acquisto."
-                                                    data-reason="L'utente ha riportato informazioni non veritiere sulla durata della batteria">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Smartphone XYZ</td>
-                                        <td>user123</td>
-                                        <td>
-                                            <div class="text-warning">
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                            </div>
-                                        </td>
-                                        <td>19/06/2025</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-orange me-1 view-review-btn" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#viewReviewModal"
-                                                    data-product="Smartphone XYZ"
-                                                    data-user="user123"
-                                                    data-rating="4"
-                                                    data-date="19/06/2025"
-                                                    data-id="#REV-1001"
-                                                    data-text="Il prodotto è arrivato in tempi rapidi e ben imballato. La qualità è buona ma la batteria dura meno di quanto pubblicizzato. Nel complesso sono soddisfatto dell'acquisto."
-                                                    data-reason="L'utente ha riportato informazioni non veritiere sulla durata della batteria">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Smartphone XYZ</td>
-                                        <td>user123</td>
-                                        <td>
-                                            <div class="text-warning">
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                            </div>
-                                        </td>
-                                        <td>19/06/2025</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-orange me-1 view-review-btn" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#viewReviewModal"
-                                                    data-product="Smartphone XYZ"
-                                                    data-user="user123"
-                                                    data-rating="4"
-                                                    data-date="19/06/2025"
-                                                    data-id="#REV-1001"
-                                                    data-text="Il prodotto è arrivato in tempi rapidi e ben imballato. La qualità è buona ma la batteria dura meno di quanto pubblicizzato. Nel complesso sono soddisfatto dell'acquisto."
-                                                    data-reason="L'utente ha riportato informazioni non veritiere sulla durata della batteria">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
                                         </td>
                                     </tr>
                                 </tbody>

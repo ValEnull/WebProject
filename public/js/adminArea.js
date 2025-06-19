@@ -137,4 +137,20 @@ document.addEventListener('DOMContentLoaded', function() {
             showAlert('success', 'Recensione eliminata con successo');
         }
     }
+
+    document.getElementById('showAllTopSellers').addEventListener('click', function() {
+    const extraRows = document.querySelectorAll('[data-top-seller="extra"]');
+    const button = this;
+    
+    extraRows.forEach(row => {
+        row.classList.toggle('d-none');
+    });
+    
+    // Cambia il testo del pulsante
+    if (button.textContent.includes('Top 5')) {
+        button.innerHTML = '<i class="fas fa-chevron-up me-1"></i> Mostra meno';
+    } else {
+        button.innerHTML = 'Vedi tutti (Top 5)';
+    }
+});
 });
