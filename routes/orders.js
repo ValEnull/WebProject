@@ -287,6 +287,43 @@ router.patch('/:id', authMiddleware(1), async (req, res) => {
   }
 });
 
+// DELETE prodotto dal carrello - protetta per cliente
+router.delete('/carrello/:prodotto_id', authMiddleware(1), async (req, res) => {
+  const prodotto_id = parseInt(req.params.prodotto_id, 10);
+  const cliente_id = req.user.id;
+
+  try {
+    // Trova l'ordine non pagato (il carrello)
+    const ordineResult = await pool.query(
+      `SELECT ordine_id FROM ordini
+       WHERE cliente_id = $1 AND stato = 'non pagato'`,
+      [cliente_id]
+    );
+
+    if (ordineResult.rowCount === 0) {
+      return res.status(404).json({ message: 'Carrello non trovato.' });
+    }
+
+    const ordine_id = ordineResult.rows[0].ordine_id;
+
+    // Elimina il prodotto dai dettagli ordine
+    const deleteResult = await pool.query(
+      `DELETE FROM dettagli_ordine
+       WHERE ordine_id = $1 AND prodotto_id = $2`,
+      [ordine_id, prodotto_id]
+    );
+
+    if (deleteResult.rowCount === 0) {
+      return res.status(404).json({ message: 'Prodotto non presente nel carrello.' });
+    }
+
+    res.status(200).json({ message: 'Prodotto rimosso dal carrello.' });
+  } catch (error) {
+    console.error('Errore rimozione prodotto dal carrello:', error);
+    res.status(500).json({ message: 'Errore del server.' });
+  }
+});
+
 // DELETE ordine — protetta per admin
 router.delete('/:ordine_id', authMiddleware(0), async (req, res) => {
   const { ordine_id } = req.params;
