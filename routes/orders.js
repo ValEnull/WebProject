@@ -3,66 +3,133 @@ const router = express.Router();
 const pool = require('../db/db');
 const authMiddleware = require('../middleware/auth');
 
-// Crea ordine con stato "non pagato"
-router.post('/', authMiddleware(1), async (req, res) => {
-  const cliente_id = req.user.id;
-  const { prodotti } = req.body;
+// POST ordine - protetta per cliente - Aggiunta al carrello 
+router.post('/carrello/:prodotto_id', authMiddleware(1), async (req, res) => {
+  const utenteId = req.user.id;
+  const prodottoId = parseInt(req.params.prodotto_id, 10);
+  const { quantita } = req.body;
 
-  if (!Array.isArray(prodotti) || prodotti.length === 0) {
-    return res.status(400).json({ message: 'Prodotti mancanti o formato non valido.' });
+  if (!prodottoId || !quantita || quantita <= 0) {
+    return res.status(400).json({ message: 'ID prodotto e quantità validi richiesti.' });
   }
 
-  const client = await pool.connect();
+  try {
+    await pool.query('BEGIN');
+
+    // 1. Trova o crea ordine non pagato
+    const ordineResult = await pool.query(`
+      SELECT ordine_id FROM ordini 
+      WHERE cliente_id = $1 AND stato = 'non pagato'
+      LIMIT 1
+    `, [utenteId]);
+
+    let ordineId;
+    if (ordineResult.rowCount === 0) {
+      const nuovoOrdine = await pool.query(`
+        INSERT INTO ordini (cliente_id, stato) 
+        VALUES ($1, 'non pagato') 
+        RETURNING ordine_id
+      `, [utenteId]);
+      ordineId = nuovoOrdine.rows[0].ordine_id;
+    } else {
+      ordineId = ordineResult.rows[0].ordine_id;
+    }
+
+    // 2. Recupera il prezzo del prodotto
+    const prodottoResult = await pool.query(`
+      SELECT prezzo FROM prodotti WHERE prodotto_id = $1
+    `, [prodottoId]);
+
+    if (prodottoResult.rowCount === 0) {
+      await pool.query('ROLLBACK');
+      return res.status(404).json({ message: 'Prodotto non trovato.' });
+    }
+
+    const prezzoUnitario = prodottoResult.rows[0].prezzo;
+
+    // 3. Verifica se il prodotto è già nel carrello
+    const dettaglioResult = await pool.query(`
+      SELECT quantita FROM dettagli_ordine
+      WHERE ordine_id = $1 AND prodotto_id = $2
+    `, [ordineId, prodottoId]);
+
+    if (dettaglioResult.rowCount > 0) {
+      // aggiorna quantità (prezzo non cambia)
+      await pool.query(`
+        UPDATE dettagli_ordine
+        SET quantita = quantita + $1
+        WHERE ordine_id = $2 AND prodotto_id = $3
+      `, [quantita, ordineId, prodottoId]);
+    } else {
+      // inserisce nuovo dettaglio con prezzo_unitario
+      await pool.query(`
+        INSERT INTO dettagli_ordine (ordine_id, prodotto_id, quantita, prezzo_unitario)
+        VALUES ($1, $2, $3, $4)
+      `, [ordineId, prodottoId, quantita, prezzoUnitario]);
+    }
+
+    await pool.query('COMMIT');
+    res.status(201).json({ message: 'Prodotto aggiunto al carrello.', ordine_id: ordineId });
+
+  } catch (error) {
+    await pool.query('ROLLBACK');
+    console.error('Errore aggiunta prodotto al carrello:', error);
+    res.status(500).json({ message: 'Errore del server.' });
+  }
+});
+
+// GET carrello - protetta per cliente - ottiene i dettagli del carrello
+router.get('/carrello', authMiddleware(1), async (req, res) => {
+  const userId = req.user.id;
 
   try {
-    await client.query('BEGIN');
+    const ordineResult = await pool.query(`
+      SELECT ordine_id, data_ordine
+      FROM ordini
+      WHERE cliente_id = $1 AND stato = 'non pagato'
+      LIMIT 1
+    `, [userId]);
 
-    const ordineResult = await client.query(
-      `INSERT INTO ordini (cliente_id, stato)
-       VALUES ($1, 'non pagato') RETURNING ordine_id`,
-      [cliente_id]
-    );
-    const ordine_id = ordineResult.rows[0].ordine_id;
-
-    for (const { prodotto_id, quantita } of prodotti) {
-    const { rows } = await client.query(
-        'SELECT prezzo, quant FROM prodotti WHERE prodotto_id = $1',
-        [prodotto_id]
-    );
-
-    if (rows.length === 0) {
-        throw new Error(`Prodotto ID ${prodotto_id} non trovato.`);
-    }
-    const { prezzo, quant } = rows[0];
-
-    if (quant < quantita) {
-        throw new Error(`Quantità non disponibile per prodotto ID ${prodotto_id}.`);
+    if (ordineResult.rowCount === 0) {
+      return res.status(404).json({ message: 'Nessun carrello trovato.' });
     }
 
-    await client.query(
-        `INSERT INTO dettagli_ordine
-        (ordine_id, prodotto_id, quantita, prezzo_unitario)
-        VALUES ($1,$2,$3,$4)`,
-        [ordine_id, prodotto_id, quantita, prezzo]
-    );
+    const ordine = ordineResult.rows[0];
 
-    await client.query(
-        `UPDATE prodotti
-        SET quant = quant - $1
-        WHERE prodotto_id = $2`,
-        [quantita, prodotto_id]
-    );
-    }
+    const dettagliResult = await pool.query(`
+      SELECT 
+        d.prodotto_id, 
+        d.quantita, 
+        d.prezzo_unitario,
+        (d.quantita * d.prezzo_unitario) AS totale,
+        p.nome_prodotto, 
+        p.descrizione,
+        i.immagine_link AS immagine_principale
+      FROM dettagli_ordine d
+      JOIN prodotti p ON d.prodotto_id = p.prodotto_id
+      LEFT JOIN LATERAL (
+        SELECT immagine_link
+        FROM immagini
+        WHERE prodotto_id = p.prodotto_id
+        ORDER BY immagine_id ASC
+        LIMIT 1
+      ) i ON true
+      WHERE d.ordine_id = $1
+    `, [ordine.ordine_id]);
 
-    await client.query('COMMIT');
-    res.status(201).json({ message: 'Ordine creato', ordine_id });
+    const prodotti = dettagliResult.rows;
+    const costo_totale = prodotti.reduce((sum, p) => sum + parseFloat(p.totale), 0);
 
-  } catch (err) {
-    await client.query('ROLLBACK');
-    console.error('Errore creazione ordine:', err);
-    res.status(500).json({ message: err.message });
-  } finally {
-    client.release();
+    res.status(200).json({
+      ordine_id: ordine.ordine_id,
+      data_ordine: ordine.data_ordine,
+      stato: 'non pagato',
+      costo_totale: costo_totale.toFixed(2),
+      prodotti
+    });
+  } catch (error) {
+    console.error('Errore recupero carrello:', error);
+    res.status(500).json({ message: 'Errore del server.' });
   }
 });
 
@@ -129,38 +196,34 @@ router.get('/:id', authMiddleware(1), async (req, res) => {
 });
 
 // GET degli oridni - protetta per cliente (ottiene solo i propri ordini) o admin (ottiene tutti gli ordini)
-router.get('/user', authMiddleware(1), async (req, res) => {
+router.get('/storico', authMiddleware(1), async (req, res) => {
   const userId = req.user.id;
-  const userRole = req.user.ruolo_id;
+  const ruolo = req.user.ruolo_id;
 
   try {
-    let query;
-    let params = [];
-
-    if (userRole === 3) { // admin
-      query = `
-        SELECT o.*, u.nome_utente
-        FROM ordini o
-        JOIN utenti u ON o.cliente_id = u.id
-        ORDER BY o.data_ordine DESC
-      `;
+    let ordiniResult;
+    if (ruolo === 3) {
+      // Admin: può vedere tutti gli ordini tranne i non pagati
+      ordiniResult = await pool.query(`
+        SELECT ordine_id, cliente_id, data_ordine, stato
+        FROM ordini
+        WHERE stato != 'non pagato'
+        ORDER BY data_ordine DESC
+      `);
     } else {
-      query = `
-        SELECT o.*, u.nome_utente
-        FROM ordini o
-        JOIN utenti u ON o.cliente_id = u.id
-        WHERE o.cliente_id = $1
-        ORDER BY o.data_ordine DESC
-      `;
-      params = [userId];
+      // Cliente: può vedere solo i propri
+      ordiniResult = await pool.query(`
+        SELECT ordine_id, data_ordine, stato
+        FROM ordini
+        WHERE cliente_id = $1 AND stato != 'non pagato'
+        ORDER BY data_ordine DESC
+      `, [userId]);
     }
 
-    const result = await pool.query(query, params);
-    res.status(200).json(result.rows);
-
+    res.status(200).json(ordiniResult.rows);
   } catch (error) {
-    console.error('Errore nel recupero degli ordini:', error);
-    res.status(500).json({ message: 'Errore del server durante il recupero degli ordini.' });
+    console.error('Errore nel recupero ordini utente:', error);
+    res.status(500).json({ message: 'Errore del server.' });
   }
 });
 
@@ -203,7 +266,7 @@ router.patch('/:id', authMiddleware(1), async (req, res) => {
       if (
         !(
           (ordine.stato === 'non pagato' && nuovoStato === 'in spedizione') ||
-          (ordine.stato === 'in spedizione')
+          (ordine.stato === 'in spedizione' && ['concluso', 'in controversia'].includes(nuovoStato))
         )
       ) {
         return res.status(403).json({ message: 'Permesso negato per cliente.' });
@@ -220,6 +283,43 @@ router.patch('/:id', authMiddleware(1), async (req, res) => {
     res.status(200).json({ message: 'Stato ordine aggiornato.' });
   } catch (error) {
     console.error('Errore aggiornamento stato ordine:', error);
+    res.status(500).json({ message: 'Errore del server.' });
+  }
+});
+
+// DELETE prodotto dal carrello - protetta per cliente
+router.delete('/carrello/:prodotto_id', authMiddleware(1), async (req, res) => {
+  const prodotto_id = parseInt(req.params.prodotto_id, 10);
+  const cliente_id = req.user.id;
+
+  try {
+    // Trova l'ordine non pagato (il carrello)
+    const ordineResult = await pool.query(
+      `SELECT ordine_id FROM ordini
+       WHERE cliente_id = $1 AND stato = 'non pagato'`,
+      [cliente_id]
+    );
+
+    if (ordineResult.rowCount === 0) {
+      return res.status(404).json({ message: 'Carrello non trovato.' });
+    }
+
+    const ordine_id = ordineResult.rows[0].ordine_id;
+
+    // Elimina il prodotto dai dettagli ordine
+    const deleteResult = await pool.query(
+      `DELETE FROM dettagli_ordine
+       WHERE ordine_id = $1 AND prodotto_id = $2`,
+      [ordine_id, prodotto_id]
+    );
+
+    if (deleteResult.rowCount === 0) {
+      return res.status(404).json({ message: 'Prodotto non presente nel carrello.' });
+    }
+
+    res.status(200).json({ message: 'Prodotto rimosso dal carrello.' });
+  } catch (error) {
+    console.error('Errore rimozione prodotto dal carrello:', error);
     res.status(500).json({ message: 'Errore del server.' });
   }
 });
