@@ -16,45 +16,21 @@
     <script src="/js/userArea.js" defer></script>
 </head>
 <body>
-    <!-- Header Bootstrap -->
+    
+    <!-- Header -->
     <header class="bg-white py-2 px-3 shadow-sm sticky-top">
         <div class="container-fluid">
             <div class="d-flex flex-wrap align-items-center justify-content-between">
                 <!-- Logo -->
-                <div class="d-flex align-items-center">
-                    <img src="/img/logoDef.png" alt="Logo" class="rounded-circle" style="width: 50px; height: 50px;">
+                <div class="d-flex align-items-center gap-2">
+                    <img src="img/logoDef.png" alt="Logo" class="rounded-circle" style="width: 50px; height: 50px;">
+                    <h5 class="mb-0">SaleCraft</h5>
                 </div>
-
-                <!-- Search Bar -->
-                <div class="flex-grow-1 mx-3" style="max-width: 600px;">
-                    <div class="input-group shadow">
-                        <input type="text" class="form-control rounded-pill border-0 bg-light" placeholder="Cerca...">
-                        <button class="btn btn-orange rounded-pill" type="button">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Icons -->
-                <div class="d-flex gap-3">
-                    <button class="btn btn-outline-dark border-0 position-relative">
-                        <i class="fas fa-shopping-cart fs-5"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-                    </button>
-                    
-                    <!-- Dropdown User -->
-                    <div class="dropdown">
-                        <button class="btn btn-outline-dark border-0 dropdown-toggle" data-bs-toggle="dropdown">
-                            <i class="fas fa-user fs-5"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-door-open me-2"></i>Login</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-file-signature me-2"></i>Registrati</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="page1.html"><i class="fas fa-store me-2"></i>Inizia la tua attività</a></li>
-                        </ul>
-                    </div>
-                </div>
+                
+                <!-- Torna allo shopping -->
+                <a href="#" class="btn btn-outline-orange">
+                    <i class="fas fa-arrow-left me-2"></i>Torna allo shopping
+                </a>
             </div>
         </div>
     </header>
