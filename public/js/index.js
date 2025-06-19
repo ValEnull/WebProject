@@ -118,6 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function setupUserDropdown() {
   const dropdownLogged = document.getElementById("user-dropdown-logged");
   const dropdownUnlogged = document.getElementById("user-dropdown-unlogged");
+  const cartBtn    = document.getElementById("cart-btn");  
   const logoutBtn = document.getElementById("logout-btn");
 
   const token = localStorage.getItem("token");
@@ -132,9 +133,11 @@ function setupUserDropdown() {
   if (token && isTokenValid(token)) {
     dropdownLogged?.classList.remove("d-none");
     dropdownUnlogged?.classList.add("d-none");
+    cartBtn?.classList.remove("d-none"); 
   } else {
     dropdownLogged?.classList.add("d-none");
     dropdownUnlogged?.classList.remove("d-none");
+    cartBtn?.classList.add("d-none");   
     localStorage.removeItem("token");
   }
 
