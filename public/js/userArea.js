@@ -23,7 +23,7 @@ function parseJwt(token) {
 // Logout function, removes token and redirects to login page
 function logout() {
     localStorage.removeItem('token');
-    window.location.href = '/logingBootstrap.html';
+    window.location.href = '/login.html';
 }
 
 // Populate UI fields with user data
