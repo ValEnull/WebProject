@@ -1,0 +1,112 @@
+/* Variabili colore */
+:root {
+    --orange: #fd7e14;
+    --orange-hover: #e67e22;
+}
+
+/* Stili generali */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Card styles */
+.card {
+    border-radius: 10px;
+    border: none;
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.25rem 1.5rem;
+}
+
+/* Button styles */
+.btn-orange {
+    background-color: var(--orange);
+    color: white;
+    border: none;
+}
+
+.btn-orange:hover {
+    background-color: var(--orange-hover);
+    color: white;
+}
+
+/* Table styles */
+.products-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    padding: 1rem 1.5rem;
+    border-top: none;
+}
+
+.products-table td {
+    padding: 1rem 1.5rem;
+    vertical-align: middle;
+    border-top: 1px solid #f1f1f1;
+}
+
+.products-table tr:hover td {
+    background-color: #f8f9fa;
+}
+
+/* Product image in table */
+.product-table-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+/* Badge styles */
+.badge {
+    font-weight: 500;
+    padding: 0.5em 0.8em;
+}
+
+.bg-active {
+    background-color: #2ecc71 !important;
+}
+
+.bg-inactive {
+    background-color: #95a5a6 !important;
+}
+
+.bg-low-stock {
+    background-color: #f39c12 !important;
+    color: #fff !important;
+}
+
+/* Pagination */
+.pagination-container {
+    background-color: #f8f9fa;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.page-link {
+    color: var(--orange);
+}
+
+.page-item.active .page-link {
+    background-color: var(--orange);
+    border-color: var(--orange);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .products-table {
+        font-size: 0.9rem;
+    }
+    
+    .products-table th, 
+    .products-table td {
+        padding: 0.75rem;
+    }
+    
+    .product-table-img {
+        width: 40px;
+        height: 40px;
+    }
+}
