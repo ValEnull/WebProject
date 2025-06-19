@@ -266,7 +266,7 @@ router.patch('/:id', authMiddleware(1), async (req, res) => {
       if (
         !(
           (ordine.stato === 'non pagato' && nuovoStato === 'in spedizione') ||
-          (ordine.stato === 'in spedizione')
+          (ordine.stato === 'in spedizione' && ['concluso', 'in controversia'].includes(nuovoStato))
         )
       ) {
         return res.status(403).json({ message: 'Permesso negato per cliente.' });
