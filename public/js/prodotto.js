@@ -140,6 +140,7 @@ async function loadReviews(id) {
   const empty = $("#no-reviews-message");
   try {
     const revs = await fetchJSON(`${RATING_API_BASE}/${id}`);
+    console.log("Recensioni dal server:", revs.length, revs);
     if (!revs.length) {
       empty.style.display = "block";
       wrap.innerHTML = empty.outerHTML; return;
@@ -220,6 +221,7 @@ function setupReviewForm(id) {
         body: JSON.stringify({ valutazione: voto, descrizione })
       });
 
+      alert("Recensione inviata con successo!");
       form.reset();
       selected = 0;
       ratingInput.value = "";
@@ -227,9 +229,12 @@ function setupReviewForm(id) {
       loadAverage(id);
       loadReviews(id);
     } catch (err) {
-      alert(err.message.includes("401")
-        ? "Devi essere loggato e aver acquistato il prodotto."
-        : "Errore invio recensione.");
+      const msg = err.message.includes("401")
+          ? "Devi essere loggato e aver acquistato il prodotto."
+          : err.message.includes("409")
+              ? "Hai già recensito questo prodotto."
+              : "Errore invio recensione.";
+      alert(msg);
     } finally {
       form.querySelector("button[type=submit]").disabled = false;
     }

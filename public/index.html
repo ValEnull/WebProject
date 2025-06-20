@@ -40,7 +40,7 @@
                 <div class="d-flex gap-3">
                         <button id="cart-btn" class="btn btn-outline-dark border-0 position-relative d-none" onclick="location.href='carrello.html'">
                             <i class="fas fa-shopping-cart fs-5x"></i>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                            <span id="cart-badge"class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
                         </button>
                     
                     <!-- Dropdown per UTENTE NON LOGGATO -->
@@ -63,7 +63,7 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="userArea.html"><i class="fas fa-user-circle me-2"></i>Profilo</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-shopping-cart me-2"></i>I miei ordini</a></li>
+                        <li><a class="dropdown-item" href="ordini.html"><i class="fas fa-shopping-cart me-2"></i>I miei ordini</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="#" id="logout-btn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                     </ul>

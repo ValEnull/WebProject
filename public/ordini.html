@@ -56,6 +56,39 @@
             </div>
         </main>
 
+        <!-- Modal segnalazione ordine -->
+        <div class="modal fade" id="reportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form class="modal-content" id="report-form">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-flag me-2 text-danger"></i>Segnala un problema</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="report-order-id">
+                <div class="mb-3">
+                <label class="form-label">Motivazione</label>
+                <select id="report-reason" class="form-select" required>
+                    <option value="" selected disabled>Scegli…</option>
+                    <option value="non consegnato">Pacco non consegnato</option>
+                    <option value="danneggiato">Prodotto danneggiato</option>
+                    <option value="errato">Prodotto errato</option>
+                    <option value="altro">Altro</option>
+                </select>
+                </div>
+                <div class="mb-3">
+                <label class="form-label">Descrizione (facoltativa)</label>
+                <textarea id="report-text" class="form-control" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="submit" class="btn btn-danger">Invia segnalazione</button>
+            </div>
+            </form>
+        </div>
+        </div>
+
         <!-- Footer -->
         <footer class="bg-dark text-white mt-auto pt-5 pb-3">
             <div class="container">

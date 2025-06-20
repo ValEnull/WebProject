@@ -3,9 +3,10 @@ const router = express.Router();
 const pool = require('../db/db');
 const authMiddleware = require('../middleware/auth');
 
+
 // Aggiunta recensione per un prodotto - protetta per cliente che ha comprato il prodotto
 router.post('/:id', authMiddleware(1), async (req, res) => {
-  const cliente_id = req.user.id;
+  const cliente_id  = req.user.id;
   const prodotto_id = parseInt(req.params.id, 10);
   const { valutazione, descrizione } = req.body;
 
@@ -14,18 +15,30 @@ router.post('/:id', authMiddleware(1), async (req, res) => {
   }
 
   try {
+    /* ① verifica se esiste già una recensione di questo utente per il prodotto */
+    const { rowCount } = await pool.query(
+      `SELECT 1 FROM recensioni WHERE cliente_id = $1 AND prodotto_id = $2`,
+      [cliente_id, prodotto_id]
+    );
+    if (rowCount > 0) {
+      return res.status(409).json({ message: 'Hai già recensito questo prodotto.' });
+    }
+
+    /* ② inserisce la nuova recensione */
     const result = await pool.query(
       `INSERT INTO recensioni (cliente_id, prodotto_id, valutazione, descrizione)
        VALUES ($1, $2, $3, $4)
        RETURNING *`,
       [cliente_id, prodotto_id, valutazione, descrizione || null]
     );
+
     res.status(201).json({ message: 'Recensione creata', recensione: result.rows[0] });
   } catch (error) {
     console.error('Errore creazione recensione:', error);
     res.status(500).json({ message: 'Errore del server durante la creazione della recensione.' });
   }
 });
+
 
 // Recupera il voto medio di un prodotto
 router.get('/:prodotto_id/average', async (req, res) => {

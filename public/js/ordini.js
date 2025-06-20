@@ -1,125 +1,146 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Verifica login
-    const token = localStorage.getItem('token');
-    if (!token) {
-        window.location.href = 'login.html';
-        return;
-    }
+/**************************************************************************
+ * ordini.js – lista ordini utente con “Ricevuto” + Segnalazione
+ **************************************************************************/
 
-    // Logout
-    document.getElementById('logout-btn').addEventListener('click', function(e) {
-        e.preventDefault();
-        localStorage.removeItem('token');
-        window.location.href = 'login.html';
-    });
+/* ----------------- helper fetch -------------------------------------- */
+async function fetchJSON(url, opts = {}) {
+  const token   = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json", ...(opts?.headers||{}) };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const res = await fetch(url, { ...opts, headers });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
 
-    // Carica ordini
-    caricaOrdini();
+/* ----------------- login-guard + logout ------------------------------ */
+document.addEventListener("DOMContentLoaded", () => {
+  if (!localStorage.getItem("token")) return location.replace("login.html");
+  document.getElementById("logout-btn")
+    ?.addEventListener("click", e => { e.preventDefault(); localStorage.removeItem("token"); location.replace("login.html"); });
+
+  loadOrders();
 });
 
-function caricaOrdini() {
-    // Simulazione dati (sostituire con chiamata API reale)
-    const ordiniEsempio = [
-        {
-            id: 'ORD-2023-001',
-            data: '2023-05-15',
-            stato: 'completato',
-            prodotti: [
-                { nome: 'Smartphone XYZ', prezzo: 599.99, quantita: 1, immagine: 'img/prodotti/phone.jpg' },
-                { nome: 'Custodia Premium', prezzo: 29.99, quantita: 1, immagine: 'img/prodotti/case.jpg' }
-            ],
-            totale: 629.98,
-            indirizzo: 'Via Roma 123, Milano'
-        },
-        {
-            id: 'ORD-2023-002',
-            data: '2023-06-20',
-            stato: 'spedito',
-            prodotti: [
-                { nome: 'Cuffie Wireless', prezzo: 129.99, quantita: 2, immagine: 'img/prodotti/headphones.jpg' }
-            ],
-            totale: 259.98,
-            indirizzo: 'Via Roma 123, Milano',
-            tracking: 'TRK123456789'
-        }
-    ];
+/* ----------------- caricamento ordini -------------------------------- */
+async function loadOrders() {
+  const wrap = document.getElementById("ordini-container");
+  wrap.innerHTML = '<div class="text-center my-5"><div class="spinner-border"></div></div>';
 
-    mostraOrdini(ordiniEsempio);
-}
-
-function mostraOrdini(ordini) {
-    const container = document.getElementById('ordini-container');
-    
-    if (ordini.length === 0) {
-        container.innerHTML = `
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle me-2"></i>
-                Non hai ancora effettuato ordini
-            </div>
-        `;
-        return;
+  try {
+    /* 1. elenco ordini (senza carrello) */
+    const elenco = await fetchJSON("/api/orders/storico");        // [{ ordine_id, data_ordine, stato }]
+    if (!elenco.length) {
+      wrap.innerHTML = `<div class="alert alert-info"><i class="fas fa-info-circle me-2"></i>Non hai ancora effettuato ordini</div>`;
+      return;
     }
 
-    container.innerHTML = ordini.map(ordine => `
-        <div class="ordine-card">
-            <div class="ordine-header">
-                <div>
-                    <span class="ordine-id">Ordine #${ordine.id}</span>
-                    <span class="ordine-data">${new Date(ordine.data).toLocaleDateString('it-IT')}</span>
-                </div>
-                <span class="ordine-stato ${getStatoClasse(ordine.stato)}">${getStatoTesto(ordine.stato)}</span>
-            </div>
-            
-            <div class="ordine-prodotti">
-                ${ordine.prodotti.map(prodotto => `
-                    <div class="prodotto">
-                        <img src="${prodotto.immagine || 'img/prodotti/default.jpg'}" alt="${prodotto.nome}" class="prodotto-immagine">
-                        <div class="prodotto-info">
-                            <div class="prodotto-nome">${prodotto.nome}</div>
-                            <div>Quantità: ${prodotto.quantita}</div>
-                            <div class="prodotto-prezzo">€ ${prodotto.prezzo.toFixed(2)}</div>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-            
-            <div class="ordine-footer mt-3 pt-3 border-top">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>Totale:</strong> € ${ordine.totale.toFixed(2)}
-                        ${ordine.tracking ? `<div class="mt-1"><small>Tracking: ${ordine.tracking}</small></div>` : ''}
-                    </div>
-                    <button class="btn btn-outline-secondary btn-sm" onclick="visualizzaDettagliOrdine('${ordine.id}')">
-                        <i class="fas fa-search me-1"></i> Dettagli
-                    </button>
-                </div>
-            </div>
-        </div>
-    `).join('');
+    /* 2. dettagli in parallelo */
+    const dettagli = await Promise.all(
+      elenco.map(o => fetchJSON(`/api/orders/${o.ordine_id}`))    // aggiunge prodotti, totale…
+    );
+
+    wrap.innerHTML = dettagli.map(renderOrderCard).join("");
+    /* attach handler dopo il render */
+    wrap.querySelectorAll(".btn-ricevuto").forEach(btn => btn.addEventListener("click", segnaRicevuto));
+    wrap.querySelectorAll(".btn-report").forEach(btn => btn.addEventListener("click", apriReportModal));
+
+  } catch (err) {
+    console.error(err);
+    wrap.innerHTML = `<div class="alert alert-danger">Errore nel caricamento ordini.</div>`;
+  }
 }
 
-// Funzioni di supporto
-function getStatoClasse(stato) {
-    const classi = {
-        'completato': 'bg-success',
-        'spedito': 'bg-primary',
-        'in-elaborazione': 'bg-warning',
-        'annullato': 'bg-danger'
-    };
-    return classi[stato] || 'bg-secondary';
+/* ----------------- renderer card ------------------------------------- */
+const statoText  = { "in spedizione":"In spedizione", "concluso":"Consegnato", "in controversia":"In controversia" };
+const statoClass = { "in spedizione":"bg-primary",    "concluso":"bg-success", "in controversia":"bg-warning text-dark" };
+
+function renderOrderCard(o) {
+  return /* html */`
+  <div class="ordine-card mb-4" data-id="${o.ordine_id}">
+    <div class="ordine-header d-flex justify-content-between align-items-baseline">
+      <div>
+        <span class="fw-semibold">Ordine #${o.ordine_id}</span>
+        <span class="text-muted ms-2">${new Date(o.data_ordine).toLocaleDateString("it-IT")}</span>
+      </div>
+      <span class="badge ${statoClass[o.stato]||"bg-secondary"}">${statoText[o.stato]||o.stato}</span>
+    </div>
+
+    <div class="ordine-prodotti my-3">
+      ${o.prodotti.map(p => `
+        <div class="d-flex align-items-center mb-2">
+          <img src="${p.immagine_principale ? `data:image/png;base64,${p.immagine_principale}` : "/img/placeholderProduct.png"}"
+               class="me-2 rounded" style="width:60px;height:60px;object-fit:cover;">
+          <div class="flex-grow-1">
+            <div>${p.nome_prodotto}</div>
+            <small class="text-muted">Quantità: ${p.quantita}</small>
+          </div>
+          <div class="fw-semibold">€ ${parseFloat(p.totale).toFixed(2)}</div>
+        </div>`).join("")}
+    </div>
+
+    <div class="ordine-footer d-flex justify-content-between align-items-center border-top pt-3">
+      <div><strong>Totale:</strong> € ${o.costo_totale}</div>
+      <div class="d-flex gap-2">
+        ${o.stato === "in spedizione" ? `
+          <button class="btn btn-sm btn-outline-success btn-ricevuto">Segna come ricevuto</button>
+          <button class="btn btn-sm btn-outline-danger btn-report">Segnala problema</button>
+        ` : ""}
+        ${o.stato === "in controversia" ? '<span class="text-danger small">Segnalazione aperta</span>' : ""}
+      </div>
+    </div>
+  </div>`;
 }
 
-function getStatoTesto(stato) {
-    const testi = {
-        'completato': 'Completato',
-        'spedito': 'Spedito',
-        'in-elaborazione': 'In elaborazione',
-        'annullato': 'Annullato'
-    };
-    return testi[stato] || stato;
+/* ----------------- segna come ricevuto ------------------------------- */
+async function segnaRicevuto(e) {
+  const card = e.target.closest(".ordine-card");
+  const id   = card.dataset.id;
+  e.target.disabled = true;
+
+  try {
+    await fetchJSON(`/api/orders/${id}`, {
+      method:"PATCH",
+      body: JSON.stringify({ stato:"concluso" })
+    });
+    card.querySelector(".badge").className = "badge bg-success";
+    card.querySelector(".badge").textContent = "Consegnato";
+    card.querySelector(".btn-report")?.remove();
+    e.target.remove();
+  } catch {
+    alert("Errore aggiornamento ordine.");
+    e.target.disabled = false;
+  }
 }
 
-// Funzione per i dettagli ordine (da implementare)
-function visualizzaDettagliOrdine(idOrdine) {
-    alert(`Dettagli ordine ${idOrdine}\nQuesta funzionalità sarà implementata`);
+/* ----------------- segnalazione ordine --------------------------------*/
+function apriReportModal(e) {
+  const id = e.target.closest(".ordine-card").dataset.id;
+  document.getElementById("report-order-id").value = id;
+  document.getElementById("report-reason").value = "";
+  document.getElementById("report-text").value   = "";
+  bootstrap.Modal.getOrCreateInstance("#reportModal").show();
 }
+
+/* submit segnalazione */
+document.getElementById("report-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const ordine_id = document.getElementById("report-order-id").value;
+  const motivazione = document.getElementById("report-reason").value;
+  const testo       = document.getElementById("report-text").value;
+
+  if (!motivazione) return alert("Seleziona una motivazione.");
+
+  try {
+    await fetchJSON(`/api/report/${ordine_id}`, {
+      method:"POST",
+      body: JSON.stringify({ motivazione, testo })
+    });
+    alert("Segnalazione inviata!");          // puoi sostituire con toast
+    bootstrap.Modal.getInstance("#reportModal").hide();
+    loadOrders();                            // ricarica per mostrare stato "in controversia"
+  } catch (err) {
+    alert(err.message.startsWith("HTTP 403")
+      ? "Non puoi segnalare questo ordine."
+      : "Errore invio segnalazione.");
+  }
+});

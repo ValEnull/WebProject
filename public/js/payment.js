@@ -1,50 +1,109 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Abilita tooltip
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+/**************************************************************************
+ * payment.js – checkout con spedizione gratis oltre 50 €
+ **************************************************************************/
+
+/* ---------- CONFIG --------------------------------------------------- */
+const FREE_SHIPPING_THRESHOLD = 50;
+const STANDARD_SHIPPING_COST  = 4.99;
+const REQUIRED_IDS = [
+  "cap","city","address","province","country",
+  "cardName","cardNumber","expiryDate","cvv"
+];
+
+/* ---------- FETCH helper --------------------------------------------- */
+async function fetchJSON(url, opts = {}) {
+  const token   = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json", ...(opts.headers||{}) };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const res = await fetch(url, { ...opts, headers });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+/* ---------- Spedizione ----------------------------------------------- */
+const shippingFee  = sub => (sub >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING_COST);
+
+/* ---------- Validazione ---------------------------------------------- */
+function isFormValid() {
+  return REQUIRED_IDS.every(id => document.getElementById(id).value.trim()) &&
+         document.getElementById("termsCheck").checked;
+}
+function togglePayBtn() {
+  document.getElementById("checkout-btn").disabled = !isFormValid();
+}
+
+/* ---------- Riepilogo ------------------------------------------------- */
+async function buildSummary() {
+  try {
+    const { costo_totale = 0 } = await fetchJSON("/api/orders/carrello");
+    const sub  = parseFloat(costo_totale);
+    const ship = shippingFee(sub);
+    const tot  = sub + ship;
+
+    document.querySelector(".subtotal-amount").textContent   = `€${sub.toFixed(2)}`;
+    document.querySelector(".shipping-cost").textContent     = `€${ship.toFixed(2)}`;
+    document.querySelectorAll(".total-amount").forEach(el =>
+      el.textContent = `€${tot.toFixed(2)}`);
+
+    // Nascondi la riga dello sconto (opzionale)
+    const discountRow = document.querySelector(".shipping-discount")?.closest("li");
+    if (discountRow) discountRow.style.display = "none";
+
+  } catch {
+    /* carrello vuoto → lascia 0,00 */
+  }
+}
+
+/* ---------- DOM READY ------------------------------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
+
+  /* Tooltip Bootstrap */
+  [...document.querySelectorAll("[data-bs-toggle='tooltip']")]
+    .forEach(el => new bootstrap.Tooltip(el));
+
+  /* Riepilogo iniziale */
+  buildSummary();
+
+  /* Live-validation campi */
+  [...REQUIRED_IDS.map(id => document.getElementById(id)), document.getElementById("termsCheck")]
+    .forEach(el => el.addEventListener("input", togglePayBtn));
+  togglePayBtn();                                // stato iniziale
+
+  /* Modal – codice transazione dinamico */
+  document.getElementById("paymentConfirmationModal")
+    .addEventListener("show.bs.modal", () => {
+      const code = "SIM-" + Math.floor(Math.random() * 1_000_000);
+      document.querySelector("#paymentConfirmationModal .text-muted")
+              .textContent = "Codice transazione: " + code;
     });
 
-    // Logica per il calcolo della spedizione (esempio)
-    function calculateShipping(subtotal) {
-        const shippingCostElement = document.querySelector('.shipping-cost');
-        const shippingDiscountElement = document.querySelector('.shipping-discount');
-        const totalAmountElement = document.querySelector('.total-amount');
-        
-        const shippingCost = 4.99;
-        let shippingDiscount = 0;
-        
-        if (subtotal >= 50) {
-            shippingDiscount = shippingCost;
-        }
-        
-        const total = subtotal + shippingCost - shippingDiscount;
-        
-        shippingCostElement.textContent = `€${shippingCost.toFixed(2)}`;
-        shippingDiscountElement.textContent = `-€${shippingDiscount.toFixed(2)}`;
-        totalAmountElement.textContent = `€${total.toFixed(2)}`;
+  /* Bottone Completa ordine */
+  document.getElementById("checkout-btn").addEventListener("click", async (e) => {
+    e.preventDefault();
+    if (!isFormValid()) return;
+
+    try {
+      /* 1. ordine in carrello */
+      const { ordine_id } = await fetchJSON("/api/orders/carrello");
+
+      /* 2. patch stato */
+      await fetchJSON(`/api/orders/${ordine_id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ stato: "in spedizione" })
+      });
+
+      /* 3. aggiorna riepilogo dentro al modal */
+      await buildSummary();                     // totali aggiornati
+      /* il modal si apre automaticamente */
+
+    } catch (err) {
+      alert(err.message.startsWith("HTTP 404")
+        ? "Il carrello è vuoto."
+        : "Errore durante il pagamento.");
     }
-    
-    // Esempio di chiamata (dovresti collegarlo al tuo carrello reale)
-    calculateShipping(0); // Inizializza a 0
+  });
+  // Reindirizzamento a ordini.html dopo la chiusura del modal
+document.getElementById("go-to-orders")?.addEventListener("click", () => {
+  window.location.href = "/ordini.html";
 });
-
-// Simulazione pagamento
-document.addEventListener('DOMContentLoaded', function() {
-    // Genera un numero di transazione casuale quando il modal viene mostrato
-    document.getElementById('paymentConfirmationModal').addEventListener('show.bs.modal', function() {
-        const transactionCode = 'SIM-' + Math.floor(Math.random() * 1000000);
-        document.querySelector('#paymentConfirmationModal .text-muted').textContent = 
-            'Codice transazione: ' + transactionCode;
-        
-        // Simula un ritardo di elaborazione (opzionale)
-        const submitBtn = document.querySelector('[data-bs-target="#paymentConfirmationModal"]');
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Elaborazione...';
-        submitBtn.disabled = true;
-        
-        setTimeout(function() {
-            submitBtn.innerHTML = '<i class="fas fa-lock me-2"></i>Completa l\'ordine';
-            submitBtn.disabled = false;
-        }, 1500);
-    });
 });
