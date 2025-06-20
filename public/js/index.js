@@ -83,6 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 1. Promo banner & prodotto in evidenza
   startPromoBanner();
   showRandomFeaturedProduct();
+  updateCartBadge();
 
   // 2. Nav categorie (link con class="category-link" e data-category-id="<id>")
   document.querySelectorAll(".category-link").forEach((link) => {
@@ -162,6 +163,41 @@ function parseJwt(token) {
     return null;
   }
 }
+
+/***** helper fetch *****/
+async function fetchJSON(url, opts = {}) {
+  const token   = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json", ...(opts?.headers||{}) };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const res = await fetch(url, { ...opts, headers });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+/***** BADGE CARRELLO *****/
+async function updateCartBadge() {
+  const badge = document.getElementById("cart-badge");
+  if (!badge) return;                        // elemento non trovato (es. admin)
+  const btn   = document.getElementById("cart-btn");
+
+  const token = localStorage.getItem("token");
+  if (!token) {                              // utente non loggato
+    badge.textContent = "0";
+    btn.classList.add("d-none");
+    return;
+  }
+
+  try {
+    const { prodotti = [] } = await fetchJSON("/api/orders/carrello");
+    const tot = prodotti.reduce((acc, p) => acc + p.quantita, 0);
+    badge.textContent = tot;
+    btn.classList.toggle("d-none", tot === 0);   // se 0 articoli nasconde btn
+  } catch {
+    badge.textContent = "0";
+    btn.classList.add("d-none");
+  }
+}
+
 
 /* ============================
    FETCH & RENDERING  PRODOTTI
@@ -251,3 +287,83 @@ function renderPagination(total, page, limit) {
     container.appendChild(li);
   }
 }
+
+/***************************
+ *  AUTH UI TOGGLER
+ ***************************/
+function refreshAuthUI() {
+  const token  = localStorage.getItem("token");
+
+  /* elementi */
+  const ddLogged   = document.getElementById("user-dropdown-logged");
+  const ddUnlogged = document.getElementById("user-dropdown-unlogged");
+  const cartBtn    = document.getElementById("cart-btn");
+  const badge      = document.getElementById("cart-badge");
+
+  /* utente NON loggato */
+  if (!token) {
+    ddLogged?.classList.add("d-none");
+    ddUnlogged?.classList.remove("d-none");
+    cartBtn?.classList.add("d-none");
+    badge.textContent = "0";
+    return;
+  }
+
+  /* utente loggato */
+  ddLogged?.classList.remove("d-none");
+  ddUnlogged?.classList.add("d-none");
+  cartBtn?.classList.remove("d-none");
+
+  /* badge quantità */
+  updateCartBadge();   // ↓ definita sotto
+}
+
+/***************************
+ *  BADGE CARRELLO
+ ***************************/
+async function updateCartBadge() {
+  const badge = document.getElementById("cart-badge");
+  if (!badge) return;
+
+  try {
+    const { prodotti = [] } = await fetchJSON("/api/orders/carrello");
+    const tot = prodotti.reduce((acc, p) => acc + p.quantita, 0);
+    badge.textContent = tot;
+  } catch {
+    badge.textContent = "0";
+  }
+}
+
+/* helper fetchJSON se non l'hai già */
+async function fetchJSON(url, opts = {}) {
+  const token   = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json", ...(opts?.headers||{}) };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const res = await fetch(url, { ...opts, headers });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+/***************************
+ *  DOM READY
+ ***************************/
+document.addEventListener("DOMContentLoaded", () => {
+  refreshAuthUI();
+
+  /* esempio: se hai già funzioni login/logout */
+  document.getElementById("logout-btn")?.addEventListener("click", () => {
+    localStorage.removeItem("token");
+    refreshAuthUI();
+  });
+  
+    /* 🔄 1.  Aggiorna badge quando la pagina torna visibile */
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) updateCartBadge();
+  });
+
+  /* 🔄 2. (opzionale) Aggiorna anche quando torna il focus alla finestra */
+  window.addEventListener("focus", updateCartBadge);
+
+  /* se altrove chiami login() dopo aver salvato il token, termina con: */
+  // refreshAuthUI();
+});
