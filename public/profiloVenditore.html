@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area Azienda</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Favicon -->
+    <link rel="icon" href="/img/logoDef.png" type="image/png">
+    <!-- CSS file -->
+    <link rel="stylesheet" href="/css/profiloVenditore.css">
+    <!-- Custom JS -->
+    <script src="/js/profiloVenditore.js" defer></script>
+</head>
+<body>
+    
+<!-- Header Bootstrap -->
+<header class="bg-white py-2 px-3 shadow-sm sticky-top">
+    <div class="container-fluid">
+        <div class="d-flex flex-wrap align-items-center justify-content-between">
+            <!-- Logo -->
+            <div class="d-flex align-items-center">
+                <img src="/img/logoDef.png" alt="Logo" class="rounded-circle" style="width: 50px; height: 50px;">
+            </div>
+            <!-- Icons -->
+            <div class="d-flex gap-3">
+                <!-- Dropdown User -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-dark border-0 dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fas fa-user fs-5"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="inventario.html">
+                                <i class="fas fa-boxes me-2"></i>Inventario
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="ordiniVenditore.html">
+                                <i class="fas fa-receipt me-2"></i>Ordini
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="#" id="logout-btn">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+    <main class="container my-5">
+        <!-- Benvenuto -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-4 text-center mb-4">Benvenuto, <span class="text-orange" id="nomeAzienda">Nome Azienda</span>!</h1>
+                <p class="lead text-center text-muted">Gestisci le informazioni della tua azienda e le impostazioni dell'account</p>
+            </div>
+        </div>
+
+        <!-- Informazioni Aziendali -->
+        <div class="row mb-4">
+            <div class="col-lg-6 mb-3 mb-lg-0">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-bottom-0">
+                        <h3 class="card-title mb-0"><i class="fas fa-building me-2 text-orange"></i>Informazioni Aziendali</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Nome Azienda</label>
+                            <div class="p-2 bg-light rounded" id="nomeAziendaDisplay">Nome Azienda</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Partita IVA</label>
+                            <div class="p-2 bg-light rounded" id="pivaDisplay">IT12345678901</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Indirizzo</label>
+                            <div class="p-2 bg-light rounded" id="indirizzoDisplay">Via Roma 123, 00100 Roma (RM)</div>
+                        </div>
+                        <button class="btn btn-outline-orange mt-2" data-bs-toggle="modal" data-bs-target="#infoAziendaModal">
+                            Modifica informazioni
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contatti -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-bottom-0">
+                        <h3 class="card-title mb-0"><i class="fas fa-address-card me-2 text-orange"></i>Contatti</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Email</label>
+                            <div id="emailDisplay" class="p-2 bg-light rounded">azienda@esempio.com</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Telefono</label>
+                            <div id="telefonoDisplay" class="p-2 bg-light rounded">+39 123 456 7890</div>
+                        </div>
+                        <button class="btn btn-outline-orange mt-2" data-bs-toggle="modal" data-bs-target="#contattiModal">
+                            Modifica contatti
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Password -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom-0">
+                        <h3 class="card-title mb-0"><i class="fas fa-lock me-2 text-orange"></i>Sicurezza</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="passwordForm">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="currentPassword" class="form-label text-muted">Password attuale</label>
+                                    <input type="password" class="form-control" id="currentPassword" placeholder="Inserisci password attuale">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="newPassword" class="form-label text-muted">Nuova password</label>
+                                    <input type="password" class="form-control" id="newPassword" placeholder="Inserisci nuova password">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="confirmPassword" class="form-label text-muted">Conferma password</label>
+                                    <input type="password" class="form-control" id="confirmPassword" placeholder="Conferma nuova password">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-orange">Cambia password</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informazioni Bancarie -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom-0">
+                        <h3 class="card-title mb-0"><i class="fas fa-university me-2 text-orange"></i>Informazioni Bancarie</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Intestatario Conto</label>
+                                <div class="p-2 bg-light rounded" id="intestatarioContoDisplay">Nome Azienda SRL</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">IBAN</label>
+                                <div class="p-2 bg-light rounded" id="ibanDisplay">IT60X0542811101000000123456</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-orange" data-bs-toggle="modal" data-bs-target="#bancarieModal">
+                            Modifica informazioni bancarie
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal per modifica informazioni aziendali -->
+    <div class="modal fade" id="infoAziendaModal" tabindex="-1" aria-labelledby="infoAziendaModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="infoAziendaModalLabel">Modifica informazioni aziendali</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="infoAziendaForm">
+                        <div class="mb-3">
+                            <label for="nomeAzienda" class="form-label">Nome Azienda</label>
+                            <input type="text" class="form-control" id="nomeAzienda" value="Nome Azienda">
+                        </div>
+                        <div class="mb-3">
+                            <label for="piva" class="form-label">Partita IVA</label>
+                            <input type="text" class="form-control" id="piva" value="IT12345678901">
+                        </div>
+                        <div class="mb-3">
+                            <label for="indirizzo" class="form-label">Indirizzo</label>
+                            <input type="text" class="form-control" id="indirizzo" value="Via Roma 123, 00100 Roma (RM)">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-orange" id="salvaInfoAzienda">Salva modifiche</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal per modifica contatti -->
+    <div class="modal fade" id="contattiModal" tabindex="-1" aria-labelledby="contattiModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="contattiModalLabel">Modifica contatti</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="contattiForm">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" value="azienda@esempio.com">
+                        </div>
+                        <div class="mb-3">
+                            <label for="telefono" class="form-label">Telefono</label>
+                            <input type="tel" class="form-control" id="telefono" value="+39 123 456 7890">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-orange" id="salvaContatti">Salva modifiche</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal per modifica informazioni bancarie -->
+    <div class="modal fade" id="bancarieModal" tabindex="-1" aria-labelledby="bancarieModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bancarieModalLabel">Modifica informazioni bancarie</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="bancarieForm">
+                        <div class="mb-3">
+                            <label for="intestatarioConto" class="form-label">Intestatario Conto</label>
+                            <input type="text" class="form-control" id="intestatarioConto" value="Nome Azienda SRL">
+                        </div>
+                        <div class="mb-3">
+                            <label for="iban" class="form-label">IBAN</label>
+                            <input type="text" class="form-control" id="iban" value="IT60X0542811101000000123456">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-orange" id="salvaBancarie">Salva modifiche</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Section -->
+    <div class="container mt-5 pb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-bottom-0">
+                <h3 class="card-title mb-0 text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Eliminazione account aziendale</h3>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">Una volta eliminato l'account aziendale, non potrai più recuperare i tuoi dati. Tutti i prodotti associati verranno rimossi dal marketplace.</p>
+                <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                    <i class="fas fa-trash-alt me-2"></i>Elimina l'account aziendale
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title text-danger" id="deleteAccountModalLabel">
+                        <i class="fas fa-exclamation-circle me-2"></i>Conferma eliminazione
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Attenzione!</strong> Questa azione è irreversibile.
+                    </div>
+                    
+                    <p class="mb-4">Stai per eliminare definitivamente l'account aziendale e tutti i dati associati, inclusi i prodotti in vendita. Sei assolutamente sicuro di voler procedere?</p>
+                    
+                    <form id="deleteAccountForm">
+                        <div class="mb-4">
+                            <label for="currentPasswordDelete" class="form-label">Inserisci la tua password attuale</label>
+                            <input type="password" class="form-control" id="currentPasswordDelete" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="confirmDelete" class="form-label">Digita "ELIMINA AZIENDA" per confermare</label>
+                            <input type="text" class="form-control" id="confirmDelete" placeholder="ELIMINA AZIENDA" required>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-trash-alt me-2"></i>Conferma eliminazione definitiva
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Annulla
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white pt-5 pb-3">
+        <div class="container">
+            <!-- Social Icons -->
+            <div class="d-flex justify-content-center gap-3 mb-4">
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-youtube"></i>
+                </a>
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="text-white bg-secondary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+            </div>
+
+            <!-- Links -->
+            <div class="text-center mb-4">
+                <a href="#" class="text-white text-decoration-none mx-3">Home</a>
+                <a href="#" class="text-white text-decoration-none mx-3">About</a>
+                <a href="#" class="text-white text-decoration-none mx-3">Contatti</a>
+                <a href="#" class="text-white text-decoration-none mx-3">Il nostro team</a>
+            </div>
+
+            <hr class="border-success my-4">
+
+            <!-- Copyright -->
+            <p class="text-center small text-light mb-0">Copyfake* ©2025; Designed by Valerio & Co.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+/* Variabili colore */
+:root {
+    --orange: #fd7e14;
+    --orange-hover: #e67e22;
+}
+
+/* Stili generali */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Card styles */
+.card {
+    border-radius: 10px;
+    border: none;
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.25rem 1.5rem;
+}
+
+/* Button styles */
+.btn-orange {
+    background-color: var(--orange);
+    color: white;
+    border: none;
+    white-space: nowrap; /* Evita il wrap del testo */
+}
+
+.btn-orange:hover {
+    background-color: var(--orange-hover);
+    color: white;
+}
+
+/* Stile specifico per il bottone aggiungi prodotto */
+.add-product-btn {
+    padding: 0.5rem 1rem; /* Padding più compatto */
+    font-size: 0.9rem; /* Dimensione font leggermente ridotta */
+}
+
+/* Table styles */
+.products-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    padding: 1rem 1.5rem;
+    border-top: none;
+}
+
+.products-table td {
+    padding: 1rem 1.5rem;
+    vertical-align: middle;
+    border-top: 1px solid #f1f1f1;
+}
+
+.products-table tr:hover td {
+    background-color: #f8f9fa;
+}
+
+/* Product image in table */
+.product-table-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+/* Badge styles */
+.badge {
+    font-weight: 500;
+    padding: 0.5em 0.8em;
+}
+
+.bg-active {
+    background-color: #2ecc71 !important;
+}
+
+.bg-inactive {
+    background-color: #95a5a6 !important;
+}
+
+.bg-low-stock {
+    background-color: #f39c12 !important;
+    color: #fff !important;
+}
+
+/* Pagination */
+.pagination-container {
+    background-color: #f8f9fa;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.page-link {
+    color: var(--orange);
+}
+
+.page-item.active .page-link {
+    background-color: var(--orange);
+    border-color: var(--orange);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .products-table {
+        font-size: 0.9rem;
+    }
+    
+    .products-table th, 
+    .products-table td {
+        padding: 0.75rem;
+    }
+    
+    .product-table-img {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* Stili specifici per mobile */
+    .add-product-btn {
+        width: 100%; /* Occupa tutta la larghezza */
+        margin-top: 0.5rem; /* Spazio sopra */
+        white-space: normal; /* Permette il wrap del testo */
+        padding: 0.4rem 0.8rem; /* Padding più compatto */
+        font-size: 0.85rem; /* Dimensione font ridotta */
+    }
+
+    /* Allinea i bottoni in colonna su mobile */
+    .d-flex.justify-content-between.align-items-center {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+
+    /* Stile per il gruppo di ricerca su mobile */
+    .input-group {
+        width: 100%;
+        max-width: 100% !important; /* Sovrascrive lo stile inline */
+        margin-bottom: 0.5rem;
+    }
+
+    /* Stile per il campo di input su mobile */
+    .input-group .form-control {
+        flex: 1;
+        min-width: 0; /* Permette al campo di ridursi */
+    }
+
+    /* Stile per il bottone di ricerca su mobile */
+    .input-group .btn-orange {
+        width: auto; /* Larghezza automatica basata sul contenuto */
+        padding: 0.4rem 0.8rem; /* Stesso padding del bottone aggiungi */
+    }
+}
