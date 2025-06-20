@@ -14,7 +14,7 @@
     <link rel="icon" href="/img/logoDef.png" type="image/png">
     
     <!-- JS -->
-    <script src="/public/js/prodotto.js" defer></script>
+    <script src="/js/prodotto.js" defer></script>
 </head>
 <body>
     <!-- Header Bootstrap -->
@@ -26,35 +26,24 @@
                     <img src="/img/logoDef.png" alt="Logo" class="rounded-circle" style="width: 50px; height: 50px;">
                 </div>
 
-                <!-- Search Bar -->
-                <div class="flex-grow-1 mx-3" style="max-width: 600px;">
-                    <div class="input-group shadow">
-                        <input type="text" class="form-control rounded-pill border-0 bg-light" placeholder="Cerca...">
-                        <button class="btn btn-orange rounded-pill" type="button">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-
                 <!-- Icons -->
                 <div class="d-flex gap-3">
-                    <button class="btn btn-outline-dark border-0 position-relative">
+                    <a href="carrello.html" class="btn btn-outline-dark border-0 position-relative">
                         <i class="fas fa-shopping-cart fs-5"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-                    </button>
-                    
+                        <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                    </a>
+
+                
                     <!-- Dropdown User -->
-                    <div class="dropdown">
+                    <div class="dropdown" id="user-dropdown-logged">
                         <button class="btn btn-outline-dark border-0 dropdown-toggle" data-bs-toggle="dropdown">
-                            <i class="fas fa-user fs-5"></i>
+                            <i class="fas fa-user-check fs-5"></i>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-door-open me-2"></i>Login</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-file-signature me-2"></i>Registrati</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="page1.html"><i class="fas fa-store me-2"></i>Inizia la tua attività</a></li>
-                        </ul>
-                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="userArea.html"><i class="fas fa-user-circle me-2"></i>Profilo</a></li>
+                        <li><a class="dropdown-item" href="ordini.html"><i class="fas fa-shopping-cart me-2"></i>I miei ordini</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" id="logout-btn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                 </div>
             </div>
         </div>
@@ -154,10 +143,14 @@
                         <form id="review-form">
                             <div class="mb-3">
                                 <label class="form-label">Valutazione</label>
-                                <div class="star-rating">
-                                    <!-- Stelle interattive -->
-                                </div>
-                                <input type="hidden" id="rating-value" name="rating" value="0">
+                                    <div class="star-rating" id="interactive-stars">
+                                        <i class="fas fa-star" data-val="1"></i>
+                                        <i class="fas fa-star" data-val="2"></i>
+                                        <i class="fas fa-star" data-val="3"></i>
+                                        <i class="fas fa-star" data-val="4"></i>
+                                        <i class="fas fa-star" data-val="5"></i>
+                                    </div>
+                                    <input type="hidden" id="rating-value" name="rating" value="0">
                             </div>
                             <div class="mb-3">
                                 <label for="review-text" class="form-label">Recensione</label>
