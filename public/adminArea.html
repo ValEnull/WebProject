@@ -53,7 +53,7 @@
             <div class="col-md-3 mb-3">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body text-center">
-                        <h2 class="text-orange">24</h2>
+                        <h2 class="text-orange" id="todayOrders">0</h2>
                         <p class="text-muted mb-0"><i class="fas fa-shopping-bag me-2"></i>Ordini oggi</p>
                     </div>
                 </div>
@@ -61,7 +61,7 @@
             <div class="col-md-3 mb-3">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body text-center">
-                        <h2 class="text-orange">8</h2>
+                        <h2 class="text-orange" id="todayReports">0</h2>
                         <p class="text-muted mb-0"><i class="fas fa-flag me-2"></i>Segnalazioni</p>
                     </div>
                 </div>
@@ -69,21 +69,21 @@
             <div class="col-md-3 mb-3">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body text-center">
-                        <h2 class="text-orange">€1,245</h2>
+                        <h2 class="text-orange" id="todayRevenue">€0</h2>
                         <p class="text-muted mb-0"><i class="fas fa-euro-sign me-2"></i>Fatturato oggi</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Top Seller (solo i primi 3 visibili) -->
+        <!-- Top Seller -->
         <div class="row mb-5">
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center">
                         <h3 class="card-title mb-0"><i class="fas fa-trophy me-2 text-orange"></i>Top Seller</h3>
                         <button class="btn btn-sm btn-outline-orange" data-bs-toggle="modal" data-bs-target="#topSellersModal">
-                            Vedi tutti (Top 5)
+                            Vedi tutti
                         </button>
                     </div>
                     <div class="card-body">
@@ -98,28 +98,8 @@
                                         <th>Fatturato</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>Smartphone XYZ</td>
-                                        <td>Elettronica</td>
-                                        <td>156</td>
-                                        <td>€ 12,450</td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>Cuffie Wireless Pro</td>
-                                        <td>Accessori</td>
-                                        <td>89</td>
-                                        <td>€ 4,273</td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td>Smartwatch Fitness</td>
-                                        <td>Elettronica</td>
-                                        <td>76</td>
-                                        <td>€ 5,548</td>
-                                    </tr>
+                                <tbody id="topSellersTableBody">
+                                    <!-- Dati caricati dinamicamente -->
                                 </tbody>
                             </table>
                         </div>
@@ -128,12 +108,12 @@
             </div>
         </div>
 
-        <!-- Modal Top 5 Sellers -->
+        <!-- Modal Top Sellers -->
         <div class="modal fade" id="topSellersModal" tabindex="-1" aria-labelledby="topSellersModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="topSellersModalLabel"><i class="fas fa-trophy me-2 text-orange"></i>Top 5 Prodotti</h5>
+                        <h5 class="modal-title" id="topSellersModalLabel"><i class="fas fa-trophy me-2 text-orange"></i>Top Prodotti</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -148,42 +128,8 @@
                                         <th>Fatturato</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>Smartphone XYZ</td>
-                                        <td>Elettronica</td>
-                                        <td>156</td>
-                                        <td>€ 12,450</td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>Cuffie Wireless Pro</td>
-                                        <td>Accessori</td>
-                                        <td>89</td>
-                                        <td>€ 4,273</td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td>Smartwatch Fitness</td>
-                                        <td>Elettronica</td>
-                                        <td>76</td>
-                                        <td>€ 5,548</td>
-                                    </tr>
-                                    <tr>
-                                        <td>4</td>
-                                        <td>Zaino Ergonomico</td>
-                                        <td>Accessori</td>
-                                        <td>65</td>
-                                        <td>€ 1,950</td>
-                                    </tr>
-                                    <tr>
-                                        <td>5</td>
-                                        <td>PowerBank 20.000mAh</td>
-                                        <td>Accessori</td>
-                                        <td>58</td>
-                                        <td>€ 1,392</td>
-                                    </tr>
+                                <tbody id="allTopSellersTableBody">
+                                    <!-- Dati verranno caricati dinamicamente -->
                                 </tbody>
                             </table>
                         </div>
@@ -195,14 +141,13 @@
             </div>
         </div>
 
-
         <!-- Tab Segnalazioni -->
         <div class="row mb-5">
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center">
                         <h3 class="card-title mb-0"><i class="fas fa-flag me-2 text-orange"></i>Segnalazioni Recenti</h3>
-                        <a href="#" class="btn btn-sm btn-outline-orange">Vedi tutte</a>
+                        <button class="btn btn-sm btn-outline-orange" data-bs-toggle="modal" data-bs-target="#allReportsModal">Vedi tutte</button>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -213,44 +158,11 @@
                                         <th>Tipo</th>
                                         <th>Utente</th>
                                         <th>Data</th>
-                                        <th>Stato</th>
                                         <th>Azioni</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>#REP-045</td>
-                                        <td>Prodotto non conforme</td>
-                                        <td>user123</td>
-                                        <td>19/06/2025</td>
-                                        <td><span class="badge bg-warning">In attesa</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-orange me-1"><i class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-success"><i class="fas fa-check"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#REP-044</td>
-                                        <td>Recensione inappropriata</td>
-                                        <td>user456</td>
-                                        <td>18/06/2025</td>
-                                        <td><span class="badge bg-success">Risolto</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-orange me-1"><i class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-success"><i class="fas fa-check"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#REP-043</td>
-                                        <td>Problema con il pagamento</td>
-                                        <td>user789</td>
-                                        <td>17/06/2025</td>
-                                        <td><span class="badge bg-danger">Rifiutato</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-orange me-1"><i class="fas fa-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-success"><i class="fas fa-check"></i></button>
-                                        </td>
-                                    </tr>
+                                <tbody id="recentReportsTableBody">
+                                    <!-- Dati verranno caricati dinamicamente -->
                                 </tbody>
                             </table>
                         </div>
@@ -258,65 +170,198 @@
                 </div>
             </div>
         </div>
-    </main>
 
-    <!-- Modal Visualizza Recensione -->
-    <div class="modal fade" id="viewReviewModal" tabindex="-1" aria-labelledby="viewReviewModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="viewReviewModalLabel"><i class="fas fa-star me-2 text-warning"></i>Dettaglio Recensione</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <h5>Prodotto: <span class="text-orange" id="reviewProduct">Smartphone XYZ</span></h5>
-                            <p class="text-muted mb-2">Utente: <span id="reviewUser">user123</span></p>
-                            <div class="mb-3">
-                                <span class="text-warning" id="reviewRating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                </span>
-                                <span class="ms-2">4/5</span>
+        <!-- Modal Visualizza Segnalazione -->
+        <div class="modal fade" id="viewReportModal" tabindex="-1" aria-labelledby="viewReportModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewReportModalLabel"><i class="fas fa-flag me-2 text-orange"></i>Dettaglio Segnalazione</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5>ID: <span class="text-orange" id="reportId"></span></h5>
+                                <p class="text-muted mb-2">Tipo: <span id="reportType"></span></p>
+                                <p class="text-muted mb-2">Utente: <span id="reportUser"></span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="text-muted">Data: <span id="reportDate"></span></p>
+                                <p class="text-muted">Prodotto: <span class="text-orange" id="reportProduct"></span></p>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <p class="text-muted mb-1">Data: <span id="reviewDate">19/06/2025</span></p>
-                            <p class="text-muted">ID Recensione: <span id="reviewId">#REV-1001</span></p>
+                        
+                        <div class="card bg-light p-4 mb-4">
+                            <h6 class="mb-3">Descrizione della segnalazione:</h6>
+                            <p id="reportDescription" class="mb-0"></p>
                         </div>
                     </div>
-                    
-                    <div class="card bg-light p-4 mb-4">
-                        <h6 class="mb-3">Testo della recensione:</h6>
-                        <p id="reviewText" class="mb-0">Il prodotto è arrivato in tempi rapidi e ben imballato. La qualità è buona ma la batteria dura meno di quanto pubblicizzato. Nel complesso sono soddisfatto dell'acquisto.</p>
-                    </div>
-                    
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        <strong>Motivo segnalazione:</strong> 
-                        <span id="reportReason">L'utente ha riportato informazioni non veritiere sulla durata della batteria</span>
-                    </div>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" id="rejectReviewBtn">
-                        <i class="fas fa-trash-alt me-2"></i>Elimina Recensione
-                    </button>
-                    <div>
-                        <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                             <i class="fas fa-times me-2"></i>Chiudi
                         </button>
-                        <button type="button" class="btn btn-orange" id="approveReviewBtn">
-                            <i class="fas fa-check me-2"></i>Approva Recensione
+                        <button type="button" class="btn btn-orange" id="approveReportBtn">
+                            <i class="fas fa-check me-2"></i>Approva Segnalazione
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+
+        <!-- Modal Tutte le Segnalazioni -->
+        <div class="modal fade" id="allReportsModal" tabindex="-1" aria-labelledby="allReportsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="allReportsModalLabel"><i class="fas fa-flag me-2 text-orange"></i>Tutte le Segnalazioni</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Tipo</th>
+                                        <th>Utente</th>
+                                        <th>Data</th>
+                                        <th>Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="allReportsTableBody">
+                                    <!-- Dati verranno caricati dinamicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-orange" data-bs-dismiss="modal">Chiudi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Cerca Utenti -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom-0">
+                        <h3 class="card-title mb-0"><i class="fas fa-users me-2 text-orange"></i>Cerca Utenti</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Barra di ricerca -->
+                        <div class="row mb-4">
+                            <div class="col-md-8 offset-md-2">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Cerca per username o email..." aria-label="Cerca utente" id="userSearchInput">
+                                    <button class="btn btn-orange" type="button" id="userSearchBtn">
+                                        <i class="fas fa-search me-1"></i> Cerca
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Risultati della ricerca -->
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Nome</th>
+                                        <th>Email</th>
+                                        <th>Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="userSearchResults">
+                                    <!-- Dati verranno caricati dinamicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Profilo Utente -->
+        <div class="modal fade" id="userProfileModal" tabindex="-1" aria-labelledby="userProfileModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="userProfileModalLabel"><i class="fas fa-user-circle me-2 text-orange"></i>Profilo Utente</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                <div class="mb-3">
+                                    <img src="" alt="Avatar" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px;" id="userProfileAvatar">
+                                    <h4 id="userProfileUsername"></h4>
+                                    <span class="badge" id="userProfileStatus"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <p><strong>Nome:</strong> <span id="userProfileName"></span></p>
+                                        <p><strong>Email:</strong> <span id="userProfileEmail"></span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Registrato il:</strong> <span id="userProfileRegDate"></span></p>
+                                        <p><strong>Ultimo accesso:</strong> <span id="userProfileLastLogin"></span></p>
+                                    </div>
+                                </div>
+                                <div class="card bg-light p-3 mb-3">
+                                    <h6><i class="fas fa-info-circle me-2 text-orange"></i>Informazioni aggiuntive</h6>
+                                    <p class="mb-0" id="userProfileBio"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-outline-danger" id="deleteUserBtn">
+                            <i class="fas fa-trash-alt me-2"></i>Elimina Account
+                        </button>
+                        <div>
+                            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-2"></i>Chiudi
+                            </button>
+                            <button type="button" class="btn btn-orange" id="messageUserBtn">
+                                <i class="fas fa-envelope me-2"></i>Invia Messaggio
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Conferma Eliminazione -->
+        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="confirmDeleteModalLabel"><i class="fas fa-exclamation-triangle me-2"></i>Conferma Eliminazione</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Sei sicuro di voler eliminare definitivamente l'account di <strong id="userToDelete"></strong>?</p>
+                        <p class="text-danger"><i class="fas fa-exclamation-circle me-2"></i>Questa azione è irreversibile e cancellerà tutti i dati associati all'utente.</p>
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" type="checkbox" id="confirmDeleteCheckbox">
+                            <label class="form-check-label" for="confirmDeleteCheckbox">
+                                Confermo di voler procedere con l'eliminazione
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annulla</button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+                            <i class="fas fa-trash-alt me-2"></i>Elimina Definitivamente
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
