@@ -26,11 +26,18 @@ body {
     background-color: var(--orange);
     color: white;
     border: none;
+    white-space: nowrap; /* Evita il wrap del testo */
 }
 
 .btn-orange:hover {
     background-color: var(--orange-hover);
     color: white;
+}
+
+/* Stile specifico per il bottone aggiungi prodotto */
+.add-product-btn {
+    padding: 0.5rem 1rem; /* Padding più compatto */
+    font-size: 0.9rem; /* Dimensione font leggermente ridotta */
 }
 
 /* Table styles */
@@ -108,5 +115,39 @@ body {
     .product-table-img {
         width: 40px;
         height: 40px;
+    }
+
+    /* Stili specifici per mobile */
+    .add-product-btn {
+        width: 100%; /* Occupa tutta la larghezza */
+        margin-top: 0.5rem; /* Spazio sopra */
+        white-space: normal; /* Permette il wrap del testo */
+        padding: 0.4rem 0.8rem; /* Padding più compatto */
+        font-size: 0.85rem; /* Dimensione font ridotta */
+    }
+
+    /* Allinea i bottoni in colonna su mobile */
+    .d-flex.justify-content-between.align-items-center {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+
+    /* Stile per il gruppo di ricerca su mobile */
+    .input-group {
+        width: 100%;
+        max-width: 100% !important; /* Sovrascrive lo stile inline */
+        margin-bottom: 0.5rem;
+    }
+
+    /* Stile per il campo di input su mobile */
+    .input-group .form-control {
+        flex: 1;
+        min-width: 0; /* Permette al campo di ridursi */
+    }
+
+    /* Stile per il bottone di ricerca su mobile */
+    .input-group .btn-orange {
+        width: auto; /* Larghezza automatica basata sul contenuto */
+        padding: 0.4rem 0.8rem; /* Stesso padding del bottone aggiungi */
     }
 }

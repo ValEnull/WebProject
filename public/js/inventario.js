@@ -83,32 +83,37 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Carica i prodotti nella tabella
-    function loadProducts() {
-        const productsBody = document.querySelector('.products-body');
-        productsBody.innerHTML = '';
+function loadProducts() {
+    const productsBody = document.querySelector('.products-body');
+    productsBody.innerHTML = '';
+    
+    products.forEach(product => {
+        const statusClass = `bg-${product.status}`;
+        const statusText = {
+            'active': 'Disponibile',
+            'inactive': 'Non disponibile',
+            'low-stock': 'Esaurimento'
+        }[product.status];
         
-        products.forEach(product => {
-            const statusClass = `bg-${product.status}`;
-            const statusText = {
-                'active': 'Disponibile',
-                'inactive': 'Non disponibile',
-                'low-stock': 'Esaurimento'
-            }[product.status];
-            
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><img src="${product.image}" alt="${product.name}" class="product-table-img"></td>
-                <td>${product.name}</td>
-                <td>${product.id}</td>
-                <td>${product.quantity}</td>
-                <td>€${product.price.toFixed(2)}</td>
-                <td><span class="badge ${statusClass}">${statusText}</span></td>
-            `;
-            productsBody.appendChild(row);
-        });
-        
-        updatePagination(products.length);
-    }
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><img src="${product.image}" alt="${product.name}" class="product-table-img"></td>
+            <td>${product.name}</td>
+            <td>${product.id}</td>
+            <td>${product.quantity}</td>
+            <td>€${product.price.toFixed(2)}</td>
+            <td><span class="badge ${statusClass}">${statusText}</span></td>
+            <td>
+                <a href="editProduct.html?id=${product.id}" class="btn btn-sm btn-outline-orange" title="Modifica prodotto">
+                    <i class="fas fa-edit"></i>
+                </a>
+            </td>
+        `;
+        productsBody.appendChild(row);
+    });
+    
+    updatePagination(products.length);
+}
 
     // Aggiorna la paginazione
     function updatePagination(totalItems) {

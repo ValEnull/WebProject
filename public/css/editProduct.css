@@ -2,27 +2,17 @@
 :root {
     --orange: #fd7e14;
     --orange-hover: #e67e22;
-    --success-green: #28a745;
 }
 
 /* Stili generali */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
 }
 
 /* Card styles */
 .card {
     border-radius: 10px;
     border: none;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
 /* Button styles */
@@ -30,13 +20,11 @@ body {
     background-color: var(--orange);
     color: white;
     border: none;
-    transition: all 0.3s ease;
 }
 
 .btn-orange:hover {
     background-color: var(--orange-hover);
     color: white;
-    transform: translateY(-2px);
 }
 
 /* Form styles */
@@ -47,23 +35,11 @@ body {
 .form-control, .form-select {
     border: 1px solid #ced4da;
     border-radius: 0.375rem;
-    transition: all 0.3s ease;
 }
 
 .form-control:focus, .form-select:focus {
     border-color: var(--orange);
     box-shadow: 0 0 0 0.25rem rgba(253, 126, 20, 0.25);
-}
-
-/* Modal styles */
-#successModal .modal-content {
-    border-radius: 10px;
-    border: none;
-}
-
-/* Footer styles */
-footer {
-    margin-top: auto;
 }
 
 /* Responsive */
