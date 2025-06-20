@@ -66,6 +66,7 @@ body {
 
 .star-rating i {
     transition: all 0.2s ease;
+    
 }
 
 .star-rating i:hover,

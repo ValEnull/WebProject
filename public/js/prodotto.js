@@ -3,8 +3,8 @@
    ========================================================================= */
 
 /***** CONFIG *****/
-const PRODUCT_API_BASE = "/api/products";   // dettagli prodotto
-const RATING_API_BASE  = "/api/rating";     // recensioni
+const PRODUCT_API_BASE = "/api/products";
+const RATING_API_BASE  = "/api/rating";
 
 /***** UTILITY *****/
 const $ = (sel) => document.querySelector(sel);
@@ -22,27 +22,55 @@ async function fetchJSON(url, opts = {}) {
   return res.json();
 }
 
+/***** BADGE CARRELLO *****/
+async function updateCartBadge() {
+  const badge = document.querySelector("#cart-badge");
+  if (!badge) return;
+
+  const token = localStorage.getItem("token");
+  if (!token) return badge.textContent = "0";
+
+  try {
+    const { prodotti = [] } = await fetchJSON("/api/orders/carrello");
+    const totale = prodotti.reduce((acc, p) => acc + p.quantita, 0);
+    badge.textContent = totale;
+  } catch (_) {
+    badge.textContent = "0";
+  }
+}
+
 /***** QUANTITÀ *****/
 function setupQuantity(max) {
-  const qtyInput = $("#quantity");
-  qtyInput.value = 1;
+  const qty   = $("#quantity");
+  const inc   = $("#increment");
+  const dec   = $("#decrement");
 
-  $("#increment")?.addEventListener("click", () => {
-    const v = +qtyInput.value;
-    if (v < max) qtyInput.value = v + 1;
-  });
+  /* imposta attributi e valore di partenza */
+  qty.max   = max;                       // <input>.max è string, ma OK
+  qty.value = max === 0 ? 0 : 1;         // sempre da 1   (0 se esaurito)
 
-  $("#decrement")?.addEventListener("click", () => {
-    const v = +qtyInput.value;
-    if (v > 1) qtyInput.value = v - 1;
-  });
+  /* blocca i pulsanti se lo stock è finito */
+  inc.disabled = dec.disabled = max === 0;
 
-  // Evita valori manuali > stock o <1
-  qtyInput.addEventListener("change", () => {
-    let v = +qtyInput.value || 1;
-    v = Math.min(Math.max(v, 1), max);
-    qtyInput.value = v;
-  });
+  /* listener aggiunti una sola volta */
+  if (!qty.dataset.bound) {
+    inc?.addEventListener("click", () => {
+      const lim = +qty.max;
+      if (+qty.value < lim) qty.value++;
+    });
+
+    dec?.addEventListener("click", () => {
+      if (+qty.value > 1) qty.value--;
+    });
+
+    qty.addEventListener("change", () => {
+      const lim = +qty.max;
+      let v = +qty.value || 1;
+      qty.value = Math.min(Math.max(v, 1), lim);
+    });
+
+    qty.dataset.bound = "1";
+  }
 }
 
 /***** STARS *****/
@@ -57,72 +85,66 @@ function renderStarRating(avg) {
 
 /***** RENDER PRODOTTO *****/
 function renderProduct(p) {
-  // Titolo, prezzo, breve descrizione
+  /* titolo - descrizione */
   document.title = p.nome_prodotto;
-  $(".product-title").textContent = p.nome_prodotto;
-  $(".product-price").textContent = `€ ${parseFloat(p.prezzo).toFixed(2)}`;
+  $(".product-title").textContent  = p.nome_prodotto;
+  $(".product-price").textContent  = `€ ${parseFloat(p.prezzo).toFixed(2)}`;
   $(".product-description").textContent = p.descrizione || "";
-  // Tab Dettagli – usa descrizione completa se presente
-  const det = $("#details");
-  if (det) det.innerHTML = `<h4>Informazioni Dettagliate</h4><p>${p.descrizione_dettagliata || p.descrizione || ""}</p>`;
+  $("#details").innerHTML =
+    `<h4>Informazioni Dettagliate</h4><p>${p.descrizione_dettagliata || p.descrizione || ""}</p>`;
 
-  // Specifiche
+  /* specifiche */
   const list = $(".specs-list");
   list.innerHTML = "";
-  (p.specifiche || "").split(";").filter(Boolean).forEach((s) => {
-    const li = document.createElement("li");
-    li.textContent = s.trim();
-    list.appendChild(li);
-  });
+  (p.specifiche || "")
+    .split(";")
+    .filter(Boolean)
+    .forEach((s) => {
+      const li = document.createElement("li");
+      li.textContent = s.trim();
+      list.appendChild(li);
+    });
 
-  // Immagini
-  const imgs = (p.immagini || []).map((o) => b64(o.immagine_base64));
-  const main = $("#mainProductImage");
-  main.src = imgs[0] || "/img/placeholderProduct.png";
-  const thumbs = Array.from(document.querySelectorAll(".img-thumbnail"));
-  thumbs.forEach((t, i) => {
+  /* immagini */
+  const imgs  = (p.immagini || []).map((o) => b64(o.immagine_base64));
+  const main  = $("#mainProductImage");
+  main.src    = imgs[0] || "/img/placeholderProduct.png";
+  document.querySelectorAll(".img-thumbnail").forEach((t, i) => {
     if (imgs[i]) {
-      t.src = imgs[i];
-      t.style.display = "block";
-      t.addEventListener("click", () => (main.src = t.src));
+      t.src = imgs[i];  t.style.display = "block";
+      t.onclick = () => (main.src = t.src);
     } else {
       t.style.display = "none";
     }
   });
 
-  // Limite stock
-  const stock = p.quant ?? 1;
+  /* stock */
+  const stock = +p.quant || 0;
   setupQuantity(stock);
-  // Se esaurito, disabilita pulsante
-  if (stock === 0) {
-    $("#increment").disabled = true;
-    $("#decrement").disabled = true;
-    $("#quantity").value = 0;
-    $(".add-to-cart").disabled = true;
-    $(".add-to-cart").textContent = "Non disponibile";
-  }
+  setupAddToCartButton(p.prodotto_id, stock);
 }
 
-/***** RECENSIONI *****/
+/***** RECENSIONI (unchanged) *****/
 async function loadAverage(id) {
   try {
-    const { media_voto = 0, numero_recensioni = 0 } = await fetchJSON(`${RATING_API_BASE}/${id}/average`);
+    const { media_voto = 0, numero_recensioni = 0 } =
+      await fetchJSON(`${RATING_API_BASE}/${id}/average`);
     renderStarRating(media_voto);
-    $(".reviews-count").textContent = `(${numero_recensioni} recension${numero_recensioni === 1 ? "e" : "i"})`;
+    $(".reviews-count").textContent =
+      `(${numero_recensioni} recension${numero_recensioni === 1 ? "e" : "i"})`;
   } catch (_) {}
 }
 
 async function loadReviews(id) {
   const wrap = $("#reviews-container");
-  const emptyMsg = $("#no-reviews-message");
+  const empty = $("#no-reviews-message");
   try {
     const revs = await fetchJSON(`${RATING_API_BASE}/${id}`);
     if (!revs.length) {
-      emptyMsg.style.display = "block";
-      wrap.innerHTML = emptyMsg.outerHTML;
-      return;
+      empty.style.display = "block";
+      wrap.innerHTML = empty.outerHTML; return;
     }
-    emptyMsg.style.display = "none";
+    empty.style.display = "none";
     wrap.innerHTML = revs.map(renderReviewHTML).join("");
   } catch (_) {}
 }
@@ -130,55 +152,132 @@ async function loadReviews(id) {
 const renderReviewHTML = (r) => {
   const date = new Date(r.data_recensione).toLocaleDateString("it-IT");
   return `<div class="review-card border rounded p-3 mb-3">
-    <div class="d-flex justify-content-between align-items-start mb-2">
-      <div><strong>${r.nome_utente}</strong><br>${starIcons(r.valutazione)}</div>
-      <span class="text-muted small">${date}</span>
-    </div>
-    <p class="mb-0">${r.descrizione || "(nessun testo)"}</p>
-  </div>`;
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div><strong>${r.nome_utente}</strong><br>${starIcons(r.valutazione)}</div>
+        <span class="text-muted small">${date}</span>
+      </div>
+      <p class="mb-0">${r.descrizione || "(nessun testo)"}</p>
+    </div>`;
 };
+
+/***** ...PRECEDENTE CODICE FINO A setupReviewForm OMITTED PER BREVITÀ... *****/
 
 function setupReviewForm(id) {
   const form = $("#review-form");
   if (!form) return;
+
   const ratingInput = $("#rating-value");
   const starWrap = $(".star-rating");
-  starWrap.innerHTML = starIcons(0);
-  starWrap.querySelectorAll("i").forEach((st, idx) => {
-    const val = idx + 1;
-    st.addEventListener("mouseover", () => (starWrap.innerHTML = starIcons(val)));
-    st.addEventListener("mouseout", () => (starWrap.innerHTML = starIcons(+ratingInput.value)));
-    st.addEventListener("click", () => {
-      ratingInput.value = val;
-      starWrap.innerHTML = starIcons(val);
+  let selected = 0;
+
+  // Crea le stelle dinamicamente
+  starWrap.innerHTML = "";
+  for (let i = 1; i <= 5; i++) {
+    const star = document.createElement("i");
+    star.classList.add("fa-star", "far"); // inizia come vuota
+    star.dataset.value = i;
+    star.style.cursor = "pointer";
+
+    star.addEventListener("mouseover", () => {
+      highlightStars(i);
     });
-  });
+
+    star.addEventListener("mouseout", () => {
+      highlightStars(selected);
+    });
+
+    star.addEventListener("click", () => {
+      selected = i;
+      ratingInput.value = i;
+      highlightStars(selected);
+    });
+
+    starWrap.appendChild(star);
+  }
+
+  function highlightStars(n) {
+    starWrap.querySelectorAll("i").forEach((s, idx) => {
+      if (idx < n) {
+        s.classList.remove("far");
+        s.classList.add("fas", "active");
+      } else {
+        s.classList.remove("fas", "active");
+        s.classList.add("far");
+      }
+    });
+  }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const voto = +ratingInput.value;
-    const txt  = $("#review-text").value.trim();
+    const descrizione = $("#review-text").value.trim();
+
     if (!voto) return alert("Seleziona un voto da 1 a 5 stelle");
     try {
       form.querySelector("button[type=submit]").disabled = true;
       await fetchJSON(`${RATING_API_BASE}/${id}`, {
         method: "POST",
-        body: JSON.stringify({ valutazione: voto, descrizione: txt })
+        body: JSON.stringify({ valutazione: voto, descrizione })
       });
+
       form.reset();
-      ratingInput.value = 0;
-      starWrap.innerHTML = starIcons(0);
+      selected = 0;
+      ratingInput.value = "";
+      highlightStars(0);
       loadAverage(id);
       loadReviews(id);
     } catch (err) {
-      alert(err.message.includes("401") ? "Devi essere loggato e aver acquistato il prodotto." : "Errore invio recensione");
+      alert(err.message.includes("401")
+        ? "Devi essere loggato e aver acquistato il prodotto."
+        : "Errore invio recensione.");
     } finally {
       form.querySelector("button[type=submit]").disabled = false;
     }
   });
 }
 
-/***** INIT ******/
+
+/***** ADD-TO-CART *****/
+function setupAddToCartButton(prodId, stock) {
+  const btn = $(".add-to-cart");
+  if (btn.dataset.bound) return;          // evita doppi listener
+
+  btn.addEventListener("click", async () => {
+    const qty = +$("#quantity").value || 1;
+    btn.disabled = true;
+
+    try {
+      /* 1. POST carrello */
+      await fetchJSON(`/api/orders/carrello/${prodId}`, {
+        method: "POST",
+        body: JSON.stringify({ quantita: qty })
+      });
+
+      await updateCartBadge();       
+      /* 2. ottieni stock aggiornato */
+      const pAgg = await fetchJSON(`${PRODUCT_API_BASE}/${prodId}`);
+      const nuovoStock = +pAgg.quant || 0;
+      setupQuantity(nuovoStock);
+
+      if (nuovoStock === 0) {
+        btn.disabled = true;
+        btn.textContent = "Non disponibile";
+      }
+
+      alert("Prodotto aggiunto al carrello");
+    } catch (err) {
+      alert(err.message.includes("401")
+        ? "Devi essere loggato per aggiungere prodotti."
+        : "Errore durante l'aggiunta.");
+    } finally {
+      if (+$("#quantity").max > 0) btn.disabled = false;
+    }
+  });
+  
+  btn.dataset.bound = "1";
+}
+
+/***** INIT *****/
 document.addEventListener("DOMContentLoaded", async () => {
   const id = new URLSearchParams(location.search).get("id");
   if (!id) return location.replace("/index.html");
@@ -189,8 +288,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupReviewForm(id);
     loadAverage(id);
     loadReviews(id);
-  } catch (e) {
+  } catch (_) {
     alert("Prodotto non trovato");
     location.replace("/index.html");
   }
 });
+
+updateCartBadge();

@@ -35,9 +35,12 @@ router.post('/carrello/:prodotto_id', authMiddleware(1), async (req, res) => {
       ordineId = ordineResult.rows[0].ordine_id;
     }
 
-    // 2. Recupera il prezzo del prodotto
+    // 2. Recupera il prezzo del prodotto e la quantità disponibile (quant)
     const prodottoResult = await pool.query(`
-      SELECT prezzo FROM prodotti WHERE prodotto_id = $1
+      SELECT prezzo, quant
+      FROM prodotti
+      WHERE prodotto_id = $1
+      FOR UPDATE
     `, [prodottoId]);
 
     if (prodottoResult.rowCount === 0) {
@@ -45,7 +48,7 @@ router.post('/carrello/:prodotto_id', authMiddleware(1), async (req, res) => {
       return res.status(404).json({ message: 'Prodotto non trovato.' });
     }
 
-    const prezzoUnitario = prodottoResult.rows[0].prezzo;
+    const { prezzo: prezzoUnitario, quant: stockDisponibile } = prodottoResult.rows[0];
 
     // 3. Verifica se il prodotto è già nel carrello
     const dettaglioResult = await pool.query(`
@@ -53,20 +56,39 @@ router.post('/carrello/:prodotto_id', authMiddleware(1), async (req, res) => {
       WHERE ordine_id = $1 AND prodotto_id = $2
     `, [ordineId, prodottoId]);
 
+    let quantitaNelCarrello = 0;
     if (dettaglioResult.rowCount > 0) {
-      // aggiorna quantità (prezzo non cambia)
+      quantitaNelCarrello = dettaglioResult.rows[0].quantita;
+    }
+
+    const nuovaQuantitaTotale = quantitaNelCarrello + quantita;
+
+    if (nuovaQuantitaTotale > stockDisponibile) {
+      await pool.query('ROLLBACK');
+      return res.status(400).json({
+        message: `Disponibilità insufficiente: in magazzino ${stockDisponibile}, già nel carrello ${quantitaNelCarrello}.`
+      });
+    }
+
+    if (quantitaNelCarrello > 0) {
       await pool.query(`
         UPDATE dettagli_ordine
-        SET quantita = quantita + $1
+        SET quantita = $1
         WHERE ordine_id = $2 AND prodotto_id = $3
-      `, [quantita, ordineId, prodottoId]);
+      `, [nuovaQuantitaTotale, ordineId, prodottoId]);
     } else {
-      // inserisce nuovo dettaglio con prezzo_unitario
       await pool.query(`
         INSERT INTO dettagli_ordine (ordine_id, prodotto_id, quantita, prezzo_unitario)
         VALUES ($1, $2, $3, $4)
       `, [ordineId, prodottoId, quantita, prezzoUnitario]);
     }
+
+    // 4. Scala lo stock del prodotto 
+    await pool.query(`
+    UPDATE prodotti
+    SET quant = quant - $1
+    WHERE prodotto_id = $2
+    `, [quantita, prodottoId]);
 
     await pool.query('COMMIT');
     res.status(201).json({ message: 'Prodotto aggiunto al carrello.', ordine_id: ordineId });
@@ -78,11 +100,14 @@ router.post('/carrello/:prodotto_id', authMiddleware(1), async (req, res) => {
   }
 });
 
+
+
 // GET carrello - protetta per cliente - ottiene i dettagli del carrello
 router.get('/carrello', authMiddleware(1), async (req, res) => {
   const userId = req.user.id;
 
   try {
+    /* 1. trova ordine "non pagato" */
     const ordineResult = await pool.query(`
       SELECT ordine_id, data_ordine
       FROM ordini
@@ -96,19 +121,20 @@ router.get('/carrello', authMiddleware(1), async (req, res) => {
 
     const ordine = ordineResult.rows[0];
 
+    /* 2. dettagli + prima immagine */
     const dettagliResult = await pool.query(`
       SELECT 
-        d.prodotto_id, 
-        d.quantita, 
+        d.prodotto_id,
+        d.quantita,
         d.prezzo_unitario,
         (d.quantita * d.prezzo_unitario) AS totale,
-        p.nome_prodotto, 
+        p.nome_prodotto,
         p.descrizione,
-        i.immagine_link AS immagine_principale
+        i.immagine AS immagine_principale    -- BYTEA
       FROM dettagli_ordine d
       JOIN prodotti p ON d.prodotto_id = p.prodotto_id
       LEFT JOIN LATERAL (
-        SELECT immagine_link
+        SELECT immagine
         FROM immagini
         WHERE prodotto_id = p.prodotto_id
         ORDER BY immagine_id ASC
@@ -117,9 +143,20 @@ router.get('/carrello', authMiddleware(1), async (req, res) => {
       WHERE d.ordine_id = $1
     `, [ordine.ordine_id]);
 
-    const prodotti = dettagliResult.rows;
-    const costo_totale = prodotti.reduce((sum, p) => sum + parseFloat(p.totale), 0);
+    /* 3. converte la colonna BYTEA in base64 */
+    const prodotti = dettagliResult.rows.map(r => ({
+      ...r,
+      immagine_principale: r.immagine_principale
+        ? r.immagine_principale.toString('base64')
+        : null
+    }));
 
+    const costo_totale = prodotti.reduce(
+      (sum, p) => sum + parseFloat(p.totale),
+      0
+    );
+
+    /* 4. risposta */
     res.status(200).json({
       ordine_id: ordine.ordine_id,
       data_ordine: ordine.data_ordine,
@@ -132,6 +169,7 @@ router.get('/carrello', authMiddleware(1), async (req, res) => {
     res.status(500).json({ message: 'Errore del server.' });
   }
 });
+
 
 // GET dettagli di un ordine - protetta per utente proprietario o admin
 router.get('/:id', authMiddleware(1), async (req, res) => {
