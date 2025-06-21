@@ -2,7 +2,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const promoText = document.getElementById('promo-text');
     const messages = [
-        "Sconto inaugurazione 15% su tutti i prodotti!",
         "Spedizione gratuita per ordini sopra €50!",
         "Collezione estiva disponibile ora!",
         "Lo stai cercando? Lo abbiamo!",
