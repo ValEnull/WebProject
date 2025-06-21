@@ -370,34 +370,36 @@ router.get('/artigiano/:artigiano_id', async (req, res) => {
 });
 
 // Elimina un prodotto - protetta per artigiani e admin
+// routes/products.js
 router.delete('/:id', authMiddleware(2), async (req, res) => {
   const { id } = req.params;
-  const userId = req.user.id;
-  const userRole = req.user.ruolo_id;
 
   try {
-    let query = 'SELECT * FROM prodotti WHERE prodotto_id = $1';
-    let values = [id];
+    // 1️⃣ esiste almeno un ordine collegato?
+    const used = await pool.query(
+      'SELECT 1 FROM dettagli_ordine WHERE prodotto_id = $1 LIMIT 1',
+      [id]
+    );
 
-    if (userRole < 3) {
-      query += ' AND artigiano_id = $2';
-      values.push(userId);
+    if (used.rowCount) {
+      // → solo stock = 0
+      await pool.query(
+        'UPDATE prodotti SET quant = 0 WHERE prodotto_id = $1',
+        [id]
+      );
+      return res.status(409).json({ message: 'PRODUCT_IN_ORDERS' });
     }
 
-    const checkResult = await pool.query(query, values);
+    // 2️⃣ nessun ordine: cancellazione “pulita”
+    await pool.query(
+      'DELETE FROM prodotti WHERE prodotto_id = $1',
+      [id]
+    );
+    return res.sendStatus(204);
 
-    if (checkResult.rows.length === 0) {
-      return res.status(403).json({ message: 'Non sei autorizzato a eliminare questo prodotto.' });
-    }
-
-    await pool.query('DELETE FROM immagini WHERE prodotto_id = $1', [id]);
-
-    await pool.query('DELETE FROM prodotti WHERE prodotto_id = $1', [id]);
-
-    res.status(200).json({ message: 'Prodotto eliminato con successo.' });
-  } catch (error) {
-    console.error('Errore durante l’eliminazione del prodotto:', error);
-    res.status(500).json({ message: 'Errore del server durante l’eliminazione del prodotto.' });
+  } catch (err) {
+    console.error('Errore DELETE prodotto:', err);
+    res.status(500).json({ message: 'Errore interno del server' });
   }
 });
 

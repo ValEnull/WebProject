@@ -28,12 +28,23 @@
 
                 <!-- Icons -->
                 <div class="d-flex gap-3">
-                    <a href="carrello.html" class="btn btn-outline-dark border-0 position-relative">
+                    <a id="cart-btn" href="carrello.html" class="btn btn-outline-dark border-0 position-relative d-none">
                         <i class="fas fa-shopping-cart fs-5"></i>
                         <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
                     </a>
 
-                
+                    <!-- Dropdown *NON* loggato -->
+                    <div class="dropdown d-none" id="user-dropdown-unlogged">
+                        <button class="btn btn-outline-dark border-0 dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="fas fa-user fs-5"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="login.html"><i class="fas fa-sign-in-alt me-2"></i>Login</a></li>
+                            <li><a class="dropdown-item" href="register.html"><i class="fas fa-user-plus me-2"></i>Registrati</a></li>
+                        </ul>
+                    </div>
+                            
+                    
                     <!-- Dropdown User -->
                     <div class="dropdown" id="user-dropdown-logged">
                         <button class="btn btn-outline-dark border-0 dropdown-toggle" data-bs-toggle="dropdown">
@@ -55,15 +66,8 @@
         <section class="row">
             <!-- Thumbnails Column -->
             <div class="col-md-2 order-md-1">
-                <div class="d-flex flex-md-column gap-2">
-                    <img src="/img/fermaPortaPolli.jpg" alt="Thumbnail 1" class="img-thumbnail cursor-pointer">
-                    <img src="/img/piattoApi.jpeg" alt="Thumbnail 2" class="img-thumbnail cursor-pointer">
-                    <img src="/img/placeholderProduct.png" alt="Thumbnail 3" class="img-thumbnail cursor-pointer">
-                    <img src="/img/placeholderProduct.png" alt="Thumbnail 4" class="img-thumbnail cursor-pointer">
-                    <img src="/img/placeholderProduct.png" alt="Thumbnail 5" class="img-thumbnail cursor-pointer">
-                </div>
+            <div id="thumbnailContainer" class="d-flex flex-md-column gap-2"></div>
             </div>
-            
             <!-- Main Image -->
             <div class="col-md-5 order-md-2 mb-4 mb-md-0 d-flex align-items-stretch">
                 <div class="main-image-container w-100">
@@ -90,7 +94,7 @@
                         <p class="mb-4 product-description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam, vel! Omnis reprehenderit nesciunt, ex culpa cupiditate ab temporibus quibusdam id eius fugit cum commodi in rerum, vero enim laborum soluta!</p>
                         
                         <div class="product-specs mb-4">
-                            <h5 class="mb-3">Specifiche:</h5>
+                            <h5 class="mb-3">Quantità:</h5>
                             <ul class="list-unstyled specs-list">
                                 <!-- Specifiche prodotto -->
                             </ul>

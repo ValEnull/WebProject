@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aggiungi Prodotto - SaleCraft</title>
+    <title>Modifica Prodotto - SaleCraft</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -83,20 +83,18 @@
                         <div class="mb-4">
                             <label for="images" class="form-label">Immagini del prodotto</label>
                             <input type="file" class="form-control" id="images" name="images[]" 
-                                accept="image/*" multiple required>
+                                accept="image/*" multiple>
                             <div class="small text-muted mt-1">Puoi selezionare più immagini (max 5)</div>
                             
                             <!-- Anteprima immagini -->
                             <div class="image-preview-container mt-3 d-flex flex-wrap gap-2" id="imagePreview"></div>
                         </div>
 
-                        <div class="d-flex justify-content-between gap-3">
-                            <button type="button" id="cancelButton" class="btn btn-outline-secondary w-50">
-                                Annulla
-                            </button>
-                            <button type="submit" class="btn btn-orange w-50">
-                                Modifica Prodotto
-                            </button>
+                        <!-- Pulsanti azione -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-orange">Salva modifiche</button>
+                            <button type="button" id="deleteButton" class="btn btn-danger">Elimina prodotto</button>
+                            <button type="button" id="cancelButton" class="btn btn-outline-secondary">Annulla</button>
                         </div>
                     </form>
                 </div>
@@ -115,7 +113,7 @@
                             <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
                         </svg>
                     </div>
-                    <h5 class="mb-3">Prodotto aggiunto correttamente!</h5>
+                    <h5 class="mb-3">Prodotto modificato correttamente!</h5>
                     <button type="button" class="btn btn-orange" id="backToInventory">
                         Torna all'Inventario
                     </button>
@@ -165,6 +163,6 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Custom JS -->
-<script src="/js/addProduct.js"></script>
+<script src="/js/editProduct.js"></script>
 </body>
 </html>

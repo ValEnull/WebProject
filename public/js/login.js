@@ -25,7 +25,7 @@
                     window.location.href = 'index.html';
                     break;
                     case 2: // Artigiano
-                    window.location.href = '/artigiano/dashboard.html';
+                    window.location.href = 'profiloVenditore.html';
                     break;
                     case 3: // Admin
                     window.location.href = 'adminArea.html';

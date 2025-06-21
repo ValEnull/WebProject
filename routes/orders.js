@@ -1,104 +1,88 @@
 const express = require('express');
-const router = express.Router();
-const pool = require('../db/db');
+const router  = express.Router();
+const pool    = require('../db/db');
 const authMiddleware = require('../middleware/auth');
 
-// POST ordine - protetta per cliente - Aggiunta al carrello 
+/**************************************************************************
+ * ORDERS API (v2 – split al checkout)
+ *
+ * ◼  Un solo «ordine non pagato» = carrello per ciascun cliente.
+ * ◼  Quando lo stato passa a “in spedizione”, l’ordine‑carrello viene
+ *    suddiviso in tanti ordini quanti sono i prodotti contenuti.
+ *
+ * End‑points invariati rispetto alla v1, a parte la logica di PATCH /:id.
+ **************************************************************************/
+
+//----------------------------------------------------------------------//
+// POST /carrello/:prodotto_id  – aggiunge o aggiorna un prodotto nel carrello
+//----------------------------------------------------------------------//
 router.post('/carrello/:prodotto_id', authMiddleware(1), async (req, res) => {
-  const utenteId = req.user.id;
-  const prodottoId = parseInt(req.params.prodotto_id, 10);
+  const clienteId  = req.user.id;
+  const prodottoId = +req.params.prodotto_id;
   const { quantita } = req.body;
 
-  if (!prodottoId || !quantita || quantita <= 0) {
+  if (!prodottoId || !quantita || quantita <= 0)
     return res.status(400).json({ message: 'ID prodotto e quantità validi richiesti.' });
-  }
 
   try {
     await pool.query('BEGIN');
 
-    // 1. Trova o crea ordine non pagato
-    const ordineResult = await pool.query(`
-      SELECT ordine_id FROM ordini 
-      WHERE cliente_id = $1 AND stato = 'non pagato'
-      LIMIT 1
-    `, [utenteId]);
+    const cartRes = await pool.query(
+      `SELECT ordine_id FROM ordini WHERE cliente_id = $1 AND stato = 'non pagato' LIMIT 1`,
+      [clienteId]
+    );
+    const cartId = cartRes.rowCount
+      ? cartRes.rows[0].ordine_id
+      : (await pool.query(
+          `INSERT INTO ordini (cliente_id, stato) VALUES ($1,'non pagato') RETURNING ordine_id`,
+          [clienteId]
+        )).rows[0].ordine_id;
 
-    let ordineId;
-    if (ordineResult.rowCount === 0) {
-      const nuovoOrdine = await pool.query(`
-        INSERT INTO ordini (cliente_id, stato) 
-        VALUES ($1, 'non pagato') 
-        RETURNING ordine_id
-      `, [utenteId]);
-      ordineId = nuovoOrdine.rows[0].ordine_id;
-    } else {
-      ordineId = ordineResult.rows[0].ordine_id;
-    }
-
-    // 2. Recupera il prezzo del prodotto e la quantità disponibile (quant)
-    const prodottoResult = await pool.query(`
-      SELECT prezzo, quant
-      FROM prodotti
-      WHERE prodotto_id = $1
-      FOR UPDATE
-    `, [prodottoId]);
-
-    if (prodottoResult.rowCount === 0) {
+    const pRes = await pool.query(
+      `SELECT prezzo, quant FROM prodotti WHERE prodotto_id = $1 FOR UPDATE`,
+      [prodottoId]
+    );
+    if (!pRes.rowCount) {
       await pool.query('ROLLBACK');
       return res.status(404).json({ message: 'Prodotto non trovato.' });
     }
+    const { prezzo: prezzoUnit, quant: stock } = pRes.rows[0];
 
-    const { prezzo: prezzoUnitario, quant: stockDisponibile } = prodottoResult.rows[0];
-
-    // 3. Verifica se il prodotto è già nel carrello
-    const dettaglioResult = await pool.query(`
-      SELECT quantita FROM dettagli_ordine
-      WHERE ordine_id = $1 AND prodotto_id = $2
-    `, [ordineId, prodottoId]);
-
-    let quantitaNelCarrello = 0;
-    if (dettaglioResult.rowCount > 0) {
-      quantitaNelCarrello = dettaglioResult.rows[0].quantita;
-    }
-
-    const nuovaQuantitaTotale = quantitaNelCarrello + quantita;
-
-    if (nuovaQuantitaTotale > stockDisponibile) {
+    const dRes = await pool.query(
+      `SELECT quantita FROM dettagli_ordine WHERE ordine_id = $1 AND prodotto_id = $2`,
+      [cartId, prodottoId]
+    );
+    const inCart = dRes.rowCount ? dRes.rows[0].quantita : 0;
+    const nuovaQ = inCart + quantita;
+    if (nuovaQ > stock) {
       await pool.query('ROLLBACK');
-      return res.status(400).json({
-        message: `Disponibilità insufficiente: in magazzino ${stockDisponibile}, già nel carrello ${quantitaNelCarrello}.`
-      });
+      return res.status(400).json({ message: `Disponibilità insufficiente (max ${stock}).` });
     }
 
-    if (quantitaNelCarrello > 0) {
-      await pool.query(`
-        UPDATE dettagli_ordine
-        SET quantita = $1
-        WHERE ordine_id = $2 AND prodotto_id = $3
-      `, [nuovaQuantitaTotale, ordineId, prodottoId]);
+    if (inCart) {
+      await pool.query(
+        `UPDATE dettagli_ordine SET quantita = $1 WHERE ordine_id = $2 AND prodotto_id = $3`,
+        [nuovaQ, cartId, prodottoId]
+      );
     } else {
-      await pool.query(`
-        INSERT INTO dettagli_ordine (ordine_id, prodotto_id, quantita, prezzo_unitario)
-        VALUES ($1, $2, $3, $4)
-      `, [ordineId, prodottoId, quantita, prezzoUnitario]);
+      await pool.query(
+        `INSERT INTO dettagli_ordine (ordine_id, prodotto_id, quantita, prezzo_unitario)
+         VALUES ($1,$2,$3,$4)`,
+        [cartId, prodottoId, quantita, prezzoUnit]
+      );
     }
 
-    // 4. Scala lo stock del prodotto 
-    await pool.query(`
-    UPDATE prodotti
-    SET quant = quant - $1
-    WHERE prodotto_id = $2
-    `, [quantita, prodottoId]);
+    await pool.query(`UPDATE prodotti SET quant = quant - $1 WHERE prodotto_id = $2`, [quantita, prodottoId]);
 
     await pool.query('COMMIT');
-    res.status(201).json({ message: 'Prodotto aggiunto al carrello.', ordine_id: ordineId });
-
-  } catch (error) {
+    res.status(201).json({ message: 'Prodotto aggiunto al carrello.', ordine_id: cartId });
+  } catch (e) {
     await pool.query('ROLLBACK');
-    console.error('Errore aggiunta prodotto al carrello:', error);
+    console.error('POST /carrello', e);
     res.status(500).json({ message: 'Errore del server.' });
   }
 });
+
 
 
 
@@ -209,6 +193,37 @@ router.get('/storico', authMiddleware(1), async (req, res) => {
 });
 
 
+/* --------------------------------------------------------------- *
+ * GET /api/orders/venditore – lista ordini che includono prodotti
+ *                             di questo venditore (ruolo 2)
+ * --------------------------------------------------------------- */
+router.get('/venditore', authMiddleware(2), async (req, res) => {
+  const venditoreId = req.user.id;           // l’id del venditore ⬅ token JWT
+  try {
+    const { rows } = await pool.query(`
+      SELECT
+        o.ordine_id,
+        o.data_ordine,
+        o.stato,
+        SUM(d.quantita)                           AS tot_pezzi,
+        SUM(d.quantita * d.prezzo_unitario)       AS tot_importo
+      FROM ordini           o
+      JOIN dettagli_ordine  d ON d.ordine_id   = o.ordine_id
+      JOIN prodotti         p ON p.prodotto_id = d.prodotto_id
+      WHERE p.artigiano_id = $1
+        AND o.stato <> 'non pagato'
+      GROUP BY o.ordine_id, o.data_ordine, o.stato
+      ORDER BY o.data_ordine DESC;
+    `, [venditoreId]);
+
+    res.json(rows);
+  } catch (err) {
+    console.error('GET /orders/venditore', err);
+    res.status(500).json({ message: 'Errore del server.' });
+  }
+});
+
+
 // GET dettagli di un ordine - protetta per utente proprietario o admin
 // GET dettagli di un ordine
 router.get('/:id', authMiddleware(1), async (req, res) => {
@@ -282,7 +297,6 @@ router.get('/:id', authMiddleware(1), async (req, res) => {
     res.status(500).json({ message: 'Errore del server durante il recupero dell’ordine.' });
   }
 });
-
 
 
 
@@ -508,4 +522,8 @@ router.delete('/:ordine_id', authMiddleware(0), async (req, res) => {
     res.status(500).json({ message: 'Errore del server' });
   }
 });
+
+
+
+
 module.exports = router;
