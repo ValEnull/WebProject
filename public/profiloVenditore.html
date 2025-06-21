@@ -45,7 +45,7 @@
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <a class="dropdown-item" href="#" id="logout-btn">
+                            <a class="dropdown-item" href="index.html" id="logout-btn">
                                 <i class="fas fa-sign-out-alt me-2"></i>Logout
                             </a>
                         </li>
@@ -81,10 +81,6 @@
                             <label class="form-label text-muted">Partita IVA</label>
                             <div class="p-2 bg-light rounded" id="pivaDisplay">IT12345678901</div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label text-muted">Indirizzo</label>
-                            <div class="p-2 bg-light rounded" id="indirizzoDisplay">Via Roma 123, 00100 Roma (RM)</div>
-                        </div>
                         <button class="btn btn-outline-orange mt-2" data-bs-toggle="modal" data-bs-target="#infoAziendaModal">
                             Modifica informazioni
                         </button>
@@ -102,10 +98,6 @@
                         <div class="mb-3">
                             <label class="form-label text-muted">Email</label>
                             <div id="emailDisplay" class="p-2 bg-light rounded">azienda@esempio.com</div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label text-muted">Telefono</label>
-                            <div id="telefonoDisplay" class="p-2 bg-light rounded">+39 123 456 7890</div>
                         </div>
                         <button class="btn btn-outline-orange mt-2" data-bs-toggle="modal" data-bs-target="#contattiModal">
                             Modifica contatti
@@ -144,32 +136,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Informazioni Bancarie -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white border-bottom-0">
-                        <h3 class="card-title mb-0"><i class="fas fa-university me-2 text-orange"></i>Informazioni Bancarie</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">Intestatario Conto</label>
-                                <div class="p-2 bg-light rounded" id="intestatarioContoDisplay">Nome Azienda SRL</div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">IBAN</label>
-                                <div class="p-2 bg-light rounded" id="ibanDisplay">IT60X0542811101000000123456</div>
-                            </div>
-                        </div>
-                        <button class="btn btn-outline-orange" data-bs-toggle="modal" data-bs-target="#bancarieModal">
-                            Modifica informazioni bancarie
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </main>
 
     <!-- Modal per modifica informazioni aziendali -->
@@ -189,10 +155,6 @@
                         <div class="mb-3">
                             <label for="piva" class="form-label">Partita IVA</label>
                             <input type="text" class="form-control" id="piva" value="IT12345678901">
-                        </div>
-                        <div class="mb-3">
-                            <label for="indirizzo" class="form-label">Indirizzo</label>
-                            <input type="text" class="form-control" id="indirizzo" value="Via Roma 123, 00100 Roma (RM)">
                         </div>
                     </form>
                 </div>
@@ -218,10 +180,6 @@
                             <label for="email" class="form-label">Email</label>
                             <input type="email" class="form-control" id="email" value="azienda@esempio.com">
                         </div>
-                        <div class="mb-3">
-                            <label for="telefono" class="form-label">Telefono</label>
-                            <input type="tel" class="form-control" id="telefono" value="+39 123 456 7890">
-                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -233,31 +191,7 @@
     </div>
 
     <!-- Modal per modifica informazioni bancarie -->
-    <div class="modal fade" id="bancarieModal" tabindex="-1" aria-labelledby="bancarieModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="bancarieModalLabel">Modifica informazioni bancarie</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="bancarieForm">
-                        <div class="mb-3">
-                            <label for="intestatarioConto" class="form-label">Intestatario Conto</label>
-                            <input type="text" class="form-control" id="intestatarioConto" value="Nome Azienda SRL">
-                        </div>
-                        <div class="mb-3">
-                            <label for="iban" class="form-label">IBAN</label>
-                            <input type="text" class="form-control" id="iban" value="IT60X0542811101000000123456">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annulla</button>
-                    <button type="button" class="btn btn-orange" id="salvaBancarie">Salva modifiche</button>
-                </div>
-            </div>
-        </div>
+    
     </div>
 
     <!-- Delete Account Section -->

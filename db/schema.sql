@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS dettagli_ordine (
     CONSTRAINT dettagli_ordine_prodotto_id_fkey FOREIGN KEY (prodotto_id)
         REFERENCES prodotti (prodotto_id)
         ON UPDATE CASCADE
-        ON DELETE CASCADE
+        ON DELETE RESTRICT
 );
 
 -- crea tabella recensioni

@@ -19,13 +19,15 @@ router.post('/register', async (req, res) => {
     CAP
   } = req.body;
 
+  // Normalizza isArtigiano: accetta booleano o stringa 'true'
+  const isArtigianoFlag = (isArtigiano === true) ||(typeof isArtigiano === 'string' && isArtigiano.toLowerCase() === 'true');
   // Campi obbligatori per tutti
   if (!nome_utente || !nome || !cognome || !email || !password) {
     return res.status(400).json({ error: 'Tutti i campi obbligatori devono essere compilati.' });
   }
 
   // Campi obbligatori solo per artigiani
-  if (isArtigiano) {
+  if (isArtigianoFlag) {
     if (!p_iva || !CAP) {
       return res.status(400).json({ error:'Partita IVA e CAP sono obbligatori per gli artigiani.' });
     }
@@ -37,7 +39,7 @@ router.post('/register', async (req, res) => {
     const password_hash = await bcrypt.hash(password, saltRounds);
 
     // Ruolo: 1 = cliente, 2 = artigiano
-    const ruolo_id = isArtigiano ? 2 : 1;
+    const ruolo_id = isArtigianoFlag ? 2 : 1;
 
     // Inserisci nella tabella utenti
     const userInsertQuery = `
@@ -51,7 +53,7 @@ router.post('/register', async (req, res) => {
     const userId = result.rows[0].id;
 
     // Se artigiano, inserisci nella tabella artigiani
-    if (isArtigiano) {
+    if (isArtigianoFlag) {
       const artisanInsertQuery = `
         INSERT INTO artigiani (artigiano_id, p_iva, CAP)
         VALUES ($1, $2, $3)
@@ -64,6 +66,9 @@ router.post('/register', async (req, res) => {
 
   } catch (error) {
     console.error('Errore durante la registrazione:', error);
+    if (error.code === '23505') { // Unique violation
+      return res.status(400).json({ error: 'Nome utente o email già in uso.' });
+    }
     res.status(500).json({ error: 'Errore del server durante la registrazione' });
   }
 });
@@ -187,17 +192,43 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// GET artigiano per ID
+// GET /api/users/artisans/:id  → profilo completo artigiano
 router.get('/artisans/:id', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM artigiani WHERE artigiano_id = $1', [req.params.id]);
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Artigiano non trovato' });
-    res.json(result.rows[0]);
-  } catch (error) {
-    console.error('Errore nel recupero artigiano:', error);
+    const { rows } = await pool.query(
+      `
+      SELECT
+        u.id,
+        u.nome_utente,
+        u.nome,         
+        u.cognome,
+        u.email,
+        a.p_iva,
+        a.cap
+      FROM   utenti    u
+      JOIN   artigiani a ON a.artigiano_id = u.id
+      WHERE  u.id = $1
+      `,
+      [req.params.id]
+    );
+
+    if (!rows.length) return res.status(404).json({ error: 'Artigiano non trovato' });
+
+    // mappa i campi come li aspetta il front-end
+    const r = rows[0];
+    res.json({
+      id:            r.id,
+      nome_azienda:  r.nome_utente,     
+      email:         r.email,
+      p_iva:         r.p_iva,
+      cap:           r.cap
+    });
+  } catch (err) {
+    console.error('Errore recupero artigiano:', err);
     res.status(500).json({ error: 'Errore interno del server' });
   }
 });
+
 // -----------------------------------------------------------------------------
 // PATCH /api/users/:id  ─ modifica nome_utente, nome, cognome, email (uno o più)
 // -----------------------------------------------------------------------------
