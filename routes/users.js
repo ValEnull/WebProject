@@ -127,6 +127,13 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Nome utente o password errati' });
     }
 
+        // 3) **nuovo controllo ban**
+    if (user.is_banned) {
+      return res
+        .status(403)
+        .json({ message: 'Account sospeso.' });
+    }
+
     const payload = {
       id: user.id,
       nome: user.nome,
@@ -191,6 +198,46 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ error: 'Errore interno del server' });
   }
 });
+
+
+
+// GET /api/users?q=searchString  – elenco filtrato (solo admin)
+router.get('/', authMiddleware(0), async (req, res) => {
+  const { q } = req.query;                   // ?q=foo
+
+  const where = [];
+  const params = [];
+  let idx = 1;
+
+  if (q) {
+    where.push(`(nome_utente ILIKE $${idx} OR email ILIKE $${idx})`);
+    params.push(`%${q}%`);
+    idx++;
+  }
+
+  const sql = `
+    SELECT id,
+           nome_utente,
+           email,
+           nome,
+           cognome,
+           ruolo_id,
+           is_banned
+    FROM   utenti
+    ${where.length ? 'WHERE ' + where.join(' AND ') : ''}
+    ORDER BY id
+    LIMIT 50;`;                              // evita di sparare troppi record
+
+  try {
+    const { rows } = await pool.query(sql, params);
+    res.json(rows);
+  } catch (err) {
+    console.error('Errore lista utenti:', err);
+    res.status(500).json({ message: 'Errore del server.' });
+  }
+});
+
+
 
 // GET /api/users/artisans/:id  → profilo completo artigiano
 router.get('/artisans/:id', async (req, res) => {
@@ -385,5 +432,55 @@ router.delete('/artisans/:id', authMiddleware(2), async (req, res) => {
     res.status(500).json({ error: 'Errore interno del server' });
   }
 });
+
+// PATCH /api/users/:id/ban  – solo admin
+router.patch('/:id/ban', authMiddleware(3), async (req, res) => {
+  const { id } = req.params;
+  const { is_banned } = req.body;          // boolean
+
+  if (typeof is_banned !== 'boolean') {
+    return res.status(400).json({ error: '`is_banned` deve essere booleano' });
+  }
+
+  try {
+    await pool.query('BEGIN');
+
+    // 1) aggiorno lo stato dell’utente
+    const userRes = await pool.query(
+      `UPDATE utenti
+         SET is_banned = $2
+       WHERE id = $1
+       RETURNING id, ruolo_id, nome_utente, is_banned`,
+      [id, is_banned]
+    );
+
+    if (!userRes.rowCount) {
+      await pool.query('ROLLBACK');
+      return res.status(404).json({ error: 'Utente non trovato' });
+    }
+
+    const user = userRes.rows[0];
+
+    // 2) se artigiano bannato → azzero lo stock dei suoi prodotti
+    if (is_banned && user.ruolo_id === 2) {
+      await pool.query(
+        'UPDATE prodotti SET quant = 0 WHERE artigiano_id = $1',
+        [id]
+      );
+    }
+
+    await pool.query('COMMIT');
+    res.json({
+      message: `Utente ${is_banned ? 'bannato' : 'sbannato'} con successo`,
+      user
+    });
+
+  } catch (err) {
+    await pool.query('ROLLBACK');
+    console.error('Errore aggiornamento ban:', err);
+    res.status(500).json({ error: 'Errore interno del server' });
+  }
+});
+
 
 module.exports = router;

@@ -70,6 +70,13 @@ body {
     background-color: #e74c3c !important;
 }
 
+.orders-table td.small {
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Pagination */
 .pagination-container {
     background-color: #f8f9fa;

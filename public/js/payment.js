@@ -86,10 +86,19 @@ document.addEventListener("DOMContentLoaded", () => {
       /* 1. ordine in carrello */
       const { ordine_id } = await fetchJSON("/api/orders/carrello");
 
+      // Costruisci l’indirizzo concatenato dai campi form
+      const indirizzo = [
+        document.getElementById("address").value.trim(),
+        document.getElementById("cap").value.trim(),
+        document.getElementById("city").value.trim(),
+        document.getElementById("province").value.trim(),
+        document.getElementById("country").value.trim()
+      ].filter(Boolean).join(", "); // esclude campi vuoti
+
       /* 2. patch stato */
       await fetchJSON(`/api/orders/${ordine_id}`, {
         method: "PATCH",
-        body: JSON.stringify({ stato: "in spedizione" })
+        body: JSON.stringify({ stato: "in spedizione", indirizzo_di_consegna: indirizzo })
       });
 
       /* 3. aggiorna riepilogo dentro al modal */

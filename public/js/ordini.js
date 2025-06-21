@@ -65,6 +65,10 @@ function renderOrderCard(o) {
       <span class="badge ${statoClass[o.stato]||"bg-secondary"}">${statoText[o.stato]||o.stato}</span>
     </div>
 
+    <div class="small text-muted mt-1">
+      <i class="fas fa-location-dot me-1"></i>${o.indirizzo}
+    </div>
+
     <div class="ordine-prodotti my-3">
       ${o.prodotti.map(p => `
         <div class="d-flex align-items-center mb-2">
