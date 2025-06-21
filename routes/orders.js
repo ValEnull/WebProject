@@ -169,7 +169,7 @@ router.get('/storico', authMiddleware(1), async (req, res) => {
     if (ruolo === 3) {
       // Admin
       ordiniResult = await pool.query(`
-        SELECT ordine_id, cliente_id, data_ordine, stato
+        SELECT ordine_id, cliente_id, data_ordine, stato, indirizzo_di_consegna
         FROM ordini
         WHERE stato != 'non pagato'
         ORDER BY data_ordine DESC
@@ -177,7 +177,7 @@ router.get('/storico', authMiddleware(1), async (req, res) => {
     } else {
       // Cliente
       ordiniResult = await pool.query(`
-        SELECT ordine_id, data_ordine, stato
+        SELECT ordine_id, data_ordine, stato, indirizzo_di_consegna
         FROM ordini
         WHERE cliente_id = $1 AND stato != 'non pagato'
         ORDER BY data_ordine DESC
@@ -205,6 +205,7 @@ router.get('/venditore', authMiddleware(2), async (req, res) => {
         o.ordine_id,
         o.data_ordine,
         o.stato,
+        o.indirizzo_di_consegna,
         SUM(d.quantita)                           AS tot_pezzi,
         SUM(d.quantita * d.prezzo_unitario)       AS tot_importo
       FROM ordini           o
@@ -223,6 +224,56 @@ router.get('/venditore', authMiddleware(2), async (req, res) => {
   }
 });
 
+//* ====================================================== STATISTICHE */
+
+/* --- Top-5 prodotti per pezzi complessivi venduti --------------- */
+/*    Restituisce:  prodotto_id · totale_pezzi · fatturato          */
+router.get('/top-sellers', async (_req, res) => {
+  try {
+    const { rows } = await pool.query(`
+      SELECT
+        d.prodotto_id,
+        p.nome_prodotto,
+        SUM(d.quantita)                      AS totale_pezzi,
+        SUM(d.quantita * d.prezzo_unitario)  AS fatturato
+      FROM dettagli_ordine d
+      JOIN prodotti p ON d.prodotto_id = p.prodotto_id
+      GROUP BY d.prodotto_id, p.nome_prodotto
+      ORDER BY totale_pezzi DESC
+      LIMIT 5
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error('Errore top-seller:', err);
+    res.status(500).json({ message: 'Errore del server.' });
+  }
+});
+
+
+/* --- Fatturato (e ordini) per giorno ---------------------------- */
+/*    Restituisce:  giorno · ordini · pezzi · fatturato            */
+router.get('/daily-metrics', async (_req, res) => {
+  try {
+    const { rows } = await pool.query(`
+      SELECT
+        DATE(o.data_ordine)                          AS giorno,
+        COUNT(DISTINCT o.ordine_id)                  AS ordini,
+        SUM(d.quantita)                             AS pezzi,
+        SUM(d.quantita * d.prezzo_unitario)         AS fatturato
+      FROM ordini          o
+      JOIN dettagli_ordine d ON d.ordine_id = o.ordine_id
+      WHERE o.stato <> 'non pagato'                 -- esclude i carrelli
+      GROUP BY giorno
+      ORDER BY giorno DESC
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error('Errore daily-metrics:', err);
+    res.status(500).json({ message: 'Errore del server.' });
+  }
+});
+
+
 
 // GET dettagli di un ordine - protetta per utente proprietario o admin
 // GET dettagli di un ordine
@@ -234,7 +285,7 @@ router.get('/:id', authMiddleware(1), async (req, res) => {
   try {
     /* 1. info ordine */
     const ordineResult = await pool.query(
-      `SELECT ordine_id, cliente_id, data_ordine, stato
+      `SELECT ordine_id, cliente_id, data_ordine, stato, indirizzo_di_consegna
        FROM ordini
        WHERE ordine_id = $1`,
       [ordine_id]
@@ -288,6 +339,7 @@ router.get('/:id', authMiddleware(1), async (req, res) => {
       ordine_id: ordine.ordine_id,
       data_ordine: ordine.data_ordine,
       stato:      ordine.stato,
+      indirizzo: ordine.indirizzo_di_consegna,
       costo_totale: costo_totale.toFixed(2),
       prodotti
     });
@@ -300,63 +352,134 @@ router.get('/:id', authMiddleware(1), async (req, res) => {
 
 
 
-// PATCH aggiorna stato ordine - protetta per cliente o admin
-
-// NB - l'aggiornamento puó essere fatto solo in certe condizioni:
-// - Cliente può aggiornare da "non pagato" a "in spedizione"
-// - Cliente può aggiornare da "in spedizione" a "concluso" o "in controversia"
-// - Admin può aggiornare da "in controversia" a "concluso"
 
 
+/* ────────────────────────────────────────────────────────────────
+ * PATCH /api/orders/:id
+ * Aggiorna lo stato di un ordine (protetto) e — se si passa
+ * da “non pagato” a “in spedizione” — suddivide il carrello
+ * creando un ordine distinto per ogni prodotto.
+ * ──────────────────────────────────────────────────────────────── */
 router.patch('/:id', authMiddleware(1), async (req, res) => {
   const { id } = req.params;
-  const { stato: nuovoStato } = req.body;
+  const { stato: nuovoStato, indirizzo_di_consegna } = req.body;
   const utente = req.user;
 
-  const statiValidi = ['non pagato', 'in spedizione', 'in controversia', 'concluso'];
-  if (!statiValidi.includes(nuovoStato)) {
+  const STATI_AMMESSI = ['non pagato', 'in spedizione',
+                         'in controversia', 'concluso'];
+  if (!STATI_AMMESSI.includes(nuovoStato)) {
     return res.status(400).json({ message: 'Stato non valido.' });
   }
 
   try {
+    /* ------------------------------------------------------------------
+     * 1. Recupero ordine + controllo esistenza
+     * ------------------------------------------------------------------ */
     const { rows } = await pool.query(
-      `SELECT stato, cliente_id FROM ordini WHERE ordine_id = $1`,
+      `SELECT stato, cliente_id
+         FROM ordini
+        WHERE ordine_id = $1`,
       [id]
     );
-
-    if (rows.length === 0)
+    if (!rows.length)
       return res.status(404).json({ message: 'Ordine non trovato.' });
 
-    const ordine = rows[0];
-    const ruolo = utente.ruolo_id;
+    const ordine    = rows[0];
+    const ruolo     = utente.ruolo_id;          // 1-cliente | 3-admin
     const isCliente = ordine.cliente_id === utente.id;
 
-    if (ruolo === 3) {
-      if (!(ordine.stato === 'in controversia' && nuovoStato === 'concluso')) {
+    /* ------------------------------------------------------------------
+     * 2. Autorizzazioni (stessa logica di prima)
+     * ------------------------------------------------------------------ */
+    if (ruolo === 3) {                 // admin
+      if (!(ordine.stato === 'in controversia' && nuovoStato === 'concluso'))
         return res.status(403).json({ message: 'Permesso negato per admin.' });
-      }
-    } else if (ruolo === 1 && isCliente) {
-      if (
-        !(
-          (ordine.stato === 'non pagato' && nuovoStato === 'in spedizione') ||
-          (ordine.stato === 'in spedizione' && ['concluso', 'in controversia'].includes(nuovoStato))
-        )
-      ) {
+    } else if (ruolo === 1 && isCliente) {      // cliente
+      const ok =
+        (ordine.stato === 'non pagato'  && nuovoStato === 'in spedizione') ||
+        (ordine.stato === 'in spedizione'
+          && ['concluso', 'in controversia'].includes(nuovoStato));
+      if (!ok)
         return res.status(403).json({ message: 'Permesso negato per cliente.' });
-      }
     } else {
       return res.status(403).json({ message: 'Permesso negato.' });
     }
 
+    /* ------------------------------------------------------------------
+     * 3. SPLIT ORDINE  (carrello ➜ spedizione per prodotto)
+     * ------------------------------------------------------------------ */
+    if (ordine.stato === 'non pagato' && nuovoStato === 'in spedizione') {
+      // 3-a. check indirizzo
+      if (!indirizzo_di_consegna || indirizzo_di_consegna.trim().length < 5)
+        return res.status(400).json({ message: 'Indirizzo di consegna non valido.' });
+
+      try {
+        await pool.query('BEGIN');
+
+        // 3-b. Dettagli del vecchio ordine (carrello)
+        const det = await pool.query(
+          `SELECT prodotto_id, quantita, prezzo_unitario
+             FROM dettagli_ordine
+            WHERE ordine_id = $1`,
+          [id]
+        );
+        if (det.rowCount === 0) {
+          await pool.query('ROLLBACK');
+          return res.status(400).json({ message: 'Carrello vuoto.' });
+        }
+
+        const nuoviOrdini = [];
+
+        // 3-c. Per ciascun prodotto  ➜  nuovo ordine + dettaglio
+        for (const r of det.rows) {
+          const oRes = await pool.query(
+            `INSERT INTO ordini (cliente_id, stato, indirizzo_di_consegna)
+             VALUES ($1, 'in spedizione', $2)
+             RETURNING ordine_id`,
+            [utente.id, indirizzo_di_consegna.trim()]
+          );
+          const nuovoOrdineId = oRes.rows[0].ordine_id;
+
+          await pool.query(
+            `INSERT INTO dettagli_ordine
+                    (ordine_id, prodotto_id, quantita, prezzo_unitario)
+             VALUES ($1, $2, $3, $4)`,
+            [nuovoOrdineId, r.prodotto_id, r.quantita, r.prezzo_unitario]
+          );
+
+          nuoviOrdini.push(nuovoOrdineId);
+        }
+
+        // 3-d. Elimina il carrello originario
+        await pool.query(`DELETE FROM dettagli_ordine WHERE ordine_id = $1`, [id]);
+        await pool.query(`DELETE FROM ordini          WHERE ordine_id = $1`, [id]);
+
+        await pool.query('COMMIT');
+        return res.status(200).json({
+          message: 'Ordine suddiviso con successo.',
+          ordini_generati: nuoviOrdini
+        });
+      } catch (err) {
+        await pool.query('ROLLBACK');
+        console.error('Errore split-ordine:', err);
+        return res.status(500).json({ message: 'Errore durante la creazione degli ordini.' });
+      }
+    }
+
+    /* ------------------------------------------------------------------
+     * 4. Altre transizioni di stato (senza split)
+     * ------------------------------------------------------------------ */
     await pool.query(
-      `UPDATE ordini SET stato = $1 WHERE ordine_id = $2`,
+      `UPDATE ordini
+          SET stato = $1
+        WHERE ordine_id = $2`,
       [nuovoStato, id]
     );
 
-    res.status(200).json({ message: 'Stato ordine aggiornato.' });
+    return res.status(200).json({ message: 'Stato ordine aggiornato.' });
   } catch (error) {
     console.error('Errore aggiornamento stato ordine:', error);
-    res.status(500).json({ message: 'Errore del server.' });
+    return res.status(500).json({ message: 'Errore del server.' });
   }
 });
 
@@ -522,8 +645,6 @@ router.delete('/:ordine_id', authMiddleware(0), async (req, res) => {
     res.status(500).json({ message: 'Errore del server' });
   }
 });
-
-
 
 
 module.exports = router;

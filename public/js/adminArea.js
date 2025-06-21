@@ -1,344 +1,323 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // =============== INITIALIZATION ===============
-    initTooltips();
-    setupEventListeners();
+/* --------------------------------------------------------------------------
+ * adminArea.js – Dashboard Amministratore
+ * -------------------------------------------------------------------------- */
 
-    // =============== GLOBAL VARIABLES ===============
-    let currentReviewId = null;
-    let currentReportId = null;
-    let currentUserId = null;
+/* ---------------- CONFIG ---------------- */
+const API = {
+  reports: '/api/report',
+  orders:  '/api/orders',
+  users:   '/api/users',
+};
 
-    // =============== CORE FUNCTIONS ===============
+const TOKEN = localStorage.getItem('token');
 
-    /**
-     * Initialize Bootstrap tooltips
-     */
-    function initTooltips() {
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-    }
+/* ---------------- FETCH JSON Helper ---------------- */
+async function fetchJSON(url, options = {}) {
+  const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+  if (TOKEN) headers.Authorization = `Bearer ${TOKEN}`;
+  const res = await fetch(url, { ...options, headers });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
 
-    /**
-     * Setup all event listeners
-     */
-    function setupEventListeners() {
-        // Review management
-        setupReviewHandlers();
-        
-        // Report management
-        setupReportHandlers();
-        
-        // User management
-        setupUserHandlers();
-        
-        // UI components
-        document.getElementById('showAllTopSellers')?.addEventListener('click', toggleTopSellers);
-    }
+/* ---------------- GLOBALS ---------------- */
+let reports = [];
+let usersMap = {};
+let currentReportId = null;
 
-    // =============== REVIEW MANAGEMENT ===============
+/* ---------------- DAILY METRICS ---------------- */
+async function loadDailyMetrics() {
+  try {
+    const data = await fetchJSON('/api/orders/daily-metrics');
+    if (!Array.isArray(data) || !data.length) return;
 
-    function setupReviewHandlers() {
-        // Review viewing
-        document.querySelectorAll('.view-review-btn').forEach(button => {
-            button.addEventListener('click', handleReviewView);
-        });
+    const row = data[0];                    // ← riga più recente
 
-        // Review actions
-        document.getElementById('approveReviewBtn')?.addEventListener('click', approveReview);
-        document.getElementById('rejectReviewBtn')?.addEventListener('click', showDeleteReviewModal);
-        document.getElementById('confirmDeleteReview')?.addEventListener('click', deleteReview);
-    }
+    document.getElementById('todayOrders').textContent =
+      row.ordini ?? row.pezzi ?? 0;
 
-    function handleReviewView() {
-        const button = this;
-        currentReviewId = button.getAttribute('data-id');
-        
-        populateReviewModal(
-            button.getAttribute('data-product'),
-            button.getAttribute('data-user'),
-            button.getAttribute('data-date'),
-            currentReviewId,
-            button.getAttribute('data-text'),
-            button.getAttribute('data-reason'),
-            parseInt(button.getAttribute('data-rating'))
-        );
-    }
+    document.getElementById('todayRevenue').textContent =
+      `€${parseFloat(row.fatturato).toFixed(2)}`;
+  } catch (err) {
+    console.error('Daily metrics error:', err);
+  }
+}
 
-    function populateReviewModal(product, user, date, id, text, reason, rating) {
-        // Set basic info
-        document.getElementById('reviewProduct').textContent = product;
-        document.getElementById('reviewUser').textContent = user;
-        document.getElementById('reviewDate').textContent = date;
-        document.getElementById('reviewId').textContent = id;
-        document.getElementById('reviewText').textContent = text;
-        document.getElementById('reportReason').textContent = reason || 'No reason specified';
-        
-        // Render star rating
-        renderRatingStars(rating);
-    }
-
-    function renderRatingStars(rating) {
-        const starsContainer = document.getElementById('reviewRating');
-        starsContainer.innerHTML = '';
-        
-        for (let i = 1; i <= 5; i++) {
-            const star = document.createElement('i');
-            star.className = i <= rating ? 'fas fa-star' : 'far fa-star';
-            starsContainer.appendChild(star);
-        }
-    }
-
-    function approveReview() {
-        if (!currentReviewId) return;
-        
-        // TODO: Add actual API call to approve review
-        console.log(`Review ${currentReviewId} approved`);
-        
-        closeModal('viewReviewModal');
-        showAlert('success', 'Review approved successfully!');
-        updateReviewStatus(currentReviewId, 'approved');
-    }
-
-    function showDeleteReviewModal() {
-        if (!currentReviewId) return;
-        showModal('deleteReviewModal');
-    }
-
-    function deleteReview() {
-        if (!currentReviewId) return;
-        
-        // TODO: Add actual API call to delete review
-        console.log(`Review ${currentReviewId} deleted`);
-        
-        closeModal('deleteReviewModal');
-        closeModal('viewReviewModal');
-        showAlert('success', 'Review deleted successfully!');
-        updateReviewStatus(currentReviewId, 'deleted');
-    }
-
-    function updateReviewStatus(reviewId, action) {
-        const row = document.querySelector(`.view-review-btn[data-id="${reviewId}"]`)?.closest('tr');
-        if (!row) return;
-        
-        row.remove();
-        showAlert('success', action === 'approved' 
-            ? 'Review approved and removed from list' 
-            : 'Review deleted successfully');
-    }
-
-    // =============== REPORT MANAGEMENT ===============
-
-    function setupReportHandlers() {
-        // Report viewing
-        document.querySelectorAll('.view-report-btn').forEach(button => {
-            button.addEventListener('click', handleReportView);
-        });
-
-        // Report resolution
-        document.querySelectorAll('.btn-outline-success').forEach(button => {
-            button.addEventListener('click', resolveReport);
-        });
-
-        // Report approval
-        document.getElementById('approveReportBtn')?.addEventListener('click', approveReport);
-
-        // All reports modal
-        document.getElementById('allReportsModal')?.addEventListener('show.bs.modal', loadAllReports);
-    }
-
-    function handleReportView() {
-        const button = this;
-        currentReportId = button.getAttribute('data-id');
-        
-        populateReportModal(
-            currentReportId,
-            button.getAttribute('data-type'),
-            button.getAttribute('data-user'),
-            button.getAttribute('data-date'),
-            button.getAttribute('data-product'),
-            button.getAttribute('data-description')
-        );
-        
-        document.getElementById('approveReportBtn').setAttribute('data-report-id', currentReportId);
-    }
-
-    function populateReportModal(id, type, user, date, product, description) {
-        document.getElementById('reportId').textContent = id;
-        document.getElementById('reportType').textContent = type;
-        document.getElementById('reportUser').textContent = user;
-        document.getElementById('reportDate').textContent = date;
-        document.getElementById('reportProduct').textContent = product;
-        document.getElementById('reportDescription').textContent = description;
-    }
-
-    function resolveReport() {
-        const reportId = this.getAttribute('data-report-id');
-        // TODO: Add actual API call to resolve report
-        console.log(`Report ${reportId} marked as resolved`);
-        
-        const statusBadge = this.closest('tr').querySelector('.badge');
-        if (statusBadge) {
-            statusBadge.classList.remove('bg-warning');
-            statusBadge.classList.add('bg-success');
-            statusBadge.textContent = 'Resolved';
-        }
-    }
-
-    function approveReport() {
-        const reportId = this.getAttribute('data-report-id');
-        if (!reportId) return;
-        
-        // TODO: Add actual API call to approve report
-        console.log(`Report ${reportId} approved`);
-        
-        closeModal('viewReportModal');
-        showAlert('success', 'Report approved successfully!');
-        removeReportRow(reportId);
-    }
-
-    function loadAllReports() {
-        // TODO: Replace with actual API call
-        const allReportsData = []; // Your report data here
-        
-        const tableBody = document.getElementById('allReportsTableBody');
-        tableBody.innerHTML = '';
-        
-        allReportsData.forEach(report => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${report.id}</td>
-                <td>${report.type}</td>
-                <td>${report.user}</td>
-                <td>${report.date}</td>
-                <td>
-                    <button class="btn btn-sm btn-outline-orange view-report-btn" 
-                            data-bs-toggle="modal" 
-                            data-bs-target="#viewReportModal"
-                            data-id="${report.id}"
-                            data-type="${report.type}"
-                            data-user="${report.user}"
-                            data-date="${report.date}"
-                            data-product="${report.product}"
-                            data-description="${report.description}">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </td>
-            `;
-            tableBody.appendChild(row);
-        });
-    }
-
-    function removeReportRow(reportId) {
-        // Remove from main table
-        document.querySelector(`.view-report-btn[data-id="${reportId}"]`)?.closest('tr')?.remove();
-        
-        // Remove from all reports modal
-        document.querySelector(`#allReportsTableBody .view-report-btn[data-id="${reportId}"]`)?.closest('tr')?.remove();
-    }
-
-    // =============== USER MANAGEMENT ===============
-
-    function setupUserHandlers() {
-        // User profile viewing
-        document.querySelectorAll('.view-user-btn').forEach(button => {
-            button.addEventListener('click', handleUserView);
-        });
-
-        // User actions
-        document.getElementById('deleteUserBtn')?.addEventListener('click', showDeleteUserModal);
-        document.getElementById('confirmDeleteBtn')?.addEventListener('click', deleteUser);
-        document.getElementById('confirmDeleteCheckbox')?.addEventListener('change', toggleDeleteButton);
-    }
-
-    function handleUserView() {
-        const button = this;
-        currentUserId = button.getAttribute('data-id');
-        
-        // TODO: Fetch actual user data
-        const userData = {
-            username: button.getAttribute('data-username'),
-            name: button.getAttribute('data-name'),
-            email: button.getAttribute('data-email'),
-            regDate: button.getAttribute('data-regdate'),
-            lastLogin: button.getAttribute('data-lastlogin'),
-            status: button.getAttribute('data-status'),
-            bio: button.getAttribute('data-bio')
-        };
-        
-        populateUserModal(userData);
-    }
-
-    function populateUserModal(user) {
-        document.getElementById('userProfileUsername').textContent = user.username;
-        document.getElementById('userProfileName').textContent = user.name;
-        document.getElementById('userProfileEmail').textContent = user.email;
-        document.getElementById('userProfileRegDate').textContent = user.regDate;
-        document.getElementById('userProfileLastLogin').textContent = user.lastLogin;
-        document.getElementById('userProfileBio').textContent = user.bio;
-        document.getElementById('userToDelete').textContent = user.username;
-        
-        // Set status badge
-        const statusBadge = document.getElementById('userProfileStatus');
-        statusBadge.textContent = user.status === 'active' ? 'Active' : 'Inactive';
-        statusBadge.className = `badge bg-${user.status === 'active' ? 'success' : 'danger'}`;
-    }
-
-    function showDeleteUserModal() {
-        showModal('confirmDeleteModal');
-    }
-
-    function toggleDeleteButton() {
-        document.getElementById('confirmDeleteBtn').disabled = !this.checked;
-    }
-
-    function deleteUser() {
-        if (!currentUserId) return;
-        
-        // TODO: Add actual API call to delete user
-        console.log(`User ${currentUserId} deleted`);
-        
-        closeModal('confirmDeleteModal');
-        closeModal('userProfileModal');
-        showAlert('success', 'User deleted successfully!');
-        
-        // Remove user row from table
-        document.querySelector(`.view-user-btn[data-id="${currentUserId}"]`)?.closest('tr')?.remove();
-    }
-
-    // =============== UI UTILITIES ===============
-
-    function toggleTopSellers() {
-        const extraRows = document.querySelectorAll('[data-top-seller="extra"]');
-        const button = this;
-        
-        extraRows.forEach(row => row.classList.toggle('d-none'));
-        
-        // Toggle button text
-        button.innerHTML = button.textContent.includes('Top 5') 
-            ? '<i class="fas fa-chevron-up me-1"></i> Show Less' 
-            : 'View All (Top 5)';
-    }
-
-    function showModal(modalId) {
-        new bootstrap.Modal(document.getElementById(modalId)).show();
-    }
-
-    function closeModal(modalId) {
-        bootstrap.Modal.getInstance(document.getElementById(modalId))?.hide();
-    }
-
-    function showAlert(type, message) {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
-        alertDiv.style.zIndex = '1100';
-        alertDiv.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
-        
-        document.body.appendChild(alertDiv);
-        
-        // Auto-dismiss after 5 seconds
-        setTimeout(() => alertDiv.remove(), 5000);
-    }
+/* ---------------- DOM READY ---------------- */
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!TOKEN) return location.replace('login.html');
+  try {
+    await Promise.all([
+      loadUsers(),
+      loadReports(),
+      loadTopSellers(),
+      loadDailyMetrics()
+    ]);
+  } catch (error) {
+    console.error(error);
+    alert('Errore nel caricamento dei dati');
+  }
 });
+
+/* ---------------- LOGOUT ---------------- */
+document.getElementById('logoutBtn')?.addEventListener('click', e => {
+  e.preventDefault();                  // evita l'#'
+  localStorage.removeItem('token');    // 👉  cancella il JWT
+  window.location.replace('/index.html'); // o semplicemente '/' se l’index è root
+});
+
+
+// ricerca via click
+document.getElementById('userSearchBtn')
+        .addEventListener('click', searchUsers);
+
+// ricerca con Enter
+document.getElementById('userSearchInput')
+        .addEventListener('keydown', e => {
+          if (e.key === 'Enter') searchUsers();
+        });
+
+// delega per i pulsanti ban/sban (tabella risultati)
+document.getElementById('userSearchResults')
+        .addEventListener('click', e => {
+          const btn = e.target.closest('.toggle-ban-btn');
+          if (btn) toggleBan(btn);      // ⬅️ passa il pulsante, non l’evento
+        });
+
+
+/* ---------------- LOAD USERS ---------------- */
+async function loadUsers() {
+  const usersArray = await fetchJSON(API.users);
+  usersMap = Object.fromEntries(usersArray.map(user => [user.id, user]));
+}
+
+/* ---------------- LOAD REPORTS ---------------- */
+async function loadReports() {
+  const rawReports = (await fetchJSON(API.reports))
+        .filter(r => r.ordine_id && r.stato_segnalazione === 'in attesa');
+
+  reports = await Promise.all(rawReports.map(async report => {
+    const cliente = usersMap[report.cliente_id];
+    let venditoreUsername = '?';
+    let prodottoId = null;                  // 👈  lo inizializziamo
+
+    try {
+      /* 1) l’ordine ha sempre UN solo prodotto */
+      const ordine   = await fetchJSON(`${API.orders}/${report.ordine_id}`);
+      const prodotto = ordine.prodotti?.[0];
+
+      if (prodotto) {
+        prodottoId = prodotto.prodotto_id;  // 👉  salva l’id
+        const prodDetail = await fetchJSON(`/api/products/${prodottoId}`);
+        venditoreUsername = prodDetail.nome_artigiano || '-';
+      }
+    } catch (err) {
+      console.warn('Errore reperimento venditore', err);
+    }
+
+    return {
+      ...report,
+      prodotto_id: prodottoId,              // ← ora c’è davvero
+      cliente_username  : cliente?.nome_utente || report.cliente_id,
+      venditore_username: venditoreUsername
+    };
+  }));
+
+  updateStats();
+  renderReportsTable();
+}
+
+/* ---------------- LOAD TOP SELLERS ---------------- */
+async function loadTopSellers() {
+  try {
+    const top = await fetchJSON('/api/orders/top-sellers'); // ← restituisce TOP-5 dal backend
+
+    // ───────── tabella principale: SOLO i primi 3
+    const mainBody = document.getElementById('topSellersTableBody');
+    mainBody.innerHTML = '';
+    top.slice(0, 3).forEach((p, i) => {
+      mainBody.insertAdjacentHTML('beforeend', `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${p.prodotto_id}</td>
+          <td>${p.nome_prodotto}</td>
+          <td>${p.totale_pezzi}</td>
+          <td>€${parseFloat(p.fatturato).toFixed(2)}</td>
+        </tr>
+      `);
+    });
+
+    // ───────── modale “Vedi tutti”: elenco completo
+    const modalBody = document.getElementById('allTopSellersTableBody');
+    modalBody.innerHTML = '';
+    top.forEach((p, i) => {
+      modalBody.insertAdjacentHTML('beforeend', `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${p.nome_prodotto}</td>
+          <td>—</td>                    <!-- se non hai la categoria -->
+          <td>${p.totale_pezzi}</td>
+          <td>€${parseFloat(p.fatturato).toFixed(2)}</td>
+        </tr>
+      `);
+    });
+  } catch (err) {
+    console.error('Top seller load error:', err);
+  }
+}
+
+/* ---------------- USER SEARCH ---------------- */
+async function searchUsers() {
+  const q = document.getElementById('userSearchInput').value.trim();
+  if (!q) return;
+
+  try {
+    const users = await fetchJSON(`/api/users?q=${encodeURIComponent(q)}`);
+    const tbody = document.getElementById('userSearchResults');
+    tbody.innerHTML = '';
+
+    users.forEach(u => {
+      tbody.insertAdjacentHTML('beforeend', `
+        <tr data-id="${u.id}" data-banned="${u.is_banned}">
+          <td>${u.nome_utente}</td>
+          <td>${u.nome} ${u.cognome}</td>
+          <td>${u.email}</td>
+          <td>
+            <button class="btn btn-sm ${
+              u.is_banned ? 'btn-success' : 'btn-danger'
+            } toggle-ban-btn">
+              <i class="fas ${u.is_banned ? 'fa-lock-open' : 'fa-lock'}"></i>
+            </button>
+          </td>
+        </tr>
+      `);
+    });
+  } catch (err) {
+    console.error('User search error:', err);
+    showToast('danger', 'Errore nella ricerca utenti');
+  }
+}
+
+/* handler bottone Ban/Sban */
+async function toggleBan(btn) {
+  const tr        = btn.closest('tr');
+  const id        = tr.dataset.id;
+  const bannedNow = tr.dataset.banned === 'true';
+
+  try {
+    await fetchJSON(`/api/users/${id}/ban`, {
+      method: 'PATCH',
+      body: JSON.stringify({ is_banned: !bannedNow })
+    });
+
+    // aggiorna dataset e interfaccia
+    tr.dataset.banned = (!bannedNow).toString();
+    btn.classList.toggle('btn-danger');
+    btn.classList.toggle('btn-success');
+    btn.innerHTML = `<i class="fas ${!bannedNow ? 'fa-lock' : 'fa-lock-open'}"></i>`;
+
+    showToast('success', `Utente ${!bannedNow ? 'bannato' : 'sbannato'} con successo`);
+  } catch (err) {
+    console.error('Toggle ban error:', err);
+    showToast('danger', 'Errore durante il ban/sban');
+  }
+}
+
+
+/* ---------------- UPDATE DASHBOARD STATS ---------------- */
+function updateStats() {
+  const openReports = reports.filter(r => r.stato_segnalazione === 'in attesa').length;
+  const counter = document.getElementById('todayReports');
+  if (counter) counter.textContent = openReports;
+}
+
+/* ---------------- RENDER REPORTS ---------------- */
+function renderReportsTable() {
+  const recentTbody = document.getElementById('recentReportsTableBody');
+  const allTbody = document.getElementById('allReportsTableBody');
+
+  [recentTbody, allTbody].forEach(tbody => tbody.innerHTML = '');
+
+  const sortedReports = [...reports].sort(
+    (a, b) => new Date(b.data_segnalazione) - new Date(a.data_segnalazione)
+  );
+
+  sortedReports.slice(0, 5).forEach(rep => insertReportRow(rep, recentTbody));
+  sortedReports.forEach(rep => insertReportRow(rep, allTbody));
+
+  document.querySelectorAll('.view-report-btn').forEach(btn =>
+    btn.addEventListener('click', openReportModal)
+  );
+}
+
+function insertReportRow(rep, tbody) {
+  const row = `
+    <tr>
+      <td>${rep.segnalazione_id}</td>
+      <td>${rep.motivazione}</td>
+      <td>${rep.cliente_username}</td>
+      <td>${rep.venditore_username}</td>
+      <td>${new Date(rep.data_segnalazione).toLocaleDateString('it-IT')}</td>
+      <td>
+        <button class="btn btn-sm btn-outline-orange view-report-btn" data-id="${rep.segnalazione_id}">
+          <i class="fas fa-eye"></i>
+        </button>
+      </td>
+    </tr>`;
+  tbody.insertAdjacentHTML('beforeend', row);
+}
+
+/* ---------------- MODALE REPORT ---------------- */
+function openReportModal() {
+  currentReportId = this.dataset.id;
+  const report = reports.find(r => r.segnalazione_id == currentReportId);
+  if (!report) return;
+
+  document.getElementById('reportId').textContent = report.segnalazione_id;
+  document.getElementById('reportType').textContent = report.motivazione;
+  document.getElementById('reportUser').textContent = report.cliente_username;
+  document.getElementById('reportVendor').textContent = report.venditore_username;
+  document.getElementById('reportDate').textContent = new Date(report.data_segnalazione).toLocaleDateString('it-IT');
+  document.getElementById('reportProduct').textContent = report.prodotto_id;
+  document.getElementById('reportOrder').textContent = report.ordine_id;
+  document.getElementById('reportDescription').textContent = report.testo || '—';
+
+  const textarea = document.getElementById('resolutionComment');
+  if (textarea) textarea.value = '';
+
+  showModal('viewReportModal');
+}
+
+document.getElementById('approveReportBtn')?.addEventListener('click', async () => {
+  if (!currentReportId) return;
+  const comment = document.getElementById('resolutionComment')?.value.trim() || 'Chiuso dall’admin';
+
+  await fetchJSON(`${API.reports}/${currentReportId}/close`, {
+    method: 'PATCH',
+    body: JSON.stringify({ risoluzione: comment })
+  });
+
+  reports = reports.filter(r => r.segnalazione_id != currentReportId);
+  updateStats();
+  renderReportsTable();
+  hideModal('viewReportModal');
+  showToast('success', 'Segnalazione chiusa con successo');
+});
+
+/* ---------------- UI HELPERS ---------------- */
+function showModal(id) {
+  new bootstrap.Modal(document.getElementById(id)).show();
+}
+
+function hideModal(id) {
+  bootstrap.Modal.getInstance(document.getElementById(id))?.hide();
+}
+
+function showToast(type, message) {
+  const toast = document.createElement('div');
+  toast.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
+  toast.style.zIndex = '1100';
+  toast.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 5000);
+}

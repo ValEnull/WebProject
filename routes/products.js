@@ -79,9 +79,17 @@ router.get('/:id', async (req, res) => {
 
   try {
     const prodottoResult = await pool.query(
-      `SELECT prodotto_id, nome_prodotto, descrizione, prezzo, quant, artigiano_id 
-       FROM prodotti 
-       WHERE prodotto_id = $1`,
+      `SELECT 
+         p.prodotto_id, 
+         p.nome_prodotto, 
+         p.descrizione, 
+         p.prezzo, 
+         p.quant, 
+         p.artigiano_id,
+         u.nome_utente AS nome_artigiano
+       FROM prodotti p
+       JOIN utenti u ON u.id = p.artigiano_id
+       WHERE p.prodotto_id = $1`,
       [id]
     );
 
@@ -98,7 +106,6 @@ router.get('/:id', async (req, res) => {
       [id]
     );
 
-    // Converti campo BYTEA (Buffer) in base64 string
     const immagini = immaginiResult.rows.map(img => ({
       immagine_id: img.immagine_id,
       immagine_base64: img.immagine.toString('base64')
@@ -112,6 +119,7 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ message: 'Errore del server durante il recupero del prodotto.' });
   }
 });
+
 
 // GET con paginazione e filtri - protetta per artigiani e admin
 router.get('/', async (req, res) => {

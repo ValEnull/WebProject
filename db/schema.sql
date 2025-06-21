@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS utenti (
     email VARCHAR(50) NOT NULL UNIQUE,
     password_hash VARCHAR(100) NOT NULL,
     ruolo_id INTEGER NOT NULL,
+    is_banned BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT utente_ruolo_id_fkey FOREIGN KEY (ruolo_id)
         REFERENCES ruoli (ruolo_id)
         ON UPDATE CASCADE
@@ -82,6 +83,7 @@ CREATE TABLE IF NOT EXISTS ordini (
     cliente_id INTEGER NOT NULL,
     data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     stato VARCHAR(20) NOT NULL,
+    indirizzo_di_consegna VARCHAR(255),
     CONSTRAINT ordini_cliente_id_fkey FOREIGN KEY (cliente_id)
         REFERENCES utenti (id)
         ON UPDATE CASCADE

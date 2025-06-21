@@ -30,6 +30,7 @@ async function fetchVendorOrders() {
     date:       new Date(r.data_ordine).toLocaleDateString('it-IT'),
     pieces:     parseInt(r.tot_pezzi, 10),
     amount:     parseFloat(r.tot_importo),
+    address:    r.indirizzo_di_consegna,
     statusKey:  dbStateToKey(r.stato)
   }));
 }
@@ -76,7 +77,8 @@ function renderOrdersTable(list, filter = 'all', search = '') {
     .filter(o => filter === 'all' || o.statusKey === filter)
     .filter(o =>
       o.id.toLowerCase().includes(search) ||
-      o.date.toLowerCase().includes(search));
+      o.date.toLowerCase().includes(search) ||
+      o.address.toLowerCase().includes(search));
 
   rows.forEach(o => {
     tbody.insertAdjacentHTML('beforeend', `
@@ -85,6 +87,7 @@ function renderOrdersTable(list, filter = 'all', search = '') {
         <td>${o.date}</td>
         <td>${o.pieces}</td>
         <td>€${o.amount.toFixed(2)}</td>
+        <td class="small">${o.address}</td>
         <td><span class="badge bg-${o.statusKey}">
               ${keyToLabel(o.statusKey)}</span></td>
       </tr>`);
