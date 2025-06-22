@@ -1,20 +1,23 @@
-function handleFormSubmission() {
+// /js/formCompratore.js
+(() => {
   const form = document.querySelector('.myForm');
-  if (!form) return;
+  if (!form) return;                      // la pagina non ha il form? esci.
 
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();                   // blocca il submit tradizionale
 
+    // raccogli i dati
     const formData = {
-      nome_utente: document.getElementById('username').value,
-      nome:        document.getElementById('name').value,
-      cognome:     document.getElementById('surname').value,
-      email:       document.getElementById('email').value,
-      password:    document.getElementById('psw').value,
+      nome_utente:  document.getElementById('username').value.trim(),
+      nome:         document.getElementById('name').value.trim(),
+      cognome:      document.getElementById('surname').value.trim(),
+      email:        document.getElementById('email').value.trim(),
+      password:     document.getElementById('psw').value,
       password_confirmation: document.getElementById('pswConf').value,
       isArtigiano: false
     };
 
+    // validazione client-side minima
     if (formData.password !== formData.password_confirmation) {
       alert('Le password non corrispondono!');
       return;
@@ -27,23 +30,20 @@ function handleFormSubmission() {
         body: JSON.stringify(formData)
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        alert('Errore: ' + (errorData.error || response.statusText));
+      if (!response.ok) {                 // 4xx o 5xx
+        const { error } = await response.json().catch(() => ({}));
+        alert('Errore: ' + (error || response.statusText));
         return;
       }
 
-      // ✅ Successo
+      // ✅ tutto ok
       alert('Registrazione avvenuta con successo!');
-      setTimeout(() => {
-        window.location.href = 'index.html';
-      }, 100); // leggero delay per permettere di vedere l'alert
+      // se index.html è nella root del tuo server statico
+      window.location.replace('/index.html'); // oppure window.location.assign('/');
 
-    } catch (error) {
-      console.error('Error:', error);
+    } catch (err) {
+      console.error(err);
       alert('Si è verificato un errore durante la comunicazione con il server');
     }
   });
-}
-
-document.addEventListener('DOMContentLoaded', handleFormSubmission);
+})();
