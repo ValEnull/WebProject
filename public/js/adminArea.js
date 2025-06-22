@@ -141,6 +141,7 @@ async function loadTopSellers() {
           <td>${i + 1}</td>
           <td>${p.prodotto_id}</td>
           <td>${p.nome_prodotto}</td>
+          <td>${p.nome_tipologia}</td> 
           <td>${p.totale_pezzi}</td>
           <td>€${parseFloat(p.fatturato).toFixed(2)}</td>
         </tr>
@@ -154,8 +155,9 @@ async function loadTopSellers() {
       modalBody.insertAdjacentHTML('beforeend', `
         <tr>
           <td>${i + 1}</td>
+          <td>${p.prodotto_id}</td>
           <td>${p.nome_prodotto}</td>
-          <td>—</td>                    <!-- se non hai la categoria -->
+          <td>${p.nome_tipologia}</td>                    <!-- se non hai la categoria -->
           <td>${p.totale_pezzi}</td>
           <td>€${parseFloat(p.fatturato).toFixed(2)}</td>
         </tr>

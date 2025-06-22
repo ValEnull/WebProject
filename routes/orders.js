@@ -230,18 +230,20 @@ router.get('/venditore', authMiddleware(2), async (req, res) => {
 /*    Restituisce:  prodotto_id · totale_pezzi · fatturato          */
 router.get('/top-sellers', async (_req, res) => {
   try {
-    const { rows } = await pool.query(`
-      SELECT
-        d.prodotto_id,
-        p.nome_prodotto,
-        SUM(d.quantita)                      AS totale_pezzi,
-        SUM(d.quantita * d.prezzo_unitario)  AS fatturato
-      FROM dettagli_ordine d
-      JOIN prodotti p ON d.prodotto_id = p.prodotto_id
-      GROUP BY d.prodotto_id, p.nome_prodotto
-      ORDER BY totale_pezzi DESC
-      LIMIT 5
-    `);
+  const { rows } = await pool.query(`
+    SELECT
+      d.prodotto_id,
+      p.nome_prodotto,
+      t.nome_tipologia,
+      SUM(d.quantita)                      AS totale_pezzi,
+      SUM(d.quantita * d.prezzo_unitario) AS fatturato
+    FROM dettagli_ordine d
+    JOIN prodotti p     ON d.prodotto_id = p.prodotto_id
+    JOIN tipologia t    ON p.tipologia_id = t.tipologia_id
+    GROUP BY d.prodotto_id, p.nome_prodotto, t.nome_tipologia
+    ORDER BY totale_pezzi DESC
+    LIMIT 10
+  `);
     res.json(rows);
   } catch (err) {
     console.error('Errore top-seller:', err);

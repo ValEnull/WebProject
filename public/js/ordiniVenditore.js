@@ -69,33 +69,57 @@ function renderStats(list) {
       </div>`));
 }
 
+/* --------- sostituisci TUTTA la funzione con questa versione --------- */
 function renderOrdersTable(list, filter = 'all', search = '') {
   const tbody = document.querySelector('.orders-body');
   tbody.innerHTML = '';
 
+  // regole min-length: 1 per testo, 2 per numerico puro
+  const isNumeric     = /^\d+$/.test(search);
+  const filterEnabled = (isNumeric ? search.length >= 2
+                                   : search.length >= 1);
+
   const rows = list
     .filter(o => filter === 'all' || o.statusKey === filter)
     .filter(o =>
+      !filterEnabled ||                // se il termine è troppo corto → nessun filtro
       o.id.toLowerCase().includes(search) ||
       o.date.toLowerCase().includes(search) ||
-      o.address.toLowerCase().includes(search));
+      o.address.toLowerCase().includes(search)
+    );
 
-  rows.forEach(o => {
-    tbody.insertAdjacentHTML('beforeend', `
+  /* -- messaggio “Nessun ordine trovato” ------------------------------ */
+  if (rows.length === 0) {
+    tbody.innerHTML = `
       <tr>
-        <td>${o.id}</td>
-        <td>${o.date}</td>
-        <td>${o.pieces}</td>
-        <td>€${o.amount.toFixed(2)}</td>
-        <td class="small">${o.address}</td>
-        <td><span class="badge bg-${o.statusKey}">
-              ${keyToLabel(o.statusKey)}</span></td>
-      </tr>`);
-  });
+        <td colspan="6" class="text-center text-muted py-4">
+          Nessun ordine trovato.
+        </td>
+      </tr>`;
+  } else {
+    rows.forEach(o => {
+      tbody.insertAdjacentHTML('beforeend', `
+        <tr>
+          <td>${o.id}</td>
+          <td>${o.date}</td>
+          <td>${o.pieces}</td>
+          <td>€${o.amount.toFixed(2)}</td>
+          <td class="small">${o.address}</td>
+          <td>
+            <span class="badge bg-${o.statusKey}">
+              ${keyToLabel(o.statusKey)}
+            </span>
+          </td>
+        </tr>`);
+    });
+  }
 
-  document.querySelector('.pagination-container')
-          .innerHTML = `<span class="small text-muted">Totale record: ${rows.length}</span>`;
+  /* -- contatore record ----------------------------------------------- */
+  document.querySelector('.pagination-container').innerHTML =
+    `<span class="small text-muted">Totale record: ${rows.length}</span>`;
 }
+/* --------------------------------------------------------------------- */
+
 
 function keyToLabel(k) {
   return {

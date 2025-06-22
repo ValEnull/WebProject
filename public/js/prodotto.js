@@ -356,6 +356,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     alert("Prodotto non trovato");
     location.replace("/index.html");
   }
+
+  document.getElementById("logout-btn")?.addEventListener("click", () => {
+    localStorage.removeItem("token");
+    location.reload();
+  });
+
 });
 
 updateCartBadge();
