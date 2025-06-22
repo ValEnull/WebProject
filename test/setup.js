@@ -1,6 +1,7 @@
 const fs   = require('fs');
 const path = require('path');
 const pool = require('../db/db');
+const { seed } = require('../db/seed');
 
 async function execSchema() {
   const schemaPath = path.join(__dirname, '../db/schema.sql');
@@ -25,11 +26,10 @@ before(async () => {
   await execSchema();
   console.log('[setup] schema creato.');
 
-  // Import dinamico del seed dopo schema completo
   console.log('Esecuzione seed...');
-  const { seed } = require('../db/seed');
   await seed();
-  // Aspetta che il seed abbia inserito gli utenti
+
+  // attesa finché il seed ha effetto
   let tentativi = 0;
   while (tentativi < 20) {
     const { rows } = await pool.query('SELECT COUNT(*) FROM utenti');
@@ -43,7 +43,17 @@ before(async () => {
 });
 
 after(async () => {
+  console.log('[teardown] ripristino DB post-test...');
+  await pool.query('DROP SCHEMA public CASCADE;');
+  await pool.query('CREATE SCHEMA public;');
+  await pool.query('SET search_path TO public;');
+  await execSchema();
+  console.log('[teardown] schema ricreato.');
+
+  await seed();
+  console.log('[teardown] seed originale ripristinato.');
+
   console.log('[teardown] chiusura pool globale');
-  await new Promise(r => setTimeout(r, 200)); // aspetta completamento finale
+  await new Promise(r => setTimeout(r, 200));
   if (!pool.ended) await pool.end();
 });
