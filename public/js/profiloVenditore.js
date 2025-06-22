@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-            oldPassword: currentPassword,   // 👈 chiavi corrette
+            oldPassword: currentPassword, 
             newPassword: newPassword
         })
         });
@@ -174,17 +174,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const pwd = document.getElementById('currentPasswordDelete').value;
     const txt = document.getElementById('confirmDelete').value;
 
-    if (txt !== 'ELIMINA AZIENDA') return alert('Conferma non valida');
-    if (!confirm('Eliminare definitivamente?')) return;
+    if (txt !== 'DISATTIVA AZIENDA') return alert('Conferma non valida');
+    if (!confirm('Vuoi disattivare il profilo definitivamente?')) return;
 
     try {
-      const res = await fetch(`/api/users/${companyData.id}`, {
+      const res = await fetch(`/api/users/artisans/${companyData.id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ password: pwd })
       });
 
-      if (res.ok) { alert('Account eliminato'); logout(); }
+      if (res.ok) { alert('Account disattivato'); logout(); }
       else        { const d = await res.json(); alert(d.error || 'Errore.'); }
     } catch (err) {
       console.error(err); alert('Errore di rete.');

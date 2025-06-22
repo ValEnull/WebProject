@@ -425,23 +425,41 @@ router.delete('/:id', authMiddleware(1), async (req, res) => {
   }
 });
 
-// DELETE artigiano - protetta per artigiano proprietario o admin
+// DELETE artigiano – protetta per artigiano proprietario o admin
 router.delete('/artisans/:id', authMiddleware(2), async (req, res) => {
   const { id } = req.params;
-  const userId = req.user.id;
+  const userId   = req.user.id;
   const userRole = req.user.ruolo_id;
 
-  if (parseInt(id) !== userId && userRole !== 3) {
+  // solo l’artigiano stesso o un admin (ruolo 3) possono disattivare
+  if (parseInt(id, 10) !== userId && userRole !== 3) {
     return res.status(403).json({ error: 'Non autorizzato a eliminare questo artigiano' });
   }
 
+  const client = await pool.connect();
   try {
-    const result = await pool.query('DELETE FROM artigiani WHERE artigiano_id = $1 RETURNING *', [id]);
-    if (result.rowCount === 0) return res.status(404).json({ error: 'Artigiano non trovato' });
-    res.json({ message: 'Artigiano eliminato con successo', artisan: result.rows[0] });
+    await client.query('BEGIN');
+
+    // 1. azzera lo stock di tutti i prodotti dell’artigiano
+    await client.query(
+      'UPDATE prodotti SET quant = 0 WHERE artigiano_id = $1',
+      [id]
+    );
+
+    // 2. marca l’utente come bannato (soft-delete)
+    await client.query(
+      'UPDATE utenti SET is_banned = TRUE WHERE id = $1',
+      [id]
+    );
+
+    await client.query('COMMIT');
+    res.json({ message: 'Artigiano disattivato con successo' });
   } catch (error) {
-    console.error('Errore eliminazione artigiano:', error);
+    await client.query('ROLLBACK');
+    console.error('Errore disattivazione artigiano:', error);
     res.status(500).json({ error: 'Errore interno del server' });
+  } finally {
+    client.release();
   }
 });
 

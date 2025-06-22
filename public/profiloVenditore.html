@@ -198,12 +198,12 @@
     <div class="container mt-5 pb-4">
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white border-bottom-0">
-                <h3 class="card-title mb-0 text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Eliminazione account aziendale</h3>
+                <h3 class="card-title mb-0 text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Disattivazione account aziendale</h3>
             </div>
             <div class="card-body">
-                <p class="text-muted mb-4">Una volta eliminato l'account aziendale, non potrai più recuperare i tuoi dati. Tutti i prodotti associati verranno rimossi dal marketplace.</p>
+                <p class="text-muted mb-4">Una volta disattivato l'account aziendale, non potrai più utilizzarlo. Tutti i prodotti associati verranno rimossi dal marketplace. Per ripristinare l'account dovrai contattare il supporto tecnico.</p>
                 <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
-                    <i class="fas fa-trash-alt me-2"></i>Elimina l'account aziendale
+                    <i class="fas fa-trash-alt me-2"></i>Disattiva l'account aziendale
                 </button>
             </div>
         </div>
@@ -215,17 +215,17 @@
             <div class="modal-content">
                 <div class="modal-header border-0">
                     <h5 class="modal-title text-danger" id="deleteAccountModalLabel">
-                        <i class="fas fa-exclamation-circle me-2"></i>Conferma eliminazione
+                        <i class="fas fa-exclamation-circle me-2"></i>Conferma disattivazione
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body py-4">
                     <div class="alert alert-danger" role="alert">
                         <i class="fas fa-exclamation-triangle me-2"></i>
-                        <strong>Attenzione!</strong> Questa azione è irreversibile.
+                        <strong>Attenzione!</strong> Per ripristinare l'account dovrai contattare il supporto tecnico.
                     </div>
                     
-                    <p class="mb-4">Stai per eliminare definitivamente l'account aziendale e tutti i dati associati, inclusi i prodotti in vendita. Sei assolutamente sicuro di voler procedere?</p>
+                    <p class="mb-4">Stai per disattivare il tuo account aziendale. Sei assolutamente sicuro di voler procedere?</p>
                     
                     <form id="deleteAccountForm">
                         <div class="mb-4">
@@ -233,8 +233,8 @@
                             <input type="password" class="form-control" id="currentPasswordDelete" required>
                         </div>
                         <div class="mb-4">
-                            <label for="confirmDelete" class="form-label">Digita "ELIMINA AZIENDA" per confermare</label>
-                            <input type="text" class="form-control" id="confirmDelete" placeholder="ELIMINA AZIENDA" required>
+                            <label for="confirmDelete" class="form-label">Digita "DISATTIVA AZIENDA" per confermare</label>
+                            <input type="text" class="form-control" id="confirmDelete" placeholder="DISATTIVA AZIENDA" required>
                         </div>
                         
                         <div class="d-grid gap-2">
