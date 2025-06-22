@@ -1,4 +1,4 @@
-# SaleCraft - E-commerce Platform
+# SaleCraft - E-commerce Platform - PROVA
 
 SaleCraft è una piattaforma e-commerce che connette acquirenti con artigiani e piccole aziende, offrendo prodotti unici e sostenibili.
 
