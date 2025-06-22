@@ -56,12 +56,6 @@ function showFeaturedFrom(prodotti = []) {
 }
 
 
-/* ================
-   GLOBAL STATE
-   ================ */
-let currentPage = 1;
-const limit = 12;
-let currentCategoryId = null; // null => tutte le categorie
 
 /* =================================
    DOM READY – CONFIGURAZIONE PAGINA
@@ -239,44 +233,49 @@ async function updateCartBadge() {
    FETCH & RENDERING  PRODOTTI
    ============================ */
 
-async function loadProducts(page = 1) {
-  const search = document.getElementById("search")?.value.trim() || "";
+/************************************
+ *  COSTANTI
+ ************************************/
+const limit = 12;          // quante card per pagina
+let currentPage       = 1; // pagina attualmente visualizzata
+let currentCategoryId = null;      // null = tutte le categorie
 
-  // 🚫 Non usare paginazione lato server, prendi tutti
+/************************************
+ *  MAIN: caricamento prodotti
+ ************************************/
+async function loadProducts(page = 1) {
+  currentPage = page;   // tieni traccia dell’ultima pagina richiesta
+
+  /* 1️⃣  Costruisci la query-string in modo sicuro */
+  const params = new URLSearchParams({
+    page,               // es. 1, 2, 3 …
+    limit               // 12
+  });
+
+  const search = document.getElementById("search")?.value.trim();
+  if (search) params.set("search", search);
+
+  /* 2️⃣  Scegli l’endpoint (tutte le tipologie o una sola) */
   let url;
   if (currentCategoryId) {
-    url = `/api/products/tipologia/${currentCategoryId}`;
+    url = `/api/products/tipologia/${currentCategoryId}?${params.toString()}`;
   } else {
-    url = `/api/products`;
-  }
-
-  if (search) {
-    url += `?search=${encodeURIComponent(search)}`;
+    url = `/api/products?${params.toString()}`;
   }
 
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
 
-    const prodottiRaw = Array.isArray(data) ? data : data.prodotti;
+    /* 3️⃣  La risposta ha già la struttura paginata */
+    const { prodotti, total, page: srvPage, limit: srvLimit } = await res.json();
 
-    // ✅ Filtra solo quelli con quantità > 0
-    const prodottiDisponibili = prodottiRaw.filter(p => p.quant > 0);
+    renderProducts(prodotti);                     // card nella grid
+    renderPagination(total, srvPage, srvLimit);   // bottoni numerati
+    showFeaturedFrom(prodotti);                   // “prodotto in evidenza”
 
-    // ✅ Calcola paginazione sul risultato filtrato
-    const total = prodottiDisponibili.length;
-    const totalPages = Math.ceil(total / limit);
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const prodottiPagina = prodottiDisponibili.slice(startIndex, endIndex);
-
-    renderProducts(prodottiPagina);
-    renderPagination(total, page, limit);
-    showFeaturedFrom(prodottiDisponibili);
-    currentPage = page;
   } catch (err) {
-    console.error("Errore nella fetch:", err);
+    console.error("Errore nella fetch prodotti:", err);
   }
 }
 
@@ -308,19 +307,20 @@ function renderProducts(prodotti = []) {
   });
 }
 
-function renderPagination(total, page, limit) {
+function renderPagination(total, currentPage, limit) {
   const container = document.getElementById("pagination");
   if (!container) return;
-  container.innerHTML = "";
 
+  container.innerHTML = "";
   const totalPages = Math.ceil(total / limit);
+
   for (let i = 1; i <= totalPages; i++) {
     const li = document.createElement("li");
-    li.className = `page-item ${i === page ? "active" : ""}`;
+    li.className = `page-item ${i === currentPage ? "active" : ""}`;
     li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-    li.addEventListener("click", (e) => {
+    li.addEventListener("click", e => {
       e.preventDefault();
-      loadProducts(i);
+      loadProducts(i);          // ricarica pagina i
     });
     container.appendChild(li);
   }
