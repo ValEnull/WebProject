@@ -21,37 +21,19 @@
         <header class="bg-white py-2 px-3 shadow-sm sticky-top">
             <div class="container-fluid">
                 <div class="d-flex flex-wrap align-items-center justify-content-between">
-                    <!-- Logo e Nome -->
-                    <div class="d-flex align-items-center">
-                        <div class="d-flex align-items-center">
-                            <img src="/img/logoDef.png" alt="Logo" class="rounded-circle me-2" style="width: 50px; height: 50px;">
-                            <h1 class="h4 mb-0 text-orange">SaleCraft</h1>
-                        </div>
+                    <!-- Logo -->
+                    <div class="d-flex align-items-center gap-2">
+                        <img src="img/logoDef.png" alt="Logo" class="rounded-circle" style="width: 50px; height: 50px;">
+                        <h5 class="mb-0">SaleCraft</h5>
                     </div>
-
-                    <!-- Icons -->
-                    <div class="d-flex gap-3">                        
-                        <!-- Dropdown User -->
-                        <div class="dropdown">
-                            <button class="btn btn-outline-dark border-0 dropdown-toggle" data-bs-toggle="dropdown">
-                                <i class="fas fa-user fs-5"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="userArea.html"><i class="fas fa-user-circle me-2"></i>Profilo</a></li>
-                                <li><a class="dropdown-item" href="ordini.html"><i class="fas fa-shopping-cart me-2"></i>I miei ordini</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="index.html" id="logout-btn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-                            </ul>
-                        </div>
-                    </div>
+                    
+                    <!-- Torna allo shopping -->
+                    <a href="index.html" class="btn btn-outline-orange">
+                        <i class="fas fa-arrow-left me-2"></i>Torna allo shopping
+                    </a>
                 </div>
             </div>
         </header>
-
-        <!-- homepage btn -->
-        <div class="container-fluid px-0">
-            <input type="button" value="Torna alla Home" class="btn btn-orange w-100 rounded-0 py-2" onclick="location.href='index.html'">
-        </div>
 
         <!-- Carrello -->
         <div class="container my-5">
