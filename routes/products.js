@@ -225,7 +225,7 @@ router.get('/tipologia/:tipologia_id', async (req, res) => {
         LIMIT 1
       ) img ON true
       WHERE p.tipologia_id = $1
-      andp.quant > 0
+      and p.quant > 0
     `;
 
     let countQuery = `SELECT COUNT(*) FROM prodotti WHERE tipologia_id = $1 AND quant > 0`;
