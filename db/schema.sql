@@ -41,6 +41,8 @@ CREATE TABLE IF NOT EXISTS utenti (
     password_hash VARCHAR(100) NOT NULL,
     ruolo_id INTEGER NOT NULL,
     is_banned BOOLEAN NOT NULL DEFAULT FALSE,
+    reset_token TEXT,
+    reset_token_expires TIMESTAMP,
     CONSTRAINT utente_ruolo_id_fkey FOREIGN KEY (ruolo_id)
         REFERENCES ruoli (ruolo_id)
         ON UPDATE CASCADE

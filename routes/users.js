@@ -4,6 +4,18 @@ const pool = require('../db/db');
 const router = express.Router();
 const authMiddleware = require('../middleware/auth');
 const jwt = require('jsonwebtoken');// Abilita CORS per tutte le rotte in questo router
+const nodemailer = require('nodemailer');
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: 'craftsaleinsubria@gmail.com',
+    pass: 'eqku kgjy sgfp dwpn'
+  },
+    tls: {
+    rejectUnauthorized: false
+  }
+});
+const crypto = require('crypto');
 
 // Rotta per la registrazione degli utenti
 
@@ -482,5 +494,60 @@ router.patch('/:id/ban', authMiddleware(3), async (req, res) => {
   }
 });
 
+// POST /api/users/send-reset-email
+router.post('/send-reset-email', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) return res.status(400).json({ error: 'Email mancante' });
+
+  const result = await pool.query('SELECT id FROM utenti WHERE email = $1', [email]);
+  if (!result.rows.length) return res.status(404).json({ error: 'Utente non trovato' });
+
+  const token = crypto.randomBytes(32).toString('hex');
+  const expires = new Date(Date.now() + 1000 * 60 * 60); // 1 ora
+
+  await pool.query(
+    'UPDATE utenti SET reset_token = $1, reset_token_expires = $2 WHERE email = $3',
+    [token, expires, email]
+  );
+
+  const resetUrl = `http://localhost:5000/changePSW.html?token=${token}`;
+
+  // Invia email con resetUrl
+  await transporter.sendMail({
+    to: email,
+    subject: 'Reset della password - SaleCraft',
+    html: `<p>Clicca per resettare la password: <a href="${resetUrl}">${resetUrl}</a></p>`
+  });
+
+  res.json({ message: 'Email inviata!' });
+});
+
+router.post('/reset-password', async (req, res) => {
+  const { token, password } = req.body;
+
+  if (!token || !password) return res.status(400).json({ error: 'Token o password mancanti' });
+
+  const result = await pool.query(
+    'SELECT id FROM utenti WHERE reset_token = $1 AND reset_token_expires > NOW()',
+    [token]
+  );
+
+  if (!result.rows.length) {
+    return res.status(400).json({ error: 'Token non valido o scaduto' });
+  }
+
+  const userId = result.rows[0].id;
+  const hashed = await bcrypt.hash(password, 10);
+
+  await pool.query(
+    `UPDATE utenti 
+     SET password_hash = $1, reset_token = NULL, reset_token_expires = NULL 
+     WHERE id = $2`,
+    [hashed, userId]
+  );
+
+  res.json({ message: 'Password aggiornata con successo' });
+});
 
 module.exports = router;
