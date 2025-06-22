@@ -267,7 +267,7 @@ function setupReviewForm(id) {
       loadReviews(id);
     } catch (err) {
       const msg = err.message.includes("401")
-          ? "Devi essere loggato e aver acquistato il prodotto."
+          ? "Devi essere loggato per inserire una recensione."
           : err.message.includes("409")
               ? "Hai già recensito questo prodotto."
               : "Errore invio recensione.";

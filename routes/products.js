@@ -148,6 +148,7 @@ router.get('/', async (req, res) => {
         LIMIT 1
       ) img ON true
       WHERE 1=1
+      AND p.quant > 0
     `;
 
     let countQuery = `
@@ -162,7 +163,7 @@ router.get('/', async (req, res) => {
 
     if (tipologia) {
       baseQuery += ` AND p.tipologia_id = $${paramIndex}`;
-      countQuery += ` AND p.tipologia_id = $${paramIndex}`;
+      countQuery += ` AND p.tipologia_id = $${paramIndex} AND p.quant > 0`;
       params.push(tipologia);
       countParams.push(tipologia);
       paramIndex++;
@@ -224,9 +225,10 @@ router.get('/tipologia/:tipologia_id', async (req, res) => {
         LIMIT 1
       ) img ON true
       WHERE p.tipologia_id = $1
+      andp.quant > 0
     `;
 
-    let countQuery = `SELECT COUNT(*) FROM prodotti WHERE tipologia_id = $1`;
+    let countQuery = `SELECT COUNT(*) FROM prodotti WHERE tipologia_id = $1 AND quant > 0`;
     const params = [tipologia_id];
     let idx = 2;
 
@@ -259,46 +261,7 @@ router.get('/tipologia/:tipologia_id', async (req, res) => {
     res.status(500).json({ message: 'Errore server.' });
   }
 });
-// GET tutti i prodotti - pubblico
-/*router.get('/', async (req, res) => {
-  try {
-    const query = `
-      SELECT 
-        p.prodotto_id,
-        p.nome_prodotto,
-        p.tipologia_id,
-        p.prezzo,
-        p.descrizione,
-        p.quant,
-        u.nome_utente AS nome_artigiano,
-        img.immagine 
-      FROM prodotti p
-      JOIN artigiani a ON p.artigiano_id = a.artigiano_id
-      JOIN utenti u ON a.artigiano_id = u.id
-      LEFT JOIN LATERAL (
-        SELECT immagine
-        FROM immagini
-        WHERE prodotto_id = p.prodotto_id
-        ORDER BY immagine_id
-        LIMIT 1
-      ) img ON true
-       ORDER BY p.prodotto_id
-    `;
 
-    const result = await pool.query(query);
-
-    const prodotti = result.rows.map(({ immagine, ...rest }) => ({
-  ...rest,
-  immagine_principale: immagine ? immagine.toString('base64') : null
-  }));
-
-    res.status(200).json(prodotti);
-  } catch (error) {
-    console.error('Errore nel recupero dei prodotti:', error);
-    res.status(500).json({ message: 'Errore del server durante il recupero dei prodotti.' });
-  }
-});
-*/
 
 // GET con filtro su tipologia - pubblico
 router.get('/tipologia/:tipologia_id', async (req, res) => {
