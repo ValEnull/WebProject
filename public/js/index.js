@@ -1,3 +1,5 @@
+purgeIfNeeded();
+
 /* =====================
    PROMO BANNER ROTATOR
    ===================== */
@@ -30,27 +32,6 @@ function startPromoBanner() {
 /* ============================
    PRODOTTO IN EVIDENZA RANDOM
    ============================ */
-
-const featuredProducts = [
-  {
-    image: "/img/piattoApi.jpeg",
-    title: "Piatto decorato a mano",
-    description:
-      "Bellissimo piatto decorato a mano raffigurante api e fiorellini. Un regalo perfetto per chi ama la natura e i picnic!"
-  },
-  {
-    image: "/img/fermaPortaPolli.jpg",
-    title: "Fermaporte divertenti a forma di polli",
-    description:
-      "Divertenti e simpaticissimi fermaporta. Disponibili in varie colorazioni e misure. Perfetti per la casa o per un regalo originale!"
-  },
-  {
-    image: "/img/operaMetallo.png",
-    title: "Opera artigianale con materiali riciclati",
-    description:
-      "Opera artigianale realizzata a mano con materiali di recupero. Un pezzo unico che aggiunge un tocco di originalità a qualsiasi ambiente!"
-  }
-];
 
 function showFeaturedFrom(prodotti = []) {
   if (!Array.isArray(prodotti) || !prodotti.length) return;
@@ -87,6 +68,8 @@ let currentCategoryId = null; // null => tutte le categorie
    ================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
+
+  
   // 1. Promo banner & prodotto in evidenza
   startPromoBanner();
   updateCartBadge();
@@ -175,6 +158,47 @@ function parseJwt(token) {
     return null;
   }
 }
+
+/* =========================================
+   TOKEN GUARD – invalida admin / venditore
+   ========================================= */
+function isAdminOrVenditore(payload) {
+  // 2 = admin  |  3 = venditore
+  return payload && (payload.ruolo_id === 2 || payload.ruolo_id === 3);
+}
+
+function shouldDiscardToken(payload) {
+  const now = Date.now() / 1000;          // seconds
+  return !payload                 ||      // non decodificabile
+         payload.exp < now        ||      // scaduto
+         isAdminOrVenditore(payload);     // ruolo non ammesso in index
+}
+
+function purgeIfNeeded() {
+  let token = localStorage.getItem("token");
+  if (!token) return;
+
+  // ✅ rimuove "Bearer " se presente
+  if (token.startsWith("Bearer ")) {
+    token = token.slice(7); // rimuove "Bearer "
+  }
+
+  const payload = parseJwt(token);
+  console.log("🧾 JWT Payload:", payload);
+
+  const now = Date.now() / 1000;
+  const role = payload?.ruolo_id;
+
+  const mustLogout = !payload || payload.exp < now || [2, 3].includes(role);
+  console.log("⛔ Deve sloggare?", mustLogout);
+
+  if (mustLogout) {
+    console.warn("🔴 Token non valido o ruolo non ammesso. Logout forzato.");
+    localStorage.removeItem("token");
+    location.reload(); // oppure: window.location.replace("/login.html");
+  }
+}
+
 
 /***** helper fetch *****/
 async function fetchJSON(url, opts = {}) {
@@ -332,31 +356,6 @@ function refreshAuthUI() {
   updateCartBadge();   // ↓ definita sotto
 }
 
-/***************************
- *  BADGE CARRELLO
- ***************************/
-async function updateCartBadge() {
-  const badge = document.getElementById("cart-badge");
-  if (!badge) return;
-
-  try {
-    const { prodotti = [] } = await fetchJSON("/api/orders/carrello");
-    const tot = prodotti.reduce((acc, p) => acc + p.quantita, 0);
-    badge.textContent = tot;
-  } catch {
-    badge.textContent = "0";
-  }
-}
-
-/* helper fetchJSON se non l'hai già */
-async function fetchJSON(url, opts = {}) {
-  const token   = localStorage.getItem("token");
-  const headers = { "Content-Type": "application/json", ...(opts?.headers||{}) };
-  if (token) headers.Authorization = `Bearer ${token}`;
-  const res = await fetch(url, { ...opts, headers });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
-}
 
 /***************************
  *  DOM READY
