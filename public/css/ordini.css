@@ -62,6 +62,10 @@ header {
     color: white;
 }
 
+.fa-shopping-bag {
+    color: var(--arancione);
+}
+
 /* Contenuto principale */
 .titolo-pagina {
     color: #333;
