@@ -1,3 +1,5 @@
+SET search_path TO public;
+
 -- crea tabella ruoli
 CREATE TABLE IF NOT EXISTS ruoli (
     ruolo_id SERIAL PRIMARY KEY,

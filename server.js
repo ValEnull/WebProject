@@ -5,8 +5,6 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
-
-
 app.use(cors());
 
 app.use(express.json({ limit: '10mb' }));
@@ -22,7 +20,7 @@ app.use('/api/users', utentiRouter);
 const productsRouter = require('./routes/products');
 app.use('/api/products', productsRouter);
 
-//Rotte ordini
+// Rotte ordini
 const ordersRouter = require('./routes/orders');
 app.use('/api/orders', ordersRouter);
 
@@ -35,6 +33,12 @@ const reportRouter = require('./routes/report');
 app.use('/api/report', reportRouter);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server avviato su http://localhost:${PORT}`);
-});
+
+// Avvia solo se eseguito direttamente (non nei test)
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server avviato su http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;

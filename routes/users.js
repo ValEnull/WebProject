@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const pool = require('../db/db');
 const router = express.Router();
 const authMiddleware = require('../middleware/auth');
-const jwt = require('jsonwebtoken');// Abilita CORS per tutte le rotte in questo router
+const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
@@ -213,8 +213,8 @@ router.get('/:id', async (req, res) => {
 
 
 
-// GET /api/users?q=searchString  – elenco filtrato (solo admin)
-router.get('/', authMiddleware(0), async (req, res) => {
+// GET elenco filtrato (solo admin)
+router.get('/', authMiddleware(3), async (req, res) => {
   const { q } = req.query;                   // ?q=foo
 
   const where = [];
@@ -238,7 +238,7 @@ router.get('/', authMiddleware(0), async (req, res) => {
     FROM   utenti
     ${where.length ? 'WHERE ' + where.join(' AND ') : ''}
     ORDER BY id
-    LIMIT 50;`;                              // evita di sparare troppi record
+    LIMIT 50;`; 
 
   try {
     const { rows } = await pool.query(sql, params);
@@ -288,9 +288,8 @@ router.get('/artisans/:id', async (req, res) => {
   }
 });
 
-// -----------------------------------------------------------------------------
-// PATCH /api/users/:id  ─ modifica nome_utente, nome, cognome, email (uno o più)
-// -----------------------------------------------------------------------------
+
+// PATCH modifica nome_utente, nome, cognome, email (uno o più)
 router.patch('/:id', authMiddleware(1), async (req, res) => {
   const { nome_utente, nome, cognome, email } = req.body;
   const { id } = req.params;
@@ -321,9 +320,7 @@ router.patch('/:id', authMiddleware(1), async (req, res) => {
   }
 });
 
-// -----------------------------------------------------------------------------
 // PATCH /api/users/:id/email  ─ modifica solo email
-// -----------------------------------------------------------------------------
 router.patch('/:id/email', authMiddleware(1), async (req, res) => {
   const { id } = req.params;
   const { email } = req.body;
@@ -343,9 +340,7 @@ router.patch('/:id/email', authMiddleware(1), async (req, res) => {
   }
 });
 
-// -----------------------------------------------------------------------------
 // PATCH /api/users/:id/password  ─ cambio password con verifica oldPassword
-// -----------------------------------------------------------------------------
 router.patch('/:id/password', authMiddleware(1), async (req, res) => {
   const { id } = req.params;
   const { oldPassword, newPassword } = req.body;
