@@ -52,20 +52,28 @@ const featuredProducts = [
   }
 ];
 
-function showRandomFeaturedProduct() {
+function showFeaturedFrom(prodotti = []) {
+  if (!Array.isArray(prodotti) || !prodotti.length) return;
+
   const productImage = document.getElementById("product-image");
   const productTitle = document.getElementById("product-title");
   const productDescription = document.getElementById("product-description");
+  const productLink = document.getElementById("featured-link");
 
-  if (!productImage || !productTitle || !productDescription) return; // sezione non presente
+  if (!productImage || !productTitle || !productDescription || !productLink) return;
 
-  const randomProduct =
-    featuredProducts[Math.floor(Math.random() * featuredProducts.length)];
+  const p = prodotti[Math.floor(Math.random() * prodotti.length)];
 
-  productImage.src = randomProduct.image;
-  productTitle.textContent = randomProduct.title;
-  productDescription.textContent = randomProduct.description;
+  const imgSrc = p.immagine_principale
+    ? `data:image/png;base64,${p.immagine_principale}`
+    : "/img/placeholderProduct.png";
+
+  productImage.src = imgSrc;
+  productTitle.textContent = p.nome_prodotto;
+  productDescription.textContent = p.descrizione || "";
+  productLink.href = `prodotto.html?id=${p.prodotto_id}`;
 }
+
 
 /* ================
    GLOBAL STATE
@@ -81,7 +89,6 @@ let currentCategoryId = null; // null => tutte le categorie
 document.addEventListener("DOMContentLoaded", () => {
   // 1. Promo banner & prodotto in evidenza
   startPromoBanner();
-  showRandomFeaturedProduct();
   updateCartBadge();
 
   // 2. Nav categorie (link con class="category-link" e data-category-id="<id>")
@@ -99,11 +106,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // 3. Barra di ricerca (se presente)
+  // 3. Barra di ricerca (clic su bottone o invio)
   const searchInput = document.getElementById("search");
-  if (searchInput) {
-    searchInput.addEventListener("input", () => loadProducts(1));
+  const searchBtn   = document.getElementById("search-btn");
+
+  if (searchInput && searchBtn) {
+    searchBtn.addEventListener("click", () => loadProducts(1));
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") loadProducts(1);
+    });
   }
+
 
   // 4. Dropdown utente + logout
   setupUserDropdown();
@@ -205,36 +218,38 @@ async function updateCartBadge() {
 async function loadProducts(page = 1) {
   const search = document.getElementById("search")?.value.trim() || "";
 
+  // 🚫 Non usare paginazione lato server, prendi tutti
   let url;
   if (currentCategoryId) {
-    // nuova API filtrata per tipologia
-    url = `/api/products/tipologia/${currentCategoryId}?page=${page}&limit=${limit}`;
+    url = `/api/products/tipologia/${currentCategoryId}`;
   } else {
-    // lista completa (eventuale ricerca)
-    url = `/api/products?page=${page}&limit=${limit}`;
+    url = `/api/products`;
   }
 
   if (search) {
-    // la tua API per tipologia non gestisce la ricerca: aggiungila se vuoi
-    url += `&search=${encodeURIComponent(search)}`;
+    url += `?search=${encodeURIComponent(search)}`;
   }
-
-  console.log("Chiamo API con URL:", url);
 
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
 
-    /*
-      L'endpoint /tipologia/:id restituisce solo "prodotti".
-      Per ri‑usare lo stesso renderer, simuliamo il vecchio formato se necessario.
-    */
-    const prodotti = Array.isArray(data) ? data : data.prodotti;
-    const total    = data.total || prodotti.length;
+    const prodottiRaw = Array.isArray(data) ? data : data.prodotti;
 
-    renderProducts(prodotti);
+    // ✅ Filtra solo quelli con quantità > 0
+    const prodottiDisponibili = prodottiRaw.filter(p => p.quant > 0);
+
+    // ✅ Calcola paginazione sul risultato filtrato
+    const total = prodottiDisponibili.length;
+    const totalPages = Math.ceil(total / limit);
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const prodottiPagina = prodottiDisponibili.slice(startIndex, endIndex);
+
+    renderProducts(prodottiPagina);
     renderPagination(total, page, limit);
+    showFeaturedFrom(prodottiDisponibili);
     currentPage = page;
   } catch (err) {
     console.error("Errore nella fetch:", err);

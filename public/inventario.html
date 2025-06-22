@@ -40,9 +40,11 @@
             <h1 class="display-4 text-center mb-4">Inventario</h1>
             
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="position-relative" style="max-width: 300px;">
-                    <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ps-3 text-muted"></i>
-                    <input type="text" class="form-control ps-5" id="searchInput" placeholder="Cerca prodotto...">
+                <div class="input-group" style="max-width: 300px;">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Cerca prodotto...">
+                    <button class="btn btn-orange search-btn" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
                 </div>
 
                 <button class="btn btn-orange add-product-btn" onclick="window.location.href='addProduct.html'">

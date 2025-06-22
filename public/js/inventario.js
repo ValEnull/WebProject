@@ -98,22 +98,32 @@ function loadTable (filtered = products) {
   if (badge) badge.textContent = `${filtered.length} prodotti`;
 }
 
-/* ── Search (fix selector & event) ─────────────────────────────────── */
+/* ── Search con bottone + invio ─────────────────────────────────────── */
 function setupSearch () {
-  // Preferisci l'id esplicito se presente, altrimenti fallback alla vecchia struttura
-  const input = document.getElementById('searchInput') ||
-                document.querySelector('.input-group input');
-  if (!input) return; // markup inconsistente? esci silenziosamente
+  const input  = document.getElementById('searchInput') ||
+                 document.querySelector('.input-group input');
+  const button = document.querySelector('.search-btn');
 
-  input.addEventListener('input', () => {
+  if (!input || !button) return;  // markup mancante? esci
+
+  const doSearch = () => {
     const q = input.value.toLowerCase().trim();
-    const filtrati = !q ? products
-                        : products.filter(p =>
-                            p.nome_prodotto.toLowerCase().includes(q) ||
-                            (p.descrizione || '').toLowerCase().includes(q));
+    const isNumeric     = /^\d+$/.test(q);
+    const filterEnabled = (isNumeric ? q.length >= 2 : q.length >= 1);
+
+    const filtrati = !filterEnabled ? products : products.filter(p =>
+      p.nome_prodotto.toLowerCase().includes(q) ||
+      (p.descrizione || '').toLowerCase().includes(q) ||
+      String(p.prodotto_id).includes(q)
+    );
+
     loadTable(filtrati);
-  });
+  };
+
+  button.addEventListener('click', doSearch);
+  input.addEventListener('keyup', e => { if (e.key === 'Enter') doSearch(); });
 }
+
 
 /* ── Logout link ───────────────────────────────────────────────────── */
 function attachLogout () {

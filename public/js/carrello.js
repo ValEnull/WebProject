@@ -44,6 +44,7 @@ async function fetchJSON(url, opts = {}) {
 const cartBody   = document.getElementById("cart-body");
 const cartTotal  = document.getElementById("cart-total");
 const checkoutBtn = document.getElementById("checkout-btn");
+checkoutBtn.disabled = true;
 checkoutBtn.addEventListener("click", () => {
   if (checkoutBtn.disabled) return;
   location.href = "/payment.html";          // cambia con la tua pagina reale
@@ -159,9 +160,17 @@ async function loadCart() {
     cartBody.querySelectorAll(".cart-item").forEach(attachHandlers);
     updateCartTotal();  
   } catch (err) {
-    cartBody.innerHTML = '<p class="text-danger">Errore nel caricamento del carrello.</p>';
-    cartTotal.textContent = "0.00";
+    if (err.message.includes("404")) {
+      // ✅ Carrello vuoto gestito dal server con 404
+      cartBody.innerHTML = '<p class="text-center my-5 text-muted">Il tuo carrello è vuoto.</p>';
+      cartTotal.textContent = "0.00";
+      checkoutBtn.disabled = true;
+    } else {
+      // ❌ Errore generico
+      cartBody.innerHTML = '<p class="text-danger">Errore nel caricamento del carrello.</p>';
+      cartTotal.textContent = "0.00";
+      checkoutBtn.disabled = true;
+    }
   }
 }
-
 document.addEventListener("DOMContentLoaded", loadCart);
