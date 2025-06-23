@@ -27,9 +27,11 @@ async function setupDatabase () {
   try {
     /* 1. se la tabella utenti non esiste → eseguo l’intero schema */
     const { rows } = await pool.query(`
-      SELECT to_regclass('public.utenti') AS exists;
+      SELECT
+        to_regclass('public.utenti') IS NOT NULL AS utenti_exists,
+        to_regclass('public.ruoli_ruolo_id_seq') IS NOT NULL AS ruoli_seq_exists
     `);
-    if (!rows[0].exists) {
+    if (!rows[0].utenti_exists || !rows[0].ruoli_seq_exists) {
       console.log('[init] eseguo schema.sql…');
       const sql = await fs.readFile(path.join(__dirname, 'db/schema.sql'), 'utf-8');
       await pool.query(sql);

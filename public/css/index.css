@@ -22,7 +22,26 @@
     color: white;
 }
 
+#search {
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+  background-color: rgba(255, 255, 255, 0.95); /* quasi opaco */
+  backdrop-filter: blur(1px); /* effetto glassy soft */
+}
+
+#search {
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid #ccc;
+}
+
+
 /* Banner */
+
+#promo-banner {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  height: auto;
+}
+
 .banner {
     height: 200px;
     display: flex;
@@ -59,6 +78,13 @@
     object-fit: contain;
     display: block;
 }
+
+#categoryNav .nav-link {
+  font-size: 1.0rem;
+  padding: 0.3rem 0.3rem;
+  max-width: 8rem;
+}
+
 
 /* mobile */
 @media (max-width: 768px) {
