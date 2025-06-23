@@ -17,8 +17,7 @@ Sistema backend per la piattaforma di e-commerce **Artigianato Online**, svilupp
 
 1. **Clona il repository**
    ```bash
-   git clone https://github.com/tuo-user/tuo-repo.git
-   cd tuo-repo
+   git clone https://github.com/tuo-username/salecraft.git
    ```
 
 2. **Configura le variabili d’ambiente**
