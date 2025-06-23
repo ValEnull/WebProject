@@ -23,16 +23,7 @@ Sistema backend per la piattaforma di e-commerce **Artigianato Online**, svilupp
 
 2. **Configura le variabili d’ambiente**
 
-   Crea un file `.env` nella root del progetto, basato su `.env.example`.
-
-   ```
-   DB_HOST=db
-   DB_PORT=5432
-   DB_USER=utente
-   DB_PASSWORD=password
-   DB_NAME=nome_database
-   JWT_SECRET=segreto
-   ```
+Rinomina il file .env.example in .env
 
 3. **Installa le dipendenze**
    Se vuoi usare il backend localmente senza Docker:
@@ -48,20 +39,20 @@ Sistema backend per la piattaforma di e-commerce **Artigianato Online**, svilupp
 1. **Avvia con Docker Compose**
 
    ```bash
-   docker compose up -d --build
+   docker compose up
    ```
-
-2. **Accedi al container backend per operazioni manuali**
-
-   ```bash
-   docker compose exec app bash
-   ```
-
-3. **(Facoltativo) Installa manualmente le dipendenze nel container**
+2. Nel caso di errori di tipo modulo mancante, installa manualmente le dipendenze nel container**
 
    ```bash
    docker compose exec app npm install
    ```
+
+   **NB** - al lancio del container si vedrà una stringa ripetuta piú volte:
+   ```bash
+   app-1  | ./wait-for-it.sh: line 12: nc: command not found
+   ```
+   questo é corretto. Lo script bash `wait-for-it.sh` crea un delay nella connessione del server al db per fare si che tutto il codice sia svolto nell'ordine giusto
+3. Aprire il sito all'indirizzo http://localhost:5000/
 
 ---
 
@@ -69,6 +60,7 @@ Sistema backend per la piattaforma di e-commerce **Artigianato Online**, svilupp
 
 1. **Reset + Seed + Test in ambiente isolato**
    ```bash
+   docker compose up -d
    docker compose exec app npm test
    ```
 
@@ -78,6 +70,7 @@ Sistema backend per la piattaforma di e-commerce **Artigianato Online**, svilupp
    - Esegue il seed di dati temporanei
    - Lancia i test automatici
    - Ripristina il seed con i dati “ufficiali” alla fine
+Il risultato aspettato dal test automatico é "35 passing"
 
 2. **Test specifici**
    ```bash
@@ -189,10 +182,4 @@ Authorization: Bearer <jwt_token>
 
 - Le immagini sono salvate come BLOB nel DB (`BYTEA`) e convertite in base64 alla risposta.
 - I test automatici includono reset + teardown completo del DB.
-- Il deploy è stato pensato per funzionare sia localmente che su VPS tramite Docker.
-
----
-
-## ✨ Autori
-
-> Progetto sviluppato dal gruppo XYZ - Corso di Tecnologie Web 2025
+- Il deploy è stato pensato per funzionare sia localmente che su VPS tramite Docker. NB - per svolgere il deploy locale é necessario modificare in .env PGHOST e DB_URL per puntare a localhost
