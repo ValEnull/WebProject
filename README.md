@@ -24,50 +24,51 @@ SaleCraft è una piattaforma e-commerce che connette acquirenti con artigiani e 
 
 ## 📁 Architettura
 
+<pre>
+```text
 public/
 ├── css/
-│ ├── addProduct.css
-│ ├── adminArea.css
-│ ├── carrello.css
-│ ├── changePSW.css
-│ ├── editProduct.css
-│ ├── formCompratore.css
-│ ├── index.css
-│ ├── inventario.css
-│ ├── login.css
-│ ├── ordini.css
-│ ├── ordiniVenditore.css
-│ ├── page1.css
-│ ├── page2-form.css
-│ ├── page3-esito.css
-│ ├── payment.css
-│ ├── prodotto.css
-│ ├── profiloVenditore.css
-│ ├── resetPSWmail.css
-│ └── userArea.css
+│   ├── addProduct.css
+│   ├── adminArea.css
+│   ├── carrello.css
+│   ├── changePSW.css
+│   ├── editProduct.css
+│   ├── formCompratore.css
+│   ├── index.css
+│   ├── inventario.css
+│   ├── login.css
+│   ├── ordini.css
+│   ├── ordiniVenditore.css
+│   ├── page1.css
+│   ├── page2-form.css
+│   ├── page3-esito.css
+│   ├── payment.css
+│   ├── prodotto.css
+│   ├── profiloVenditore.css
+│   ├── resetPSWmail.css
+│   └── userArea.css
 ├── img/
-│ ├── fermaPortaPolli.jpg
-│ ├── logoDef.png
-│ ├── piattoApi.jpeg
-│ └── placeholderProduct.png
+│   ├── fermaPortaPolli.jpg
+│   ├── logoDef.png
+│   ├── piattoApi.jpeg
+│   └── placeholderProduct.png
 ├── js/
-│ ├── addProduct.js
-│ ├── adminArea.js
-│ ├── carrello.js
-│ ├── changePSW.js
-│ ├── formCompratore.js
-│ ├── index.js
-│ ├── inventario.js
-│ ├── login.js
-│ ├── ordini.js
-│ ├── ordiniVenditore.js
-│ ├── page1.js
-│ ├── page2-form.js
-│ ├── payment.js
-│ ├── prodotto.js
-│ ├── profiloVenditore.js
-│ └── userArea.js
-└── html/
+│   ├── addProduct.js
+│   ├── adminArea.js
+│   ├── carrello.js
+│   ├── changePSW.js
+│   ├── formCompratore.js
+│   ├── index.js
+│   ├── inventario.js
+│   ├── login.js
+│   ├── ordini.js
+│   ├── ordiniVenditore.js
+│   ├── page1.js
+│   ├── page2-form.js
+│   ├── payment.js
+│   ├── prodotto.js
+│   ├── profiloVenditore.js
+│   └── userArea.js
 ├── addProduct.html
 ├── adminArea.html
 ├── carrello.html
@@ -87,6 +88,8 @@ public/
 ├── profiloVenditore.html
 ├── resetPSWmail.html
 └── userArea.html
+```
+</pre>
 
 ---
 
