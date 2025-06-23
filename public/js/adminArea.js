@@ -86,9 +86,19 @@ document.getElementById('userSearchResults')
 
 
 /* ---------------- LOAD USERS ---------------- */
+
 async function loadUsers() {
   const usersArray = await fetchJSON(API.users);
-  usersMap = Object.fromEntries(usersArray.map(user => [user.id, user]));
+
+  //   filtra fuori gli admin PRIMA di costruire la mappa
+  const nonAdmin = usersArray.filter(u => !isAdminUser(u));
+
+  usersMap = Object.fromEntries(nonAdmin.map(u => [u.id, u]));
+  console.log(`loadUsers → ${nonAdmin.length}/${usersArray.length} non-admin in mappa`)
+  // DEBUG: verifica quanti utenti hai effettivamente caricato
+  console.log(`loadUsers → ${nonAdmin.length}/${usersArray.length} non-admin in mappa`);
+  // se vuoi vedere chi hai scartato:
+  // console.table(usersArray.filter(isAdminUser), ['id','nome_utente','ruolo']);
 }
 
 /* ---------------- LOAD REPORTS ---------------- */
@@ -168,6 +178,29 @@ async function loadTopSellers() {
   }
 }
 
+
+// helper universale
+function isAdminUser(u = {}) {
+  
+  if (Number(u.ruolo_id) === 3) return true;
+  const role = (u.ruolo || u.role || '').toString().toLowerCase();
+  const looksLikeRole = ['admin', 'amministratore', 'administrator', 'superadmin'].includes(role);
+  const flag = u.is_admin || u.admin || u.superuser;
+
+  const result = looksLikeRole || flag === true;
+
+  // DEBUG
+  if (result) {
+    console.warn('⚠️  Rilevato admin (scartato):', {
+      id: u.id,
+      username: u.nome_utente,
+      ruolo: u.ruolo,
+      flags: { is_admin: u.is_admin, admin: u.admin, superuser: u.superuser }
+    });
+  }
+  return result;
+}
+
 /* ---------------- USER SEARCH ---------------- */
 async function searchUsers() {
   const q = document.getElementById('userSearchInput').value.trim();
@@ -175,13 +208,16 @@ async function searchUsers() {
 
   try {
     const users = await fetchJSON(`/api/users?q=${encodeURIComponent(q)}`);
-    const tbody = document.getElementById('userSearchResults');
+    const tbody  = document.getElementById('userSearchResults');
     tbody.innerHTML = '';
 
-    users.forEach(u => {
-      const isBanned = u.is_banned;
-      const buttonClass = isBanned ? 'btn-danger' : 'btn-success';
-      const iconClass = isBanned ? 'fa-lock' : 'fa-lock-open';
+    // mostra solo gli ID che ESISTONO in usersMap (=> non-admin)
+    const visibleUsers = users.filter(u => !isAdminUser(u)).filter(u => usersMap.hasOwnProperty(u.id));
+
+    visibleUsers.forEach(u => {
+      const isBanned  = u.is_banned;
+      const btnClass  = isBanned ? 'btn-danger' : 'btn-success';
+      const iconClass = isBanned ? 'fa-lock'   : 'fa-lock-open';
 
       tbody.insertAdjacentHTML('beforeend', `
         <tr data-id="${u.id}" data-banned="${isBanned}">
@@ -189,18 +225,28 @@ async function searchUsers() {
           <td>${u.nome} ${u.cognome}</td>
           <td>${u.email}</td>
           <td>
-            <button class="btn btn-sm ${buttonClass} toggle-ban-btn">
+            <button class="btn btn-sm ${btnClass} toggle-ban-btn">
               <i class="fas ${iconClass}"></i>
             </button>
           </td>
         </tr>
       `);
     });
+
+    if (!visibleUsers.length) {
+      tbody.insertAdjacentHTML(
+        'beforeend',
+        `<tr><td colspan="4" class="text-center text-muted">Nessun utente trovato</td></tr>`
+      );
+    }
+
   } catch (err) {
     console.error('User search error:', err);
     showToast('danger', 'Errore nella ricerca utenti');
   }
 }
+
+
 /* handler bottone Ban/Sban */
 async function toggleBan(btn) {
   const tr        = btn.closest('tr');
