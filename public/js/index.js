@@ -207,27 +207,34 @@ async function fetchJSON(url, opts = {}) {
 /***** BADGE CARRELLO *****/
 async function updateCartBadge() {
   const badge = document.getElementById("cart-badge");
-  if (!badge) return;                        // elemento non trovato (es. admin)
   const btn   = document.getElementById("cart-btn");
+  if (!badge || !btn) return;
 
   const token = localStorage.getItem("token");
-  if (!token) {                              // utente non loggato
+
+  /* Utente NON loggato → nascondi tutto  */
+  if (!token) {
     badge.textContent = "0";
     btn.classList.add("d-none");
     return;
   }
 
+  /* Utente loggato → mostra SEMPRE il bottone  */
+  btn.classList.remove("d-none");
+
   try {
     const { prodotti = [] } = await fetchJSON("/api/orders/carrello");
     const tot = prodotti.reduce((acc, p) => acc + p.quantita, 0);
-    badge.textContent = tot;
-    btn.classList.toggle("d-none", tot === 0);   // se 0 articoli nasconde btn
+
+    badge.textContent = tot;              // mostra 0, 1, 2, …
+    // Se vuoi nascondere solo la badge a 0 articoli:
+    // badge.classList.toggle("d-none", tot === 0);
+
   } catch {
     badge.textContent = "0";
-    btn.classList.add("d-none");
+    // Il bottone resta visibile anche in caso di errore
   }
 }
-
 
 /* ============================
    FETCH & RENDERING  PRODOTTI
