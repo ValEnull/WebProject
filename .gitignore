@@ -1,8 +1,2 @@
-# Ignora solo i symlink e i file problematici in node_modules
-node_modules/.bin/
-node_modules/mocha/bin/_mocha
-node_modules/mocha/bin/mocha
-
-# (Opzionale) altri file temporanei o generati da strumenti
-npm-debug.log*
-.DS_Store
+node_modules/
+.env
