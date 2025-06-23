@@ -1,182 +1,198 @@
-# SaleCraft - E-commerce Platform
+# Artigianato Online - Backend
 
-SaleCraft è una piattaforma e-commerce che connette acquirenti con artigiani e piccole aziende, offrendo prodotti unici e sostenibili.
-
-## 🚀 Funzionalità principali
-
-- **Area Clienti**: Registrazione, login, gestione profilo e ordini
-- **Area Venditori**: Registrazione artigiani/piccole aziende
-- **Area Admin**: Dashboard con statistiche e gestione utenti
-- **Carrello**: Gestione prodotti e checkout
-- **Pagamenti**: Sistema di pagamento integrato
-- **Catalogo**: Visualizzazione prodotti con recensioni
-- **Inventario**: Gestione prodotti in vendita
-
-## 🛠 Tecnologie utilizzate
-
-- **Frontend**:
-  - HTML5, CSS3, JavaScript
-  - Bootstrap 5.3
-  - Font Awesome 6.5
-- **Backend**: (da implementare)
-  - Node.js/Express
-  - Database MySQL/PostgreSQL
-
-## 📁 Architettura
-
-public/
-├── css/
-│ ├── addProduct.css
-│ ├── adminArea.css
-│ ├── carrello.css
-│ ├── changePSW.css
-│ ├── editProduct.css
-│ ├── formCompratore.css
-│ ├── index.css
-│ ├── inventario.css
-│ ├── login.css
-│ ├── ordini.css
-│ ├── ordiniVenditore.css
-│ ├── page1.css
-│ ├── page2-form.css
-│ ├── page3-esito.css
-│ ├── payment.css
-│ ├── prodotto.css
-│ ├── profiloVenditore.css
-│ ├── resetPSWmail.css
-│ └── userArea.css
-├── img/
-│ ├── fermaPortaPolli.jpg
-│ ├── logoDef.png
-│ ├── piattoApi.jpeg
-│ └── placeholderProduct.png
-├── js/
-│ ├── addProduct.js
-│ ├── adminArea.js
-│ ├── carrello.js
-│ ├── changePSW.js
-│ ├── formCompratore.js
-│ ├── index.js
-│ ├── inventario.js
-│ ├── login.js
-│ ├── ordini.js
-│ ├── ordiniVenditore.js
-│ ├── page1.js
-│ ├── page2-form.js
-│ ├── payment.js
-│ ├── prodotto.js
-│ ├── profiloVenditore.js
-│ └── userArea.js
-└── html/
-├── addProduct.html
-├── adminArea.html
-├── carrello.html
-├── changePSW.html
-├── editProduct.html
-├── formCompratore.html
-├── index.html
-├── inventario.html
-├── loging.html
-├── ordini.html
-├── ordiniVenditore.html
-├── page1.html
-├── page2-form.html
-├── page3-esito.html
-├── payment.html
-├── prodotto.html
-├── profiloVenditore.html
-├── resetPSWmail.html
-└── userArea.html
+Sistema backend per la piattaforma di e-commerce **Artigianato Online**, sviluppato in **Node.js** con architettura RESTful. Il backend gestisce utenti (clienti, artigiani, admin), prodotti, ordini, immagini, recensioni e pagamenti. Include test automatici con Mocha + Supertest e database PostgreSQL.
 
 ---
 
-## 🖥 Pagine principali
+## 🧱 Requisiti
 
-1. **Homepage** (`index.html`) - Catalogo prodotti e navigazione
-2. **Area Clienti** (`userArea.html`) - Gestione profilo utente
-3. **Area Admin** (`adminArea.html`) - Dashboard amministrativa
-4. **Area Venditore** (`profiloVenditore.html`) - Dashboard commerciante
-5. **Carrello** (`carrello.html`) - Gestione ordini
-6. **Pagamento** (`payment.html`) - Checkout e pagamento
-7. **Registrazione** (`formCompratore.html`, `page2-form.html`) - Form per clienti e venditori
-8. **Prodotto** (`prodotto.html`) - Dettaglio prodotto con recensioni
-9. **Inventario** (`inventario.html`) - Elenco prodotti di un venditore
+- [Node.js](https://nodejs.org) v16+
+- [npm](https://www.npmjs.com/)
+- [Docker](https://www.docker.com/) + [Docker Compose](https://docs.docker.com/compose/)
+- [PostgreSQL](https://www.postgresql.org/) (solo se non usi Docker)
 
-## 🛠 Installazione e avvio
+---
 
-### Prerequisiti
+## ⚙️ Installazione e Setup
 
-- Browser moderno (Chrome, Firefox, Edge, Opera)
-
-### Passi per l'installazione
-
-1. Clona il repository:
-
+1. **Clona il repository**
    ```bash
-   git clone https://github.com/tuo-username/salecraft.git
-
+   git clone https://github.com/tuo-user/tuo-repo.git
+   cd tuo-repo
    ```
 
-2. Posiziona i file nella root del tuo server web
-3. Apri nel Browser
+2. **Configura le variabili d’ambiente**
+
+   Crea un file `.env` nella root del progetto, basato su `.env.example`.
+
+   ```
+   DB_HOST=db
+   DB_PORT=5432
+   DB_USER=utente
+   DB_PASSWORD=password
+   DB_NAME=nome_database
+   JWT_SECRET=segreto
+   ```
+
+3. **Installa le dipendenze**
+   Se vuoi usare il backend localmente senza Docker:
+
+   ```bash
+   npm install
+   ```
 
 ---
 
-## Funzioni Principali
+## 🐳 Deploy con Docker
 
-### 🏠 Homepage (index.html):
+1. **Avvia con Docker Compose**
 
-Vetrina del nostro sito che permette al compratore di esplorare il nostro sito in cerca del prodotto perfetto da acquistare.
-Da questa pagina è possibile aggiungere i prodotti direttamente al carrello e accedere alla pagina del prodotto che si desidera vedere meglio.
+   ```bash
+   docker compose up -d --build
+   ```
 
-### 🔎 Prodotto (prodotto.html):
+2. **Accedi al container backend per operazioni manuali**
 
-Pagina che permette una visione più compelta del prodotto che si vuole acquistare. Permette di vedere i dettagli dei prodotti, oltre che la possibilità di lasciare recensioni su e di visualizzare quelle degli altri utenti. Da questa pagina è possibile aggiungere il prodotto al carrello.
+   ```bash
+   docker compose exec app bash
+   ```
 
-## 🛒 Carrello (carrello.html):
+3. **(Facoltativo) Installa manualmente le dipendenze nel container**
 
-Questa pagina mostra una panoramica di tutti i prodotti che il compratore si è salvato da comprare. Mostra anche il totale (parziale) della spesa.
-
-## 💸 Checkout (payment.html):
-
-Pagina successiva al carrello. Qui il venditore rimepie un form per la spedizione e per le informazioni della carta. Il nostro sito al momento accetta solo pagamenti con carta di credito/debito. Il pagamento avviene all'interno del nostro sito, senza l'ausilio di terzi, al termine del quale viene mostrato un popup in caso di esito positivo una volta completato il pagamento.
-Viene mostrato il totale completo di spese di spedizione ed eventuali sconti.
-
-## 👤 Profilo Compratore (userArea.html):
-
-Attraverso una pagina dallo stile moderno, l'utente (compratore) è in grado di gestire le sue informazioni personali, come: nome utente, email, password e anche di eliminare il proprio account.
-
-## 📦 Gestione Ordini (ordini.html):
-
-Con questa pagina l'utente che compra sul nostro sito è in grado di monitorare tutti gli ordini fatti, anche quelli già ricevuti.
-
-## 💼 Diventa Venditore (page1.html):
-
-Attraverso questa pagina gli utenti che desiderano aprire un negozio sulla nostra piattaforma possono iniziare la loro avventura.
-Dopo una piccola introduzione al nostro sito e perché sceglierci l'utente, con pochi semplici click e dopo una rapida registrazione può iniziare a vendere sul nostro sito.
-
-## 🚔 Dashboard Admin (admin.Area.html):
-
-Da questa pagina, un admin del sito, è in grado di gestire e controllare l'andamento delle vendite, attraverso la sezione "Top Sellers" che mostra i top 3 prodotti venduti e può essere espansa fino a mostrare i top 5.
-Segnalazioni Recenti, che mostra eventuali segnalazioni inviate dagli utenti e infine la funzione "cerca utenti" per poter cercare un utente registrato nel sito ed, eventualmente, eliminare il suo account.
-
-## 🛍️ Dashboard Venditore (profiloVenditore.html):
-
-Da questa pagina i venditori potranno consultare e modificare le proprie informazioni aziendali, i contatti, le credenziali bancarie e la password per accedere. È anche possibile eliminare definitivamente il profilo.
-Dal bottone azienda in alto a destra si può accedere all'inventario, allo storico ordini ed eseguire il logout.
-
-## 📥 Inventario (inventario.html)
-
-Dalla pagina di inventario ogni commerciante potrà visualizzare e cercare i propri prodotti disponibili all'interno di una tabella con i vari dati quali Immagini, Nome, Codice, Quantità, Prezzo, Stato e Azioni.
-I prodotti sono aggiungibili e modificabili tramite form raggiungibili dagli appositi bottoni.
-
-## 🧾 Storico ordini (ordini.html)
-
-In questa schermata sarà possibile per i venditori visualizzare lo storico degli ordini ricevuti in una tabella con le varie informazioni per prodotto: ID, Data, Compratore, Importo e Stato. Per quest'ultimo possiamo filtrare gli elementi, nonchè cercarli tramite barra di ricerca.
+   ```bash
+   docker compose exec app npm install
+   ```
 
 ---
 
-## Responsive:
+## 🧪 Testing
 
-Tutto il sito è stato creato con l'idea in mente di essere adatto a ogni tipo di piattaforma.
-Attraverso l'utilizzo di Bootstrap e Media Query abbiamo reso il sito responsivo e adatto a qualsiasi dispositivo, anche quelli mobili.
+1. **Reset + Seed + Test in ambiente isolato**
+   ```bash
+   docker compose exec app npm test
+   ```
+
+   Questo comando:
+   - Cancella il database
+   - Ricrea lo schema
+   - Esegue il seed di dati temporanei
+   - Lancia i test automatici
+   - Ripristina il seed con i dati “ufficiali” alla fine
+
+2. **Test specifici**
+   ```bash
+   docker compose exec app npx mocha test/users.test.js
+   ```
+
+---
+
+## 📁 Struttura del Progetto
+
+```
+.
+├── db/
+│   ├── schema.sql
+│   ├── seed.js
+│   ├── clear.js
+│   └── setup.js
+├── routes/
+│   ├── auth.js
+│   ├── users.js
+│   ├── products.js
+│   ├── orders.js
+│   ├── payments.js
+│   └── ratings.js
+├── middleware/
+│   └── auth.js
+├── test/
+│   ├── auth.test.js
+│   ├── users.test.js
+│   ├── products.test.js
+│   ├── orders.test.js
+│   ├── rating.test.js
+│   └── images.test.js
+├── Dockerfile
+├── docker-compose.yml
+├── .env.example
+└── index.js
+```
+
+---
+
+## 🔐 Autenticazione
+
+Autenticazione con JWT + autorizzazione a 3 livelli:
+- Cliente (`ruolo: 1`)
+- Artigiano (`ruolo: 2`)
+- Admin (`ruolo: 3`)
+
+Tutte le route protette richiedono il token nel header:
+
+```
+Authorization: Bearer <jwt_token>
+```
+
+---
+
+## 🧪 API Endpoints principali
+
+### Auth
+
+| Metodo | Endpoint               | Descrizione          |
+|--------|------------------------|----------------------|
+| POST   | `/api/users/register`  | Registrazione utente |
+| POST   | `/api/users/login`     | Login utente         |
+
+### Utenti
+
+| Metodo | Endpoint         | Descrizione                       |
+|--------|------------------|-----------------------------------|
+| GET    | `/api/users`     | Lista utenti (solo admin)        |
+| PATCH  | `/api/users/:id` | Aggiorna dati (self o admin)     |
+| PATCH  | `/api/users/:id/password` | Cambia password          |
+| PATCH  | `/api/users/:id/ban` | Admin banna utente            |
+| DELETE | `/api/users/:id` | Eliminazione soft del proprio utente |
+
+### Prodotti
+
+| Metodo | Endpoint              | Descrizione                         |
+|--------|-----------------------|-------------------------------------|
+| GET    | `/api/products`       | Lista prodotti                      |
+| POST   | `/api/products`       | Crea prodotto (artigiano)           |
+| PATCH  | `/api/products/:id`   | Modifica prodotto                   |
+| DELETE | `/api/products/:id`   | Elimina prodotto                    |
+| POST   | `/api/products/:id/images` | Aggiunge immagine (form-data) |
+| DELETE | `/api/products/:id/images/:imageId` | Elimina immagine        |
+
+### Ordini
+
+| Metodo | Endpoint           | Descrizione                        |
+|--------|--------------------|------------------------------------|
+| GET    | `/api/orders/carrello` | Stato del carrello             |
+| PATCH  | `/api/orders/carrello/:prodotto_id` | Modifica quantità |
+| DELETE | `/api/orders/carrello/:prodotto_id` | Rimuove prodotto     |
+| POST   | `/api/orders/checkout` | Effettua checkout (split)     |
+| GET    | `/api/orders/storico` | Storico ordini                  |
+| GET    | `/api/orders`       | Admin / Artigiano: ordini ricevuti |
+
+### Recensioni
+
+| Metodo | Endpoint             | Descrizione                     |
+|--------|----------------------|---------------------------------|
+| POST   | `/api/ratings/:order_id` | Lascia recensione ordine    |
+| GET    | `/api/ratings/prodotto/:id` | Visualizza recensioni prodotto |
+| GET    | `/api/ratings/artigiano/:id` | Visualizza recensioni artigiano |
+
+---
+
+## 📝 Note finali
+
+- Le immagini sono salvate come BLOB nel DB (`BYTEA`) e convertite in base64 alla risposta.
+- I test automatici includono reset + teardown completo del DB.
+- Il deploy è stato pensato per funzionare sia localmente che su VPS tramite Docker.
+
+---
+
+## ✨ Autori
+
+> Progetto sviluppato dal gruppo XYZ - Corso di Tecnologie Web 2025
