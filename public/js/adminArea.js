@@ -179,16 +179,18 @@ async function searchUsers() {
     tbody.innerHTML = '';
 
     users.forEach(u => {
+      const isBanned = u.is_banned;
+      const buttonClass = isBanned ? 'btn-danger' : 'btn-success';
+      const iconClass = isBanned ? 'fa-lock' : 'fa-lock-open';
+
       tbody.insertAdjacentHTML('beforeend', `
-        <tr data-id="${u.id}" data-banned="${u.is_banned}">
+        <tr data-id="${u.id}" data-banned="${isBanned}">
           <td>${u.nome_utente}</td>
           <td>${u.nome} ${u.cognome}</td>
           <td>${u.email}</td>
           <td>
-            <button class="btn btn-sm ${
-              u.is_banned ? 'btn-success' : 'btn-danger'
-            } toggle-ban-btn">
-              <i class="fas ${u.is_banned ? 'fa-lock-open' : 'fa-lock'}"></i>
+            <button class="btn btn-sm ${buttonClass} toggle-ban-btn">
+              <i class="fas ${iconClass}"></i>
             </button>
           </td>
         </tr>
@@ -199,7 +201,6 @@ async function searchUsers() {
     showToast('danger', 'Errore nella ricerca utenti');
   }
 }
-
 /* handler bottone Ban/Sban */
 async function toggleBan(btn) {
   const tr        = btn.closest('tr');
