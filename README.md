@@ -123,6 +123,11 @@ Tutte le route protette richiedono il token nel header:
 ```
 Authorization: Bearer <jwt_token>
 ```
+I tre ruoli hanno permessi diversi, ciascuno piò svolgere solo azioni specifiche:
+
+- Cliente: può registrarsi, loggarsi, vedere prodotti, gestire carrello e lasciare recensioni.
+- Artigiano: può modificare solo i propri prodotti e vedere gli ordini dei propri articoli.
+- Admin: ha accesso completo a utenti, ordini e può eliminare prodotti.
 
 ---
 
@@ -130,50 +135,66 @@ Authorization: Bearer <jwt_token>
 
 ### Auth
 
-| Metodo | Endpoint               | Descrizione          |
-|--------|------------------------|----------------------|
-| POST   | `/api/users/register`  | Registrazione utente |
-| POST   | `/api/users/login`     | Login utente         |
+| Metodo | Endpoint              | Descrizione          | Ruolo richiesto |
+| ------ | --------------------- | -------------------- | --------------- |
+| POST   | `/api/users/register` | Registrazione utente | Nessuno         |
+| POST   | `/api/users/login`    | Login utente         | Nessuno         |
 
 ### Utenti
 
-| Metodo | Endpoint         | Descrizione                       |
-|--------|------------------|-----------------------------------|
-| GET    | `/api/users`     | Lista utenti (solo admin)        |
-| PATCH  | `/api/users/:id` | Aggiorna dati (self o admin)     |
-| PATCH  | `/api/users/:id/password` | Cambia password          |
-| PATCH  | `/api/users/:id/ban` | Admin banna utente            |
-| DELETE | `/api/users/:id` | Eliminazione soft del proprio utente |
+| Metodo | Endpoint                  | Descrizione                       | Ruolo richiesto                     |
+| ------ | ------------------------- | --------------------------------- | ----------------------------------- |
+| GET    | `/api/users`              | Lista utenti                      | Admin (`3`)                         |
+| PATCH  | `/api/users/:id`          | Aggiorna dati personali           | Utente proprietario (`1`, `2`)      |
+| PATCH  | `/api/users/:id/password` | Cambia password                   | Utente proprietario (`1`, `2`)      |
+| PATCH  | `/api/users/:id/email`    | Cambia email                      | Utente proprietario (`1`, `2`)      |
+| PATCH  | `/api/users/:id/ban`      | Banna/sbanna utente               | Admin (`3`)                         |
+| DELETE | `/api/users/:id`          | Elimina (soft) proprio account    | Utente proprietario (`1`, `2`)      |
+| PATCH  | `/api/users/artisans/:id` | Modifica dati artigiano           | Artigiano proprietario (`2`)        |
+| DELETE | `/api/users/artisans/:id` | Disattiva artigiano (soft-delete) | Artigiano stesso o Admin (`2`, `3`) |
+| GET    | `/api/users/artisans/:id` | Profilo pubblico artigiano        | Nessuno                             |
+
 
 ### Prodotti
 
-| Metodo | Endpoint              | Descrizione                         |
-|--------|-----------------------|-------------------------------------|
-| GET    | `/api/products`       | Lista prodotti                      |
-| POST   | `/api/products`       | Crea prodotto (artigiano)           |
-| PATCH  | `/api/products/:id`   | Modifica prodotto                   |
-| DELETE | `/api/products/:id`   | Elimina prodotto                    |
-| POST   | `/api/products/:id/images` | Aggiunge immagine (form-data) |
-| DELETE | `/api/products/:id/images/:imageId` | Elimina immagine        |
+| Metodo | Endpoint                            | Descrizione                   | Ruolo richiesto              |
+| ------ | ----------------------------------- | ----------------------------- | ---------------------------- |
+| GET    | `/api/products`                     | Lista prodotti                | Nessuno                      |
+| POST   | `/api/products`                     | Crea prodotto                 | Artigiano (`2`)              |
+| PATCH  | `/api/products/:id`                 | Modifica prodotto             | Artigiano proprietario (`2`) |
+| DELETE | `/api/products/:id`                 | Elimina prodotto              | Artigiano proprietario (`2`) |
+| POST   | `/api/products/:id/images`          | Aggiunge immagine al prodotto | Artigiano proprietario (`2`) |
+| DELETE | `/api/products/:id/images/:imageId` | Elimina immagine              | Artigiano proprietario (`2`) |
+
 
 ### Ordini
 
-| Metodo | Endpoint           | Descrizione                        |
-|--------|--------------------|------------------------------------|
-| GET    | `/api/orders/carrello` | Stato del carrello             |
-| PATCH  | `/api/orders/carrello/:prodotto_id` | Modifica quantità |
-| DELETE | `/api/orders/carrello/:prodotto_id` | Rimuove prodotto     |
-| POST   | `/api/orders/checkout` | Effettua checkout (split)     |
-| GET    | `/api/orders/storico` | Storico ordini                  |
-| GET    | `/api/orders`       | Admin / Artigiano: ordini ricevuti |
+| Metodo | Endpoint                            | Descrizione                     | Ruolo richiesto               |
+| ------ | ----------------------------------- | ------------------------------- | ----------------------------- |
+| GET    | `/api/orders/carrello`              | Stato attuale del carrello      | Cliente (`1`)                 |
+| PATCH  | `/api/orders/carrello/:prodotto_id` | Modifica quantità prodotto      | Cliente (`1`)                 |
+| DELETE | `/api/orders/carrello/:prodotto_id` | Rimuove prodotto dal carrello   | Cliente (`1`)                 |
+| POST   | `/api/orders/checkout`              | Effettua il checkout            | Cliente (`1`)                 |
+| GET    | `/api/orders/storico`               | Storico degli ordini effettuati | Cliente (`1`)                 |
+| GET    | `/api/orders`                       | Ordini ricevuti                 | Artigiano (`2`) / Admin (`3`) |
 
 ### Recensioni
 
-| Metodo | Endpoint             | Descrizione                     |
-|--------|----------------------|---------------------------------|
-| POST   | `/api/ratings/:order_id` | Lascia recensione ordine    |
-| GET    | `/api/ratings/prodotto/:id` | Visualizza recensioni prodotto |
-| GET    | `/api/ratings/artigiano/:id` | Visualizza recensioni artigiano |
+| Metodo | Endpoint                     | Descrizione                           | Ruolo richiesto |
+| ------ | ---------------------------- | ------------------------------------- | --------------- |
+| POST   | `/api/ratings/:order_id`     | Lascia recensione per ordine          | Cliente (`1`)   |
+| GET    | `/api/ratings/prodotto/:id`  | Visualizza recensioni di un prodotto  | Nessuno         |
+| GET    | `/api/ratings/artigiano/:id` | Visualizza recensioni di un artigiano | Nessuno         |
+
+## Segnalazioni
+
+| Metodo | Endpoint                 | Descrizione                          | Ruolo richiesto |
+| ------ | ------------------------ | ------------------------------------ | --------------- |
+| POST   | `/api/report/:ordine_id` | Invia una segnalazione su un ordine  | Cliente (`1`)   |
+| GET    | `/api/report/cliente`    | Lista segnalazioni inviate           | Cliente (`1`)   |
+| DELETE | `/api/report/:id`        | Cancella segnalazione propria        | Cliente (`1`)   |
+| PATCH  | `/api/report/:id/close`  | Chiude segnalazione (gestione admin) | Admin (`3`)     |
+| GET    | `/api/report/`           | Visualizza tutte le segnalazioni     | Admin (`3`)     |
 
 ---
 
