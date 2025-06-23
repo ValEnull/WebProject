@@ -102,33 +102,65 @@ function attachHandlers(card) {
   const price    = parseFloat(card.querySelector(".price").textContent);
   let   lastQty  = +qtyInput.value;
 
+   /* ───── 1. recupera lo stock rimasto e imposta il limite ───── */
+  let maxStock = Infinity;                    // limite iniziale
+  (async () => {
+    try {
+      const prod = await fetchJSON(`/api/products/${card.dataset.id}`);
+      const remaining = +prod.quant || +prod.stock || Infinity; // ← adatta se il campo si chiama diversamente
+      maxStock  = remaining + lastQty;          //  pezzi liberi  +   già presenti nel carrello
+      qtyInput.max = maxStock;                  // HTML5: le frecce non superano il limite
+
+      // se l’utente aveva già più pezzi di quelli ora disponibili
+      if (+qtyInput.value > maxStock) {
+        qtyInput.value = maxStock;
+        card.querySelector(".item-total").textContent = (price * maxStock).toFixed(2);
+        updateCartTotal();
+      }
+    } catch (err) {
+      console.warn("Impossibile leggere stock:", err);
+    }
+  })();
+
   /* PATCH al server con debounce 600 ms */
   let timer = null;
+
   qtyInput.addEventListener("input", () => {
-    const v = Math.max(1, +qtyInput.value || 1);
+    let v = +qtyInput.value || 1;
+    if (v < 1) v = 1;
+    if (v > maxStock) {                       // oltre lo stock? blocca
+      v = maxStock;
+      alert("Quantità massima disponibile raggiunta"); // puoi sostituire con showToast()
+    }
     qtyInput.value = v;
+
+
     card.querySelector(".item-total").textContent = (price * v).toFixed(2);
     updateCartTotal();
 
     clearTimeout(timer);
-    timer = setTimeout(async () => {
-      if (v === lastQty) return;   // niente da fare
-      try {
-        await fetchJSON(`/api/orders/carrello/${card.dataset.id}`, {
-          method: "PATCH",
-          body: JSON.stringify({ quantita: v })
-        });
-        lastQty = v;               // ok
-      } catch (err) {
-        alert(err.message.includes("400")
-          ? "Quantità non disponibile."
-          : "Errore aggiornamento carrello.");
-        qtyInput.value = lastQty;  // ripristina
-        card.querySelector(".item-total").textContent = (price * lastQty).toFixed(2);
-        updateCartTotal();
-      }
-    }, 600);
+    timer = setTimeout(patchQty, 600); 
   });
+
+    async function patchQty() {
+    const v = +qtyInput.value;
+    if (v === lastQty) return;
+
+    try {
+      await fetchJSON(`/api/orders/carrello/${card.dataset.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ quantita: v })
+      });
+      lastQty = v;                             // ok, aggiornato
+    } catch (err) {
+      alert(err.message.includes("400")
+        ? "Quantità non disponibile."
+        : "Errore aggiornamento carrello.");
+      qtyInput.value = lastQty;                // ripristina valore valido
+      card.querySelector(".item-total").textContent = (price * lastQty).toFixed(2);
+      updateCartTotal();
+    }
+  }
 
   /* rimozione prodotto */
   card.querySelector(".remove-btn").addEventListener("click", async () => {
