@@ -1,3 +1,9 @@
+# Componenti del gruppo
+- 757634 Colombo Gianluca
+- 757591 Gazziero Valerio Paolo
+- 749176 Maspero Federico
+- 758939 Salvini Alessandro
+
 # SaleCraft - E-commerce Platform
 
 SaleCraft è una piattaforma e-commerce che connette acquirenti con artigiani e piccole aziende, offrendo prodotti unici e sostenibili.
